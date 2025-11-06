@@ -484,24 +484,33 @@ class VehicleController extends Controller {
             
             fclose($output);
         } elseif ($format === 'pdf') {
-            // Produce a simple PDF summary using core/PdfExporter (ASCII-safe)
+            // Generate PDF with vehicle list
             require_once __DIR__ . '/../../../core/pdf_exporter.php';
+            
             $lines = [];
-            $lines[] = 'Lista vehicule';
+            $lines[] = 'LISTA VEHICULE';
+            $lines[] = 'Generat: ' . date('d.m.Y H:i');
             $lines[] = '';
+            $lines[] = 'Nr.Inm. | Marca Model | An | Tip | Status | Km';
+            $lines[] = str_repeat('-', 80);
+            
             foreach ($vehicles as $v) {
-                $row = [
-                    $this->translit($v['registration_number'] ?? ''),
-                    $this->translit(($v['brand'] ?? '') . ' ' . ($v['model'] ?? '')),
-                    (string)($v['year'] ?? ''),
-                    $this->translit($v['vehicle_type_name'] ?? ''),
-                    $this->translit($v['status'] ?? ''),
-                ];
-                $lines[] = implode(' | ', $row);
+                $reg = $this->translit($v['registration_number'] ?? '');
+                $brand = $this->translit(($v['brand'] ?? '') . ' ' . ($v['model'] ?? ''));
+                $year = $v['year'] ?? '';
+                $type = $this->translit($v['vehicle_type_name'] ?? '');
+                $status = $this->translit($v['status'] ?? '');
+                $km = number_format($v['current_mileage'] ?? 0, 0, ',', '.');
+                
+                $lines[] = "$reg | $brand | $year | $type | $status | $km km";
             }
+            
+            $lines[] = '';
+            $lines[] = 'Total vehicule: ' . count($vehicles);
+            
             $pdf = new PdfExporter();
-            // Use emitSimplePdf-like output through a public method: reuse vehicle report stub
-            $pdf->outputVehicleReport(['vehicles' => $vehicles], date('Y-m-d'), date('Y-m-d'), 'vehicule_' . date('Ymd'));
+            $pdf->emitSimplePdf($lines, 'vehicule_' . date('Ymd'), 'P');
+            exit;
         } else {
             // Pentru JSON sau alte formate
             $this->json($vehicles);

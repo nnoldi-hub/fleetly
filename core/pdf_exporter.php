@@ -20,7 +20,7 @@ class PdfExporter {
         return preg_replace("/[\r\n]+/", ' ', $s);
     }
 
-    private function emitSimplePdf(array $lines, string $filename, string $orientation = 'P') {
+    public function emitSimplePdf(array $lines, string $filename, string $orientation = 'P') {
         // Page size A4 in points
         $w = 595; $h = 842; // portrait
         if (strtoupper($orientation) === 'L') { [$w,$h] = [$h,$w]; }

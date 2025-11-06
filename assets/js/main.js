@@ -1,26 +1,45 @@
 // assets/js/main.js - JavaScript principal
 document.addEventListener('DOMContentLoaded', function() {
-    // Inițializare componente Bootstrap
-    initializeBootstrapComponents();
+    console.log('Main.js: DOMContentLoaded started');
     
-    // Inițializare DataTables pentru toate tabelele
-    initializeDataTables();
+    // Inițializare componente Bootstrap
+    try {
+        initializeBootstrapComponents();
+        console.log('Bootstrap components initialized');
+    } catch (e) {
+        console.error('Error initializing Bootstrap:', e);
+    }
+    
+    // Inițializare DataTables pentru toate tabelele (temporar dezactivat pentru debugging)
+    // initializeDataTables();
     
     // Inițializare validări forme
-    initializeFormValidation();
+    try {
+        initializeFormValidation();
+        console.log('Form validation initialized');
+    } catch (e) {
+        console.error('Error initializing form validation:', e);
+    }
     
-    // Inițializare notificări
-    initializeNotifications();
+    // Inițializare notificări (temporar dezactivat pentru debugging)
+    // initializeNotifications();
     
     // Event listeners globali
-    setupGlobalEventListeners();
+    try {
+        setupGlobalEventListeners();
+        console.log('Global event listeners setup');
+    } catch (e) {
+        console.error('Error setting up event listeners:', e);
+    }
 
     // Aplică temă pentru Chart.js dacă este disponibil
     const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
     try { applyChartTheme(currentTheme); } catch (e) { /* noop */ }
 
-    // Elimină diacriticele din UI (preferință globală)
-    try { if (window.FleetManagement && window.FleetManagement.noDiacritics !== false) removeDiacriticsFromPage(); } catch (e) { /* noop */ }
+    // Elimină diacriticele din UI (temporar dezactivat pentru debugging)
+    // try { if (window.FleetManagement && window.FleetManagement.noDiacritics !== false) removeDiacriticsFromPage(); } catch (e) { /* noop */ }
+    
+    console.log('Main.js: DOMContentLoaded completed');
 });
 
 function initializeBootstrapComponents() {

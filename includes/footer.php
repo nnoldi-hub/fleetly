@@ -124,7 +124,8 @@
         })();
 
         document.addEventListener('DOMContentLoaded', function() {
-            loadNotifications();
+            // Temporar dezactivat pentru debugging
+            // loadNotifications();
             
             // Reinițializare componente Bootstrap după încărcarea paginii
             if (window.FleetManagement && window.FleetManagement.reinitialize) {
@@ -133,8 +134,8 @@
                 }, 100);
             }
             
-            // Reîncarcă notificările la fiecare 5 minute
-            setInterval(loadNotifications, 300000);
+            // Reîncarcă notificările la fiecare 5 minute (temporar dezactivat)
+            // setInterval(loadNotifications, 300000);
         });
         
         // Reinițializare componente când se navighează prin aplicație
