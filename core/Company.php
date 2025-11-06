@@ -47,7 +47,6 @@ class Company extends Model {
                     $stmt2->execute(['cid' => $companyId]);
                     $user = $stmt2->fetch(PDO::FETCH_ASSOC);
                 } catch (Throwable $inner) {
-                    error_log('[Company::resetAdminAccount] roles join lookup failed: ' . $inner->getMessage());
                 }
             }
 
@@ -58,7 +57,6 @@ class Company extends Model {
                     $stmt->execute(['cid' => $companyId]);
                     $user = $stmt->fetch(PDO::FETCH_ASSOC);
                 } catch (Throwable $e) {
-                    error_log('[Company::resetAdminAccount] enum role lookup failed: ' . $e->getMessage());
                 }
             }
 
@@ -134,7 +132,6 @@ class Company extends Model {
                         'password' => $plain,
                     ];
                 } catch (Throwable $ce) {
-                    error_log('[Company::resetAdminAccount] failed to auto-create admin: ' . $ce->getMessage());
                     return ['success' => false, 'message' => 'Nu a fost găsit contul admin și nu s-a putut crea automat.'];
                 }
             }
@@ -194,7 +191,6 @@ class Company extends Model {
                 'password' => $plain,
             ];
         } catch (Throwable $e) {
-            error_log('[Company::resetAdminAccount] ' . $e->getMessage());
             return ['success' => false, 'message' => 'Eroare la resetarea contului admin.'];
         }
     }
@@ -238,7 +234,6 @@ class Company extends Model {
             $stmt->execute($params);
             return $stmt->fetchAll(PDO::FETCH_OBJ);
         } catch (Throwable $e) {
-            error_log('[Company::getAll] ' . $e->getMessage());
             return [];
         }
     }
@@ -270,7 +265,6 @@ class Company extends Model {
             $company->vehicles_count = 0;
             return $company;
         } catch (Throwable $e) {
-            error_log('[Company::getById] ' . $e->getMessage());
             return null;
         }
     }
@@ -341,7 +335,6 @@ class Company extends Model {
             try {
                 Database::getInstance()->setTenantDatabaseByCompanyId($companyId);
             } catch (Throwable $e) {
-                error_log('[Company::create] Failed to initialize tenant DB for company ' . $companyId . ' | ' . $e->getMessage());
             }
 
             // Log audit
@@ -363,7 +356,6 @@ class Company extends Model {
             
         } catch (Exception $e) {
             $this->conn->rollBack();
-            error_log("Company creation error: " . $e->getMessage());
             return ['success' => false, 'message' => 'Eroare la crearea companiei'];
         }
     }
@@ -413,7 +405,6 @@ class Company extends Model {
             return ['success' => true];
             
         } catch (Exception $e) {
-            error_log("Company update error: " . $e->getMessage());
             return ['success' => false, 'message' => 'Eroare la actualizarea companiei'];
         }
     }
@@ -442,8 +433,7 @@ class Company extends Model {
             return ['success' => true];
             
         } catch (Exception $e) {
-            error_log("Company deletion error: " . $e->getMessage());
-            return ['success' => false, 'message' => 'Eroare la È™tergerea companiei'];
+            return ['success' => false, 'message' => 'Eroare la ștergerea companiei'];
         }
     }
     

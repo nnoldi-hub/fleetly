@@ -12,16 +12,10 @@ class LoginController extends Controller {
             return;
         }
         
-        // Debug: check output buffer
-        error_log('Output buffer level before clean: ' . ob_get_level());
-        error_log('Output buffer contents length: ' . strlen(ob_get_contents()));
-        
         // Clear any output buffer and render standalone login page
         while (ob_get_level()) {
             ob_end_clean();
         }
-        
-        error_log('Output buffer level after clean: ' . ob_get_level());
         
         $viewPath = __DIR__ . '/../views/login.php';
         if (file_exists($viewPath)) {
@@ -37,10 +31,6 @@ class LoginController extends Controller {
      * Process login
      */
     public function login() {
-        // Debug: log the request
-        error_log('Login POST received: ' . print_r($_POST, true));
-        error_log('Request method: ' . $_SERVER['REQUEST_METHOD']);
-        
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $this->redirect('/login');
             return;
@@ -50,11 +40,7 @@ class LoginController extends Controller {
         $password = $_POST['password'] ?? '';
         $rememberMe = isset($_POST['remember_me']);
         
-        error_log("Attempting login for: $username");
-        
         $result = Auth::getInstance()->login($username, $password, $rememberMe);
-        
-        error_log('Login result: ' . print_r($result, true));
         
         if ($result['success']) {
             // Redirect based on role
@@ -69,7 +55,6 @@ class LoginController extends Controller {
                         Database::getInstance()->setTenantDatabaseByCompanyId($user->company_id);
                     }
                 } catch (Throwable $e) {
-                    error_log('LoginController: failed to select tenant DB for company ' . ($user->company_id ?? 'null') . ' | ' . $e->getMessage());
                 }
                 $this->redirect('/dashboard');
             }

@@ -36,7 +36,6 @@ class Database {
             $stmt->execute($params);
             return $stmt;
         } catch (PDOException $e) {
-            error_log('DB QUERY ERROR: ' . $e->getMessage() . ' | SQL: ' . $sql . ' | Params: ' . print_r($params,true));
             throw $e;
         }
     }
@@ -285,7 +284,6 @@ class Database {
                 ('Generator/Compresor', 'equipment', 'Echipamente auxiliare')");
             }
         } catch (Throwable $e) {
-            error_log('Tenant schema seed error: ' . $e->getMessage());
         }
     }
 
@@ -305,7 +303,6 @@ class Database {
             $stmt->execute($params);
             return $stmt;
         } catch (PDOException $e) {
-            error_log('DB QUERY ERROR (table ' . $table . '): ' . $e->getMessage() . ' | SQL: ' . $sql . ' | Params: ' . print_r($params,true));
             throw $e;
         }
     }

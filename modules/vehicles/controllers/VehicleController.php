@@ -1,8 +1,4 @@
 <?php
-// DEBUG: Activează afișarea erorilor
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
 class VehicleController extends Controller {
     private $vehicleModel;
@@ -72,7 +68,6 @@ class VehicleController extends Controller {
     }
     
     public function add() {
-        error_log('VehicleController::add called, method=' . ($_SERVER['REQUEST_METHOD'] ?? 'UNKNOWN'));
         $viewErrors = [];
         $viewFormData = [];
         // Plan limit check (both GET and POST)
@@ -94,7 +89,6 @@ class VehicleController extends Controller {
                 $this->render('add', [ 'vehicleTypes' => $vehicleTypes, 'errors' => $viewErrors, 'formData' => $_POST, 'limitReached' => true, 'maxVehicles'=>$maxVehicles, 'usedVehicles'=>$usedVehicles ]);
                 return;
             }
-            error_log('POST data: ' . print_r($_POST, true));
             $data = [
                 'registration_number' => $_POST['registration_number'] ?? '',
                 'vin_number' => $_POST['vin_number'] ?? '',
@@ -156,7 +150,6 @@ class VehicleController extends Controller {
             ];
             
             $errors = $this->validateInput($data, $validationRules);
-            error_log('Validation errors: ' . print_r($errors, true));
             // Asigură existența tipului de vehicul
             if (empty($errors) && $data['vehicle_type_id'] > 0) {
                 $vt = $this->vehicleTypeModel->find($data['vehicle_type_id']);
@@ -166,20 +159,16 @@ class VehicleController extends Controller {
             }
             if (empty($errors)) {
                 try {
-                    error_log('Attempting DB insert: ' . print_r($data, true));
                     // Încearcă să creeze vehiculul
                     $vehicleId = $this->vehicleModel->create($data);
-                    error_log('DB insert result: ' . $vehicleId);
                     if ($vehicleId) {
                         $_SESSION['success'] = 'Vehiculul a fost adăugat cu succes!';
                         header('Location: ' . BASE_URL . 'vehicles');
                         exit;
                     } else {
                         $errors['general'] = 'Inserarea a eșuat (ID nul).';
-                        error_log('Insert failed: ID nul');
                     }
                 } catch (Exception $e) {
-                    error_log('Exception: ' . $e->getMessage());
                     $errors['general'] = 'Eroare la salvare: ' . $e->getMessage();
                 }
             }
@@ -188,7 +177,7 @@ class VehicleController extends Controller {
                 $viewFormData = $_POST;
             }
         }
-        try { $vehicleTypes = $this->vehicleTypeModel->findAll(); } catch (Exception $e) { error_log('Error fetching vehicle types: ' . $e->getMessage()); $vehicleTypes = []; }
+        try { $vehicleTypes = $this->vehicleTypeModel->findAll(); } catch (Exception $e) { $vehicleTypes = []; }
         $this->render('add', [ 'vehicleTypes' => $vehicleTypes, 'errors' => $viewErrors, 'formData' => $viewFormData, 'limitReached' => $limitReached ?? false, 'maxVehicles'=>$maxVehicles ?? 0, 'usedVehicles'=>$usedVehicles ?? 0 ]);
     }
     
@@ -270,7 +259,6 @@ class VehicleController extends Controller {
                 exit;
             }
         } catch (Exception $e) {
-            error_log('VehicleController::store() Exception: ' . $e->getMessage());
             $_SESSION['errors'] = ['Eroare: ' . $e->getMessage()];
             $_SESSION['form_data'] = $_POST;
             header('Location: ' . BASE_URL . 'vehicles/add');

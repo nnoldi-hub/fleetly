@@ -143,7 +143,6 @@ class User extends Model {
             ];
             
         } catch (Exception $e) {
-            error_log("User creation error: " . $e->getMessage());
             return ['success' => false, 'message' => 'Eroare la crearea utilizatorului'];
         }
     }
@@ -216,7 +215,6 @@ class User extends Model {
             return ['success' => true];
             
         } catch (Exception $e) {
-            error_log("User update error: " . $e->getMessage());
             return ['success' => false, 'message' => 'Eroare la actualizarea utilizatorului'];
         }
     }
@@ -245,7 +243,6 @@ class User extends Model {
             return ['success' => true];
             
         } catch (Exception $e) {
-            error_log("User deletion error: " . $e->getMessage());
             return ['success' => false, 'message' => 'Eroare la ștergerea utilizatorului'];
         }
     }

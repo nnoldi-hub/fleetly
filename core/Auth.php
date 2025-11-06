@@ -137,7 +137,6 @@ class Auth {
             return ['success' => true, 'message' => 'Autentificare reușită', 'user' => $this->user];
             
         } catch (Exception $e) {
-            error_log("Login error: " . $e->getMessage());
             return ['success' => false, 'message' => 'Eroare la autentificare'];
         }
     }
@@ -341,7 +340,6 @@ class Auth {
                 $_SERVER['HTTP_USER_AGENT'] ?? null
             ]);
         } catch (Exception $e) {
-            error_log("Audit log error: " . $e->getMessage());
         }
     }
     

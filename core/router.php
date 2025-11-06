@@ -15,11 +15,6 @@ class Router {
         $normMethod = strtoupper($method);
         $normUri = $this->normalizePath($uri);
         
-        // Debug temporar
-        error_log('[Router DEBUG] Original URI: ' . $uri);
-        error_log('[Router DEBUG] Normalized URI: ' . $normUri);
-        error_log('[Router DEBUG] Method: ' . $normMethod);
-        
         foreach ($this->routes as $route) {
             if ($route['method'] === $normMethod && $this->matchPath($route['path'], $normUri)) {
                 $controllerClass = $route['controller'];
@@ -29,17 +24,12 @@ class Router {
                     $controller = new $controllerClass();
                     if (method_exists($controller, $action)) {
                         return $controller->$action();
-                    } else {
-                        error_log('[Router] Method not found: ' . $controllerClass . '::' . $action . '()');
                     }
-                } else {
-                    error_log('[Router] Controller not found: ' . $controllerClass);
                 }
             }
         }
         
         // 404
-        error_log('[Router] No route matched: ' . $normMethod . ' ' . $normUri);
         http_response_code(404);
         // Try to include header/footer using filesystem path to avoid relative include issues
         $hdr = __DIR__ . '/../includes/header.php';

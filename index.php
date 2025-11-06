@@ -181,11 +181,6 @@ $router->addRoute('GET', '/superadmin/stop-acting', 'SuperAdminController', 'sto
 // API proxy routes (for footer notifications JSON)
 $router->addRoute('GET', '/api/notifications', 'ApiController', 'notifications');
 
-// Debug: confirm superadmin routes registered
-if (function_exists('error_log')) {
-    error_log('[Bootstrap] SuperAdmin routes registered');
-}
-
 // Rute notificări
 $router->addRoute('GET', '/notifications', 'NotificationController', 'index');
 $router->addRoute('POST', '/notifications/dismiss', 'NotificationController', 'dismiss');

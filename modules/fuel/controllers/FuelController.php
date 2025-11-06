@@ -402,7 +402,6 @@ class FuelController extends Controller {
                 ];
             }
         } catch (\Throwable $e) {
-            error_log('[FuelController::reports] ERROR: ' . $e->getMessage());
             // Safe defaults to avoid 500/404 and still show the page
             $reports = [
                 'vehicle_consumption' => [],

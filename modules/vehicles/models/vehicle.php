@@ -95,17 +95,13 @@ class Vehicle extends Model {
                     throw new Exception("Missing required field: $req");
                 }
             }
-            error_log('VehicleModel::create() data(filtered): ' . print_r($filtered, true));
             $columns = array_keys($filtered);
             $placeholders = array_fill(0, count($columns), '?');
             $sql = "INSERT INTO {$this->table} (" . implode(', ', $columns) . ") VALUES (" . implode(', ', $placeholders) . ")";
-            error_log('VehicleModel::create() SQL: ' . $sql);
             $stmt = $this->db->queryOn($this->table, $sql, array_values($filtered));
             $id = $this->db->lastInsertIdOn($this->table);
-            error_log('VehicleModel::create() inserted ID: ' . $id);
             return (int)$id;
         } catch (Exception $e) {
-            error_log('VehicleModel::create() ERROR: ' . $e->getMessage());
             throw $e;
         }
     }

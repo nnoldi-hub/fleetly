@@ -222,3 +222,77 @@ A lightweight PHP MVC fleet management app with reports and notifications.
 - Uses Bootstrap 5.3 and Chart.js with theme-aware colors
 - Router is BASE_URL aware; frontend JS reads `window.BASE_URL`
 - If you deploy in a subfolder, the app should still work thanks to BASE_URL-safe links
+
+---
+
+## Deployment (Hosting Production)
+
+### Pregatire locala
+
+1. **Verificare finala:**
+   - Testati local toate module critice (login, vehicule, documente, export CSV/PDF).
+   - Composer: `composer install --no-dev` (exclude PHPUnit pentru productie).
+
+2. **Configurare credentiale:**
+   - Copiati `config/database.example.php` → `config/database.php` cu datele DB production.
+   - Copiati `config/mail.example.php` → `config/mail.php` cu SMTP production (sau `enabled=false`).
+   - Editati `config/config.php`: setati `BASE_URL` la domeniul production (ex: `https://yourdomain.com/`).
+
+3. **Excluderi upload:**
+   - `.gitignore` exclude automat `vendor/`, `config/database.php`, `config/mail.php`, `logs/`, `uploads/**`.
+   - Pastrati `.gitkeep` in `logs/` si `uploads/*/` pentru structura.
+
+### Upload pe Hostico (sau alt shared hosting)
+
+1. **Transfer fisiere:**
+   - Incarcati toate fisierele (inclusiv `.htaccess`) in `public_html/` sau root web.
+   - **NU** incarcati `vendor/` (regenerat pe server cu Composer).
+
+2. **Composer pe server:**
+   ```bash
+   cd /path/to/project
+   composer install --no-dev --optimize-autoloader
+   ```
+   - Daca hosting-ul nu are Composer, rulati local `composer install --no-dev` si incarcati manual `vendor/` (nu recomandat).
+
+3. **Permisiuni fisiere:**
+   ```bash
+   chmod -R 755 .
+   chmod -R 775 uploads logs
+   chown -R www-data:www-data uploads logs  # sau user Apache/Nginx
+   ```
+
+4. **Baza de date:**
+   - In cPanel/PHPMyAdmin, creati DB-ul core (ex: `fleet_management`).
+   - Importati `sql/schema.sql`.
+   - (Optional) Importati `sql/sample_data.sql` pentru date demo.
+   - Completati credentialele in `config/database.php`.
+
+5. **Testare acces:**
+   - Vizitati `https://yourdomain.com/index.php` → pagina login.
+   - Logati-va cu SuperAdmin sau admin companie.
+   - Verificati module: vehicule, export, notificari.
+
+6. **SSL si siguranta:**
+   - Activati certificat SSL (Let's Encrypt gratuit pe majoritatea hosting-urilor).
+   - Actualizati `BASE_URL` in `config/config.php` la `https://`.
+   - (Optional) Fortati HTTPS in `.htaccess`:
+     ```apache
+     RewriteEngine On
+     RewriteCond %{HTTPS} off
+     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+     ```
+
+7. **Backup automat:**
+   - Configurati cron job zilnic pentru backup DB + `uploads/`:
+     ```bash
+     0 2 * * * cd /path/to/project && php scripts/backup.php >> logs/backup.log 2>&1
+     ```
+
+8. **Monitorizare:**
+   - Verificati `logs/mail.log` pentru emailuri.
+   - Configurati alertari email la erori PHP (optional).
+
+---
+
+Pentru suport tehnic sau intrebari despre deployment, consultati documentatia Hostico.

@@ -37,8 +37,6 @@ class SuperAdminController extends Controller {
             die('Acces interzis');
         }
 
-        error_log('[SuperAdmin] companies() invoked');
-
         $filters = [
             'status' => $_GET['status'] ?? null,
             'subscription_type' => $_GET['subscription_type'] ?? null,
@@ -49,7 +47,6 @@ class SuperAdminController extends Controller {
             $companyModel = new Company();
             $companies = $companyModel->getAll($filters);
         } catch (Throwable $e) {
-            error_log('[SuperAdmin] companies() error: ' . $e->getMessage());
             $_SESSION['error'] = 'Eroare la încărcarea companiilor.';
             $companies = [];
         }
@@ -119,8 +116,6 @@ class SuperAdminController extends Controller {
             die('Acces interzis');
         }
 
-        error_log('[SuperAdmin] edit() invoked with id=' . ($_GET['id'] ?? 'null'));
-
         $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
         if ($id <= 0) {
             $_SESSION['error'] = 'ID companie invalid.';
@@ -131,7 +126,6 @@ class SuperAdminController extends Controller {
         try {
             $company = $companyModel->getById($id);
         } catch (Throwable $e) {
-            error_log('[SuperAdmin] edit() getById error: ' . $e->getMessage());
             $company = null;
         }
         if (!$company) {
@@ -247,7 +241,7 @@ class SuperAdminController extends Controller {
                     }
                 }
             } catch (\Throwable $e) {
-                error_log('[SuperAdmin] resetAdmin email error: ' . $e->getMessage());
+                // Silent fail email
             }
 
             $_SESSION['success'] = $msg;
