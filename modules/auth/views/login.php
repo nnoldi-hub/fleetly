@@ -75,6 +75,11 @@
                     </div>
                     <button type="submit" class="btn btn-login text-white">Autentificare</button>
                 </form>
+                <div class="text-center mt-4">
+                    <small class="text-muted">
+                        Created by <a href="https://conectica-it.ro" target="_blank" class="text-decoration-none">conectica-it.ro</a>
+                    </small>
+                </div>
             </div>
         </div>
     </div>

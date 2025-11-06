@@ -4,10 +4,15 @@
     <footer class="bg-light py-4 mt-auto">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <p class="mb-0">&copy; <?= date('Y') ?> <?= APP_NAME ?> v<?= APP_VERSION ?></p>
                 </div>
-                <div class="col-md-6 text-end">
+                <div class="col-md-4 text-center">
+                    <small class="text-muted">
+                        Created by <a href="https://conectica-it.ro" target="_blank" class="text-decoration-none">conectica-it.ro</a>
+                    </small>
+                </div>
+                <div class="col-md-4 text-end">
                     <small class="text-muted">
                         Ultima actualizare: <?= date('d.m.Y H:i') ?>
                     </small>
