@@ -451,6 +451,11 @@ class VehicleController extends Controller {
     }
     
     public function export() {
+        // Clean any output buffers before PDF generation
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        
         $format = $_GET['format'] ?? 'csv';
         $vehicles = $this->vehicleModel->getAllWithType();
         
@@ -484,16 +489,52 @@ class VehicleController extends Controller {
             
             fclose($output);
         } elseif ($format === 'pdf') {
-            // Generate PDF with vehicle list
-            require_once __DIR__ . '/../../../core/pdf_exporter.php';
+            // Generate PDF using TCPDF
+            require_once __DIR__ . '/../../../core/vendor/tcpdf_min/tcpdf.php';
             
-            $lines = [];
-            $lines[] = 'LISTA VEHICULE';
-            $lines[] = 'Generat: ' . date('d.m.Y H:i');
-            $lines[] = '';
-            $lines[] = 'Nr.Inm. | Marca Model | An | Tip | Status | Km';
-            $lines[] = str_repeat('-', 80);
+            $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
             
+            // Document info
+            $pdf->SetCreator('Fleet Management System');
+            $pdf->SetAuthor('Fleet Management');
+            $pdf->SetTitle('Lista Vehicule');
+            
+            // Remove header/footer
+            $pdf->setPrintHeader(false);
+            $pdf->setPrintFooter(false);
+            
+            // Set margins
+            $pdf->SetMargins(15, 15, 15);
+            $pdf->SetAutoPageBreak(true, 15);
+            
+            // Add page
+            $pdf->AddPage();
+            
+            // Set font
+            $pdf->SetFont('helvetica', 'B', 16);
+            $pdf->Cell(0, 10, 'LISTA VEHICULE', 0, 1, 'C');
+            
+            $pdf->SetFont('helvetica', '', 10);
+            $pdf->Cell(0, 5, 'Generat: ' . date('d.m.Y H:i'), 0, 1, 'C');
+            $pdf->Ln(5);
+            
+            // Table header
+            $pdf->SetFont('helvetica', 'B', 9);
+            $pdf->SetFillColor(52, 58, 64);
+            $pdf->SetTextColor(255, 255, 255);
+            $pdf->Cell(30, 7, 'Nr. Inm.', 1, 0, 'C', true);
+            $pdf->Cell(40, 7, 'Marca Model', 1, 0, 'C', true);
+            $pdf->Cell(15, 7, 'An', 1, 0, 'C', true);
+            $pdf->Cell(40, 7, 'Tip', 1, 0, 'C', true);
+            $pdf->Cell(25, 7, 'Status', 1, 0, 'C', true);
+            $pdf->Cell(30, 7, 'Kilometraj', 1, 1, 'C', true);
+            
+            // Table rows
+            $pdf->SetFont('helvetica', '', 8);
+            $pdf->SetTextColor(0, 0, 0);
+            $pdf->SetFillColor(248, 249, 250);
+            
+            $fill = false;
             foreach ($vehicles as $v) {
                 $reg = $this->translit($v['registration_number'] ?? '');
                 $brand = $this->translit(($v['brand'] ?? '') . ' ' . ($v['model'] ?? ''));
@@ -502,14 +543,23 @@ class VehicleController extends Controller {
                 $status = $this->translit($v['status'] ?? '');
                 $km = number_format($v['current_mileage'] ?? 0, 0, ',', '.');
                 
-                $lines[] = "$reg | $brand | $year | $type | $status | $km km";
+                $pdf->Cell(30, 6, $reg, 1, 0, 'L', $fill);
+                $pdf->Cell(40, 6, substr($brand, 0, 25), 1, 0, 'L', $fill);
+                $pdf->Cell(15, 6, $year, 1, 0, 'C', $fill);
+                $pdf->Cell(40, 6, substr($type, 0, 25), 1, 0, 'L', $fill);
+                $pdf->Cell(25, 6, $status, 1, 0, 'C', $fill);
+                $pdf->Cell(30, 6, $km . ' km', 1, 1, 'R', $fill);
+                
+                $fill = !$fill;
             }
             
-            $lines[] = '';
-            $lines[] = 'Total vehicule: ' . count($vehicles);
+            // Footer
+            $pdf->Ln(5);
+            $pdf->SetFont('helvetica', 'B', 10);
+            $pdf->Cell(0, 7, 'Total vehicule: ' . count($vehicles), 0, 1, 'L');
             
-            $pdf = new PdfExporter();
-            $pdf->emitSimplePdf($lines, 'vehicule_' . date('Ymd'), 'P');
+            // Output
+            $pdf->Output('vehicule_' . date('Ymd') . '.pdf', 'D');
             exit;
         } else {
             // Pentru JSON sau alte formate
