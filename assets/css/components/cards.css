@@ -1,0 +1,210 @@
+
+/* assets/css/components/cards.css */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.card-header.bg-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+}
+
+.card-header.bg-success {
+    background: linear-gradient(135deg, #198754 0%, #157347 100%);
+}
+
+.card-header.bg-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%);
+    color: #000;
+}
+
+.card-header.bg-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);
+}
+
+.card-header.bg-info {
+    background: linear-gradient(135deg, #0dcaf0 0%, #31d2f2 100%);
+    color: #000;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    padding: 1rem 1.5rem;
+}
+
+/* Stats Cards */
+.stats-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.stats-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transition: all 0.5s ease;
+    transform: scale(0);
+}
+
+.stats-card:hover::before {
+    transform: scale(1);
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.stats-card i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.9;
+    position: relative;
+    z-index: 2;
+}
+
+.stats-card h3 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.stats-card p {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+    position: relative;
+    z-index: 2;
+}
+
+.stats-card.primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+}
+
+.stats-card.success {
+    background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+}
+
+.stats-card.warning {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+}
+
+.stats-card.danger {
+    background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+}
+
+.stats-card.info {
+    background: linear-gradient(135deg, #0dcaf0 0%, #17a2b8 100%);
+}
+
+.stats-card.secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+}
+
+/* Compact Cards */
+.card-compact {
+    margin-bottom: 1rem;
+}
+
+.card-compact .card-body {
+    padding: 1rem;
+}
+
+.card-compact .card-header {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+}
+
+/* Info Cards */
+.info-card {
+    border-left: 4px solid #0d6efd;
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.05) 0%, rgba(13, 110, 253, 0.02) 100%);
+}
+
+.info-card.success {
+    border-left-color: #198754;
+    background: linear-gradient(135deg, rgba(25, 135, 84, 0.05) 0%, rgba(25, 135, 84, 0.02) 100%);
+}
+
+.info-card.warning {
+    border-left-color: #ffc107;
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.05) 0%, rgba(255, 193, 7, 0.02) 100%);
+}
+
+.info-card.danger {
+    border-left-color: #dc3545;
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.05) 0%, rgba(220, 53, 69, 0.02) 100%);
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-card .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-card .card-text {
+    flex: 1;
+}
+
+/* Responsive Cards */
+@media (max-width: 768px) {
+    .stats-card {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-card i {
+        font-size: 2.5rem;
+    }
+    
+    .stats-card h3 {
+        font-size: 2rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}

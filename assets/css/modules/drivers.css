@@ -1,0 +1,682 @@
+/* assets/css/modules/drivers.css */
+.driver-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+.driver-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.driver-header {
+    background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+    color: white;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.driver-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: scale(0);
+    transition: transform 0.5s ease;
+}
+
+.driver-card:hover .driver-header::before {
+    transform: scale(1);
+}
+
+.driver-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 2rem;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    z-index: 2;
+}
+
+.driver-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.driver-license {
+    opacity: 0.9;
+    font-size: 0.95rem;
+    font-family: 'Courier New', monospace;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    display: inline-block;
+    position: relative;
+    z-index: 2;
+}
+
+.driver-status-indicator {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 3px solid white;
+    z-index: 3;
+}
+
+.driver-status-indicator.active {
+    background: #28a745;
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+}
+
+.driver-status-indicator.inactive {
+    background: #6c757d;
+}
+
+.driver-status-indicator.suspended {
+    background: #dc3545;
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+}
+
+.driver-body {
+    padding: 1.5rem;
+}
+
+.driver-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.driver-info-item {
+    text-align: center;
+    padding: 1.25rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.driver-info-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #6f42c1 0%, #e83e8c 100%);
+}
+
+.driver-info-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.driver-info-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.driver-info-value {
+    font-weight: 700;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.driver-info-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+/* License Status Alerts */
+.license-status-alert {
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    border: 2px solid;
+}
+
+.license-status-alert.valid {
+    background: linear-gradient(135deg, rgba(25, 135, 84, 0.1) 0%, rgba(25, 135, 84, 0.05) 100%);
+    border-color: rgba(25, 135, 84, 0.3);
+    color: #198754;
+}
+
+.license-status-alert.expiring {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.05) 100%);
+    border-color: rgba(255, 193, 7, 0.3);
+    color: #ffc107;
+}
+
+.license-status-alert.expired {
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+    border-color: rgba(220, 53, 69, 0.3);
+    color: #dc3545;
+}
+
+.license-alert-icon {
+    font-size: 2rem;
+    margin-right: 1rem;
+    flex-shrink: 0;
+}
+
+.license-alert-content h6 {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.license-alert-content p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Assigned Vehicle */
+.assigned-vehicle {
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.1) 0%, rgba(13, 110, 253, 0.05) 100%);
+    border: 2px solid rgba(13, 110, 253, 0.3);
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.assigned-vehicle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+}
+
+.assigned-vehicle-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0d6efd 0%, #6f42c1 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.8rem;
+    margin-right: 1.25rem;
+    flex-shrink: 0;
+}
+
+.assigned-vehicle-info h6 {
+    margin-bottom: 0.5rem;
+    color: #495057;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.assigned-vehicle-info .text-muted {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.assigned-vehicle-meta {
+    display: flex;
+    gap: 1rem;
+    margin-left: auto;
+    text-align: center;
+}
+
+.assigned-vehicle-meta-item {
+    font-size: 0.8rem;
+}
+
+.assigned-vehicle-meta-value {
+    font-weight: 600;
+    color: #0d6efd;
+    display: block;
+}
+
+.assigned-vehicle-meta-label {
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* No Vehicle Assigned */
+.no-vehicle-assigned {
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 10px;
+    padding: 2rem;
+    text-align: center;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.no-vehicle-assigned i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.no-vehicle-assigned h6 {
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+/* Driver Performance Metrics */
+.driver-performance {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    border: 1px solid #e9ecef;
+    margin-bottom: 1rem;
+}
+
+.driver-performance-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.driver-performance-title i {
+    margin-right: 0.5rem;
+    color: #6f42c1;
+}
+
+.performance-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+}
+
+.performance-metric {
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.performance-metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.performance-metric-value.good {
+    color: #198754;
+}
+
+.performance-metric-value.average {
+    color: #ffc107;
+}
+
+.performance-metric-value.poor {
+    color: #dc3545;
+}
+
+.performance-metric-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Driver Actions */
+.driver-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.driver-status-badge {
+    padding: 0.5rem 1.25rem;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.driver-status-badge i {
+    margin-right: 0.5rem;
+}
+
+.driver-status-badge.active {
+    background: rgba(25, 135, 84, 0.1);
+    color: #198754;
+    border: 2px solid rgba(25, 135, 84, 0.2);
+}
+
+.driver-status-badge.inactive {
+    background: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+    border: 2px solid rgba(108, 117, 125, 0.2);
+}
+
+.driver-status-badge.suspended {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: 2px solid rgba(220, 53, 69, 0.2);
+}
+
+/* Driver List View */
+.driver-list-item {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.driver-list-item:hover {
+    border-color: #6f42c1;
+    box-shadow: 0 4px 15px rgba(111, 66, 193, 0.1);
+    transform: translateY(-2px);
+}
+
+.driver-list-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    margin-right: 1.25rem;
+    flex-shrink: 0;
+}
+
+.driver-list-info {
+    flex: 1;
+}
+
+.driver-list-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.25rem;
+}
+
+.driver-list-license {
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 0.25rem;
+}
+
+.driver-list-vehicle {
+    font-size: 0.85rem;
+    color: #0d6efd;
+    font-weight: 500;
+}
+
+.driver-list-meta {
+    display: flex;
+    gap: 1.5rem;
+    margin-left: auto;
+    align-items: center;
+}
+
+.driver-meta-item {
+    text-align: center;
+    padding: 0.75rem;
+}
+
+.driver-meta-value {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.95rem;
+    display: block;
+}
+
+.driver-meta-label {
+    color: #6c757d;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.driver-list-status {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+/* Driver Search and Filters */
+.driver-filters {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    border: 1px solid #e9ecef;
+}
+
+.driver-search {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.driver-search input {
+    padding-left: 3rem;
+    border-radius: 25px;
+    border: 2px solid #e9ecef;
+}
+
+.driver-search i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    z-index: 10;
+}
+
+.driver-search input:focus {
+    border-color: #6f42c1;
+    box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+}
+
+.driver-search input:focus + i {
+    color: #6f42c1;
+}
+
+/* Quick Stats for Drivers */
+.drivers-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.drivers-stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.drivers-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #6f42c1 0%, #e83e8c 100%);
+}
+
+.drivers-stat-card.active::before {
+    background: linear-gradient(90deg, #198754 0%, #20c997 100%);
+}
+
+.drivers-stat-card.expiring::before {
+    background: linear-gradient(90deg, #ffc107 0%, #fd7e14 100%);
+}
+
+.drivers-stat-card.suspended::before {
+    background: linear-gradient(90deg, #dc3545 0%, #fd7e14 100%);
+}
+
+.drivers-stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: white;
+    font-size: 1.8rem;
+}
+
+.drivers-stat-card.active .drivers-stat-icon {
+    background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+}
+
+.drivers-stat-card.expiring .drivers-stat-icon {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+}
+
+.drivers-stat-card.suspended .drivers-stat-icon {
+    background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+}
+
+.drivers-stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.drivers-stat-label {
+    color: #6c757d;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .driver-info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .driver-list-item {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem;
+    }
+    
+    .driver-list-avatar {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .driver-list-meta {
+        margin-left: 0;
+        margin-top: 1rem;
+        justify-content: center;
+    }
+    
+    .assigned-vehicle {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .assigned-vehicle-icon {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .assigned-vehicle-meta {
+        margin-left: 0;
+        margin-top: 1rem;
+        justify-content: center;
+    }
+    
+    .drivers-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .performance-metrics {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .driver-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .drivers-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .performance-metrics {
+        grid-template-columns: 1fr;
+    }
+    
+    .driver-actions {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+}

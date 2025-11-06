@@ -1,0 +1,23 @@
+{
+  "decimal": ",",
+  "thousands": ".",
+  "processing": "Procesează...",
+  "search": "Caută:",
+  "lengthMenu": "Afișează _MENU_ înregistrări",
+  "info": "Afișate _START_–_END_ din _TOTAL_ înregistrări",
+  "infoEmpty": "0 înregistrări",
+  "infoFiltered": "(filtrate din _MAX_ înregistrări totale)",
+  "loadingRecords": "Se încarcă...",
+  "zeroRecords": "Nu s-au găsit rezultate",
+  "emptyTable": "Nu există date în tabel",
+  "paginate": {
+    "first": "Prima",
+    "previous": "Înapoi",
+    "next": "Înainte",
+    "last": "Ultima"
+  },
+  "aria": {
+    "sortAscending": ": activați pentru a ordona crescător",
+    "sortDescending": ": activați pentru a ordona descrescător"
+  }
+}

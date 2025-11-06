@@ -1,0 +1,27 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# PHP / Composer
+/vendor/
+composer.lock
+
+# Logs
+/logs/
+
+# Uploads (keep folders only)
+/uploads/**
+!/uploads/
+!/uploads/documents/
+!/uploads/images/
+!/uploads/reports/
+!/uploads/**/.gitkeep
+
+# Environment / Secrets
+/config/database.php
+/config/mail.php
+
+# Cache/Temp
+/tmp/
+/.idea/
+.vscode/

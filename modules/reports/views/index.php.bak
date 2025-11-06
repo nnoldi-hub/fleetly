@@ -1,0 +1,75 @@
+<?php
+// modules/reports/views/index.php (template-only)
+// Expect: $totalVehicles, $totalFuelRecords, $totalMaintenanceRecords, $totalInsuranceRecords
+?>
+
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0"><i class="fas fa-chart-bar text-primary me-2"></i> Rapoarte</h1>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card border-primary h-100">
+        <div class="card-body text-center">
+          <div class="text-muted">Vehicule active</div>
+          <div class="display-6 fw-bold text-primary"><?= (int)($totalVehicles ?? 0) ?></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-success h-100">
+        <div class="card-body text-center">
+          <div class="text-muted">Înregistrări combustibil</div>
+          <div class="display-6 fw-bold text-success"><?= (int)($totalFuelRecords ?? 0) ?></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-warning h-100">
+        <div class="card-body text-center">
+          <div class="text-muted">Înregistrări mentenanță</div>
+          <div class="display-6 fw-bold text-warning"><?= (int)($totalMaintenanceRecords ?? 0) ?></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-secondary h-100">
+        <div class="card-body text-center">
+          <div class="text-muted">Polițe asigurare</div>
+          <div class="display-6 fw-bold text-secondary"><?= (int)($totalInsuranceRecords ?? 0) ?></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fas fa-clipboard-list me-2"></i> Raport flotă</h5>
+          <p class="card-text text-muted">Rezumat combustibil, mentenanță și costuri pe întreaga flotă, într-o perioadă selectată.</p>
+          <a class="btn btn-primary" href="<?= BASE_URL ?>reports/fleet">Deschide</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fas fa-car-side me-2"></i> Raport pe vehicul</h5>
+          <p class="card-text text-muted">Detalii complete pentru un vehicul: alimentări, mentenanțe, costuri și timeline.</p>
+          <a class="btn btn-primary" href="<?= BASE_URL ?>vehicles">Selectează vehicul</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fas fa-coins me-2"></i> Analiză costuri</h5>
+          <p class="card-text text-muted">Evoluția costurilor (combustibil, mentenanță, asigurări) pe perioade (lunar, săptămânal, anual).</p>
+          <a class="btn btn-primary" href="<?= BASE_URL ?>reports/costs">Analizează</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
