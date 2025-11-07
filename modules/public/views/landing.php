@@ -399,11 +399,12 @@
                     </div>
                 </div>
                 <div class="col-lg-6 text-center">
+                    <!-- Incearca sa incarce PNG real, apoi SVG placeholder, apoi fallback inline -->
                     <img src="<?= BASE_URL ?>assets/images/marketing/dashboard-preview.png" 
                          alt="Fleet Management Dashboard" 
                          class="img-fluid rounded shadow-lg"
                          style="max-width: 100%; height: auto;"
-                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect fill=%22%23667eea%22 width=%22600%22 height=%22400%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22white%22 text-anchor=%22middle%22 dy=%22.3em%22%3EFleet Management Dashboard%3C/text%3E%3C/svg%3E'">
+                         onerror="this.onerror=null; this.src='<?= BASE_URL ?>assets/images/marketing/dashboard-preview.svg';">
                 </div>
             </div>
         </div>
