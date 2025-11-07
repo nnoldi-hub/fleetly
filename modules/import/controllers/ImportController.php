@@ -31,20 +31,20 @@ class ImportController extends Controller
     public function downloadVehiclesTemplate()
     {
         $headers = [
-            'registration_number',
-            'vin_number',
-            'brand',
+            'numar_inmatriculare',
+            'cod_vin',
+            'marca',
             'model',
-            'year',
-            'vehicle_type_id',
+            'an',
+            'tip_vehicul_id',
             'status',
-            'purchase_date',
-            'purchase_price',
-            'current_mileage',
-            'engine_capacity',
-            'fuel_type',
-            'color',
-            'notes'
+            'data_achizitie',
+            'pret_achizitie',
+            'kilometraj_curent',
+            'capacitate_motor',
+            'tip_combustibil',
+            'culoare',
+            'observatii'
         ];
 
         $example = [
@@ -73,13 +73,13 @@ class ImportController extends Controller
     public function downloadDocumentsTemplate()
     {
         $headers = [
-            'vehicle_registration_number',
-            'document_type',
-            'document_number',
-            'issue_date',
-            'expiry_date',
-            'issuer',
-            'notes'
+            'numar_inmatriculare_vehicul',
+            'tip_document',
+            'numar_document',
+            'data_emitere',
+            'data_expirare',
+            'emitent',
+            'observatii'
         ];
 
         $example = [
@@ -101,18 +101,18 @@ class ImportController extends Controller
     public function downloadDriversTemplate()
     {
         $headers = [
-            'name',
-            'license_number',
-            'license_category',
-            'license_issue_date',
-            'license_expiry_date',
-            'phone',
+            'nume_complet',
+            'numar_permis',
+            'categorii_permis',
+            'data_emitere_permis',
+            'data_expirare_permis',
+            'telefon',
             'email',
-            'address',
-            'date_of_birth',
-            'hire_date',
+            'adresa',
+            'data_nastere',
+            'data_angajare',
             'status',
-            'notes'
+            'observatii'
         ];
 
         $example = [
@@ -280,36 +280,36 @@ class ImportController extends Controller
                 $row = array_combine($headers, $data);
                 
                 // Validare date obligatorii
-                if (empty($row['brand']) || empty($row['model']) || empty($row['registration_number'])) {
-                    throw new Exception('Campuri obligatorii lipsa (brand, model, registration_number)');
+                if (empty($row['marca']) || empty($row['model']) || empty($row['numar_inmatriculare'])) {
+                    throw new Exception('Campuri obligatorii lipsa (marca, model, numar_inmatriculare)');
                 }
 
                 // Validate year
-                if (empty($row['year']) || !is_numeric($row['year'])) {
+                if (empty($row['an']) || !is_numeric($row['an'])) {
                     throw new Exception('An fabricatie invalid');
                 }
 
                 // Validate vehicle_type_id
-                if (empty($row['vehicle_type_id']) || !is_numeric($row['vehicle_type_id'])) {
+                if (empty($row['tip_vehicul_id']) || !is_numeric($row['tip_vehicul_id'])) {
                     throw new Exception('ID tip vehicul invalid (trebuie sa fie numar: 1-7)');
                 }
 
-                // Prepare data for insert
+                // Prepare data for insert - mapping romana -> engleza
                 $vehicleData = [
-                    'registration_number' => $row['registration_number'],
-                    'vin_number' => $row['vin_number'] ?? null,
-                    'brand' => $row['brand'],
+                    'registration_number' => $row['numar_inmatriculare'],
+                    'vin_number' => $row['cod_vin'] ?? null,
+                    'brand' => $row['marca'],
                     'model' => $row['model'],
-                    'year' => (int)$row['year'],
-                    'vehicle_type_id' => (int)$row['vehicle_type_id'],
+                    'year' => (int)$row['an'],
+                    'vehicle_type_id' => (int)$row['tip_vehicul_id'],
                     'status' => !empty($row['status']) ? $row['status'] : 'active',
-                    'purchase_date' => !empty($row['purchase_date']) ? $row['purchase_date'] : null,
-                    'purchase_price' => !empty($row['purchase_price']) ? (float)$row['purchase_price'] : null,
-                    'current_mileage' => !empty($row['current_mileage']) ? (int)$row['current_mileage'] : 0,
-                    'engine_capacity' => $row['engine_capacity'] ?? null,
-                    'fuel_type' => !empty($row['fuel_type']) ? $row['fuel_type'] : 'diesel',
-                    'color' => $row['color'] ?? null,
-                    'notes' => $row['notes'] ?? null
+                    'purchase_date' => !empty($row['data_achizitie']) ? $row['data_achizitie'] : null,
+                    'purchase_price' => !empty($row['pret_achizitie']) ? (float)$row['pret_achizitie'] : null,
+                    'current_mileage' => !empty($row['kilometraj_curent']) ? (int)$row['kilometraj_curent'] : 0,
+                    'engine_capacity' => $row['capacitate_motor'] ?? null,
+                    'fuel_type' => !empty($row['tip_combustibil']) ? $row['tip_combustibil'] : 'diesel',
+                    'color' => $row['culoare'] ?? null,
+                    'notes' => $row['observatii'] ?? null
                 ];
 
                 $vehicleModel->create($vehicleData);
@@ -355,21 +355,22 @@ class ImportController extends Controller
             try {
                 $row = array_combine($headers, $data);
                 
-                // Gaseste vehiculul dupa numar inmatriculare
-                $vehicles = $vehicleModel->findAll(['registration_number' => $row['vehicle_registration_number']]);
+                // Gaseste vehiculul dupa numar inmatriculare - mapping romana -> engleza
+                $vehicles = $vehicleModel->findAll(['registration_number' => $row['numar_inmatriculare_vehicul']]);
                 if (!$vehicles || empty($vehicles)) {
-                    throw new Exception('Vehicul negasit: ' . $row['vehicle_registration_number']);
+                    throw new Exception('Vehicul negasit: ' . $row['numar_inmatriculare_vehicul']);
                 }
                 $vehicleId = $vehicles[0]['id'];
 
+                // Mapping romana -> engleza
                 $documentData = [
                     'vehicle_id' => $vehicleId,
-                    'document_type' => $row['document_type'],
-                    'document_number' => $row['document_number'] ?? null,
-                    'issue_date' => !empty($row['issue_date']) ? $row['issue_date'] : null,
-                    'expiry_date' => $row['expiry_date'],
-                    'issuer' => $row['issuer'] ?? null,
-                    'notes' => $row['notes'] ?? null
+                    'document_type' => $row['tip_document'],
+                    'document_number' => $row['numar_document'] ?? null,
+                    'issue_date' => !empty($row['data_emitere']) ? $row['data_emitere'] : null,
+                    'expiry_date' => $row['data_expirare'],
+                    'issuer' => $row['emitent'] ?? null,
+                    'notes' => $row['observatii'] ?? null
                 ];
 
                 $documentModel->create($documentData);
@@ -412,23 +413,24 @@ class ImportController extends Controller
             try {
                 $row = array_combine($headers, $data);
                 
-                if (empty($row['name']) || empty($row['license_number'])) {
-                    throw new Exception('Nume si numar permis sunt obligatorii');
+                if (empty($row['nume_complet']) || empty($row['numar_permis'])) {
+                    throw new Exception('Nume complet si numar permis sunt obligatorii');
                 }
 
+                // Mapping romana -> engleza
                 $driverData = [
-                    'name' => $row['name'],
-                    'license_number' => $row['license_number'],
-                    'license_category' => $row['license_category'] ?? null,
-                    'license_issue_date' => !empty($row['license_issue_date']) ? $row['license_issue_date'] : null,
-                    'license_expiry_date' => !empty($row['license_expiry_date']) ? $row['license_expiry_date'] : null,
-                    'phone' => $row['phone'] ?? null,
+                    'name' => $row['nume_complet'],
+                    'license_number' => $row['numar_permis'],
+                    'license_category' => $row['categorii_permis'] ?? null,
+                    'license_issue_date' => !empty($row['data_emitere_permis']) ? $row['data_emitere_permis'] : null,
+                    'license_expiry_date' => !empty($row['data_expirare_permis']) ? $row['data_expirare_permis'] : null,
+                    'phone' => $row['telefon'] ?? null,
                     'email' => $row['email'] ?? null,
-                    'address' => $row['address'] ?? null,
-                    'date_of_birth' => !empty($row['date_of_birth']) ? $row['date_of_birth'] : null,
-                    'hire_date' => !empty($row['hire_date']) ? $row['hire_date'] : null,
+                    'address' => $row['adresa'] ?? null,
+                    'date_of_birth' => !empty($row['data_nastere']) ? $row['data_nastere'] : null,
+                    'hire_date' => !empty($row['data_angajare']) ? $row['data_angajare'] : null,
                     'status' => !empty($row['status']) ? $row['status'] : 'active',
-                    'notes' => $row['notes'] ?? null
+                    'notes' => $row['observatii'] ?? null
                 ];
 
                 $driverModel->create($driverData);
