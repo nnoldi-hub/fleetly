@@ -116,7 +116,7 @@
                                 </table>
                             </div>
                             <p class="text-muted mb-0" style="font-size: 0.85rem;">
-                                <strong>Tip combustibil:</strong> petrol, diesel, electric, hybrid, gas<br>
+                                <strong>Tip combustibil:</strong> diesel (sau motorina), petrol (sau benzina), electric, hybrid (sau hibrid), gas (sau gpl)<br>
                                 <strong>Status:</strong> active, inactive, maintenance, deleted
                             </p>
                         </div>

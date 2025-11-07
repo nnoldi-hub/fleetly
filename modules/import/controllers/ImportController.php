@@ -59,9 +59,9 @@ class ImportController extends Controller
             '45000',
             '50000',
             '1500',
-            'petrol',
+            'diesel',
             'Alb',
-            'tip_vehicul_id: 1=Autoturism, 2=Autoutilitara, 3=Camion, 4=Autobus, 5=Motostivuitor, 6=Excavator, 7=Buldozer, 8=Trailer, 9=Utilaj Agricol, 10=Generator'
+            'tip_vehicul_id: 1=Autoturism, 2=Autoutilitara, 3=Camion, 4=Autobus, 5=Motostivuitor, 6=Excavator, 7=Buldozer, 8=Trailer, 9=Utilaj Agricol, 10=Generator. tip_combustibil: diesel, petrol, electric, hybrid, gas (sau: motorina, benzina, electric, hibrid, gpl)'
         ];
 
         $this->generateCSV('template_vehicule.csv', $headers, [$example]);
@@ -331,6 +331,27 @@ class ImportController extends Controller
                 if (empty($row['tip_vehicul_id']) || !is_numeric($row['tip_vehicul_id'])) {
                     throw new Exception('ID tip vehicul invalid (trebuie sa fie numar: 1-7)');
                 }
+                
+                // Mapping tip_combustibil: romana -> engleza ENUM
+                $fuelTypeMap = [
+                    'motorina' => 'diesel',
+                    'diesel' => 'diesel',
+                    'benzina' => 'petrol',
+                    'petrol' => 'petrol',
+                    'electric' => 'electric',
+                    'hibrid' => 'hybrid',
+                    'hybrid' => 'hybrid',
+                    'gpl' => 'gas',
+                    'gas' => 'gas'
+                ];
+                
+                $fuelType = 'diesel'; // default
+                if (!empty($row['tip_combustibil'])) {
+                    $fuelInput = strtolower(trim($row['tip_combustibil']));
+                    if (isset($fuelTypeMap[$fuelInput])) {
+                        $fuelType = $fuelTypeMap[$fuelInput];
+                    }
+                }
 
                 // Prepare data for insert - mapping romana -> engleza
                 $vehicleData = [
@@ -345,7 +366,7 @@ class ImportController extends Controller
                     'purchase_price' => !empty($row['pret_achizitie']) ? (float)$row['pret_achizitie'] : null,
                     'current_mileage' => !empty($row['kilometraj_curent']) ? (int)$row['kilometraj_curent'] : 0,
                     'engine_capacity' => $row['capacitate_motor'] ?? null,
-                    'fuel_type' => !empty($row['tip_combustibil']) ? $row['tip_combustibil'] : 'diesel',
+                    'fuel_type' => $fuelType,
                     'color' => $row['culoare'] ?? null,
                     'notes' => $row['observatii'] ?? null
                 ];
@@ -413,7 +434,7 @@ class ImportController extends Controller
         $errorDetails = [];
         $lineNumber = 1;
 
-        require_once 'modules/documents/models/Document.php';
+        require_once 'modules/documents/models/document.php';
         require_once 'modules/vehicles/models/Vehicle.php';
         
         $documentModel = new Document();
@@ -531,7 +552,7 @@ class ImportController extends Controller
         $errorDetails = [];
         $lineNumber = 1;
 
-        require_once 'modules/drivers/models/Driver.php';
+        require_once 'modules/drivers/models/driver.php';
         $driverModel = new Driver();
 
         while (($data = fgetcsv($handle, 1000, ',')) !== false) {
