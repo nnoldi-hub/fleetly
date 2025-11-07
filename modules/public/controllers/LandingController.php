@@ -4,10 +4,14 @@ class LandingController extends Controller
 {
     public function index()
     {
+        // Obtine statistici reale din baza de date
+        $stats = PublicStats::getInstance()->getGlobalStats();
+        
         // Landing page nu are header/footer standard, afisam direct view-ul
         $data = [
             'title' => 'Fleet Management - Sistem Profesional de Gestiune Flote Auto',
-            'meta_description' => 'Solutie completa pentru managementul flotelor de vehicule. Multi-tenant, rapoarte avansate, notificari automate. Created by conectica-it.ro'
+            'meta_description' => 'Solutie completa pentru managementul flotelor de vehicule. Multi-tenant, rapoarte avansate, notificari automate. Created by conectica-it.ro',
+            'stats' => $stats
         ];
         
         extract($data);

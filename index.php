@@ -45,6 +45,7 @@ require_once 'core/Router.php';
 require_once 'core/Auth.php';
 require_once 'core/User.php';
 require_once 'core/Company.php';
+require_once 'core/PublicStats.php';
 
 // Include toate modelele
 $modelFiles = glob('modules/*/models/*.php');

@@ -413,25 +413,25 @@
             <div class="row">
                 <div class="col-md-3 col-6 mb-4 mb-md-0">
                     <div class="stat-box">
-                        <span class="stat-number">500+</span>
+                        <span class="stat-number"><?= PublicStats::formatNumber($stats['companies']) ?></span>
                         <span class="stat-label">Companii Active</span>
                     </div>
                 </div>
                 <div class="col-md-3 col-6 mb-4 mb-md-0">
                     <div class="stat-box">
-                        <span class="stat-number">15,000+</span>
+                        <span class="stat-number"><?= PublicStats::formatNumber($stats['vehicles']) ?></span>
                         <span class="stat-label">Vehicule Gestionate</span>
                     </div>
                 </div>
                 <div class="col-md-3 col-6">
                     <div class="stat-box">
-                        <span class="stat-number">99.9%</span>
+                        <span class="stat-number"><?= $stats['uptime'] ?>%</span>
                         <span class="stat-label">Uptime Garantat</span>
                     </div>
                 </div>
                 <div class="col-md-3 col-6">
                     <div class="stat-box">
-                        <span class="stat-number">24/7</span>
+                        <span class="stat-number"><?= $stats['support'] ?></span>
                         <span class="stat-label">Suport Tehnic</span>
                     </div>
                 </div>
