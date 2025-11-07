@@ -61,6 +61,11 @@ foreach ($controllerFiles as $file) {
 // Inițializare router
 $router = new Router();
 
+// Rute publice (landing page)
+$router->addRoute('GET', '/home', 'LandingController', 'index');
+$router->addRoute('GET', '/contact', 'LandingController', 'contact');
+$router->addRoute('POST', '/contact/submit', 'LandingController', 'submitContact');
+
 // Rute autentificare
 $router->addRoute('GET', '/login', 'LoginController', 'index');
 $router->addRoute('POST', '/login', 'LoginController', 'login');
@@ -68,7 +73,8 @@ $router->addRoute('GET', '/logout', 'LoginController', 'logout');
 $router->addRoute('GET', '/forgot-password', 'LoginController', 'forgotPassword');
 
 // Definire rute pentru modulul vehicule
-$router->addRoute('GET', '/', 'DashboardController', 'index');
+// Root path - redirectionare inteligenta (landing pentru vizitatori, dashboard pentru utilizatori autentificati)
+$router->addRoute('GET', '/', 'HomeController', 'index');
 $router->addRoute('GET', '/dashboard', 'DashboardController', 'index');
 
 // Rute vehicule
