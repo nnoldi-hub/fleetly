@@ -16,16 +16,15 @@ class ImportController extends Controller
      */
     public function index()
     {
-        $data = [
-            'title' => 'Import Date CSV',
-            'pageTitle' => 'Import Masiv Date',
-            'breadcrumbs' => [
-                ['name' => 'Dashboard', 'url' => '/dashboard'],
-                ['name' => 'Import Date', 'url' => '']
-            ]
+        $title = 'Import Date CSV';
+        $pageTitle = 'Import Masiv Date';
+        $breadcrumbs = [
+            ['name' => 'Dashboard', 'url' => '/dashboard'],
+            ['name' => 'Import Date', 'url' => '']
         ];
         
-        $this->render('import/index', $data);
+        // Include view direct
+        include 'modules/import/views/index.php';
     }
 
     /**
@@ -359,11 +358,11 @@ class ImportController extends Controller
                 $row = array_combine($headers, $data);
                 
                 // Gaseste vehiculul dupa numar inmatriculare
-                $vehicle = $vehicleModel->findBy(['registration_number' => $row['vehicle_registration_number']]);
-                if (!$vehicle || empty($vehicle)) {
+                $vehicles = $vehicleModel->findAll(['registration_number' => $row['vehicle_registration_number']]);
+                if (!$vehicles || empty($vehicles)) {
                     throw new Exception('Vehicul negasit: ' . $row['vehicle_registration_number']);
                 }
-                $vehicleId = is_array($vehicle) ? $vehicle[0]['id'] : $vehicle['id'];
+                $vehicleId = $vehicles[0]['id'];
 
                 $documentData = [
                     'vehicle_id' => $vehicleId,
