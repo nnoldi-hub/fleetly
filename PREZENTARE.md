@@ -15,6 +15,7 @@
 - ✅ **SuperAdmin Panel** - gestionare centralizată a companiilor
 - ✅ **Role-Based Access Control (RBAC)** - 4 nivele de acces
 - ✅ **Dashboard inteligent** - statistici în timp real
+- ✅ **Import CSV masiv** - vehicule/documente/șoferi din Excel (coloane românești fără diacritice)
 - ✅ **Rapoarte avansate** - export CSV/PDF
 - ✅ **Notificări automate** - Email/SMS pentru documente expirate
 - ✅ **Mod intervenție** - SuperAdmin poate prelua controlul oricărei companii
@@ -51,6 +52,7 @@
 #### 🚗 **Vehicule**
 - Listă completă cu căutare, filtrare (tip, status)
 - Adăugare/editare cu validare companie și limită plan
+- **Import CSV masiv**: template descarcabil cu coloane românești (numar_inmatriculare, marca, model, an, tip_vehicul_id, etc.)
 - Export **CSV** și **PDF** (fără diacritice)
 - Tracking kilometraj + istoric service
 - Galerie foto vehicule
@@ -147,6 +149,7 @@ fleet-management/
 │   ├── superadmin/          # Panel SuperAdmin
 │   ├── dashboard/           # Dashboard companie
 │   ├── user/                # Management utilizatori
+│   ├── import/              # Import CSV masiv (vehicule, documente, șoferi)
 │   ├── vehicles/            # CRUD vehicule + export
 │   ├── drivers/             # Management șoferi
 │   ├── documents/           # Documente + alerte
@@ -616,6 +619,7 @@ sales@conectica-it.ro
 - ✅ Lansare versiune 1.0
 - ✅ Multi-tenant + RBAC complet
 - ✅ Rapoarte avansate + export
+- ✅ Import CSV masiv (vehicule/documente/șoferi)
 
 ### **Q2 2025**
 - 🔄 API REST pentru integrări externe

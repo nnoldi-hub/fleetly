@@ -2,8 +2,9 @@
 
 Acesta este un sistem de administrare flota multi‑tenant, cu panou SuperAdmin, mod interventie (act as), rutare fara mod_rewrite, si izolare pe baza de date per companie. Proiectul ruleaza pe WAMP/LAMP, scris in PHP (PDO) cu un MVC simplu.
 
-## Noutati (2025‑11‑06)
+## Noutati (2025‑11‑07)
 
+- **Import CSV masiv**: modul nou `/import` permite importul bulk de vehicule, documente si soferi din fisiere CSV cu coloane romanesti (fara diacritice). Descarca template-uri, completeaza in Excel, upload cu validare si feedback detaliat.
 - Email SMTP: configurabil in `config/mail.php` (PHPMailer via Composer sau fallback mail()/log).
 - Reset admin: trimite email cu credentialele noi (daca email existent si mail activat).
 - Limita vehicule: impusa la creare (lista arata folosite/max, buton Add dezactivat la limita).
@@ -52,7 +53,13 @@ Acesta este un sistem de administrare flota multi‑tenant, cu panou SuperAdmin,
   - Setarea limitelor se face din SuperAdmin > Companii > Edit (campurile `max_users` si `max_vehicles`).
 - Utilizatori (`/users`):
   - Lista + adaugare + editare + stergere, cu verificare limita `max_users`.
-  - Roluri afisate in romana fara diacritice („Administrator Firma”, „Manager Flota”, „Sofer”, „Operator Flota”).
+  - Roluri afisate in romana fara diacritice („Administrator Firma", „Manager Flota", „Sofer", „Operator Flota").
+- **Import CSV masiv (`/import`)**: modul dedicat pentru import bulk de vehicule, documente si soferi:
+  - Template-uri CSV descarcabile cu coloane romanesti fara diacritice (numar_inmatriculare, marca, model, tip_vehicul_id, etc.).
+  - Validare automata (campuri obligatorii, format date, valori ENUM).
+  - Feedback detaliat per rand (success/error) pentru depanare rapida.
+  - Mapping transparent: coloane romanesti → campuri engleze in baza de date.
+  - Compatibilitate Excel: UTF-8 BOM pentru deschidere directa fara probleme de encoding.
 - Module flota (in BD tenant): vehicule, soferi, documente, asigurari, mentenanta, combustibil, notificari, rapoarte — implementate minimal, extensibile.
 
 ### UI fara diacritice (afisare)
@@ -75,6 +82,7 @@ modules/
   dashboard/             # Dashboard companie (stats + abonament)
   superadmin/            # SuperAdmin (companies, act-as, reset admin)
   user/                  # Management utilizatori (companie)
+  import/                # Import CSV masiv (vehicule, documente, soferi)
   vehicles, drivers, documents, maintenance, fuel, insurance, reports, notifications
 assets/                  # CSS/JS/imagini (main.js include transliterare UI)
 sql/                     # schema.sql, sample_data.sql, migrations/
@@ -136,6 +144,36 @@ Rute disponibile pentru vehicule:
 /vehicles/export?format=csv|pdf&search=&type=&status=
 ```
 Parametrii `search`, `type`, `status` sunt optionali (aceiasi ca in lista UI) si se aplica si la export.
+
+## Import CSV masiv
+
+Modul `/import` ofera importul bulk pentru vehicule, documente si soferi din fisiere CSV:
+
+### Functionalitati
+- **Template-uri descarcabile**: CSV-uri preformatate cu coloane romanesti fara diacritice si exemple de date valide.
+- **Validare automata**: verificare campuri obligatorii, format date (YYYY-MM-DD), valori ENUM (status, tip_combustibil).
+- **Feedback detaliat**: raport per rand (success/error) pentru identificarea rapida a problemelor.
+- **Mapping transparent**: coloanele romanesti (ex: `numar_inmatriculare`, `marca`, `an`) sunt mapate automat la campurile engleze din baza de date.
+- **Compatibilitate Excel**: fisierele au UTF-8 BOM pentru deschidere fara probleme in Excel.
+
+### Coloane CSV vehicule
+```
+numar_inmatriculare, cod_vin, marca, model, an, tip_vehicul_id, status, 
+data_achizitie, pret_achizitie, kilometraj_curent, capacitate_motor, 
+tip_combustibil, culoare, observatii
+```
+
+### Valori valide
+- **tip_vehicul_id**: 1=Autoturism, 2=Autoutilitara, 3=Camion, 4=Autobus, 5=Motostivuitor, 6=Excavator, 7=Buldozer, 8=Trailer, 9=Utilaj Agricol, 10=Generator (vezi template pentru lista completa)
+- **status**: active, inactive, maintenance, deleted
+- **tip_combustibil**: petrol, diesel, electric, hybrid, gas
+
+### Utilizare
+1. Acceseaza `/import` in aplicatie.
+2. Descarca template-ul pentru entitatea dorita (vehicule/documente/soferi).
+3. Completeaza datele in Excel/LibreOffice (pastreaza headerele!).
+4. Salveaza ca CSV UTF-8 si upload prin formularul corespunzator.
+5. Verifica raportul de import pentru success/erori.
 
 ## Limite de plan (vehicule)
 
