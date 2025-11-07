@@ -59,6 +59,9 @@
             <li class="nav-item mb-2">
                 <a class="nav-link text-white" href="<?= ROUTE_BASE ?>reports"><i class="fas fa-chart-bar me-2"></i>Rapoarte</a>
             </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="<?= ROUTE_BASE ?>import"><i class="fas fa-file-import me-2"></i>Import CSV</a>
+            </li>
             <li class="nav-item mt-auto mb-2">
                 <a class="nav-link text-white" href="<?= ROUTE_BASE ?>notifications"><i class="fas fa-bell me-2"></i>Notificări</a>
             </li>
@@ -130,6 +133,9 @@
             </li>
             <li class="nav-item mb-2">
                 <a class="nav-link" href="<?= ROUTE_BASE ?>reports"><i class="fas fa-chart-bar me-2"></i>Rapoarte</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link" href="<?= ROUTE_BASE ?>import"><i class="fas fa-file-import me-2"></i>Import CSV</a>
             </li>
             <li class="nav-item mt-auto mb-2">
                 <a class="nav-link" href="<?= ROUTE_BASE ?>notifications"><i class="fas fa-bell me-2"></i>Notificări</a>

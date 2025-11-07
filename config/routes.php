@@ -43,3 +43,12 @@ $router->add("POST", "/superadmin/companies/add", "CompanyController@store", "mo
 $router->add("GET", "/admin/users", "UserController@index", "modules/admin/controllers/UserController.php");
 $router->add("GET", "/admin/users/add", "UserController@add", "modules/admin/controllers/UserController.php");
 $router->add("POST", "/admin/users/add", "UserController@store", "modules/admin/controllers/UserController.php");
+
+// Import routes
+$router->add("GET", "/import", "ImportController@index", "modules/import/controllers/ImportController.php");
+$router->add("GET", "/import/download-vehicles-template", "ImportController@downloadVehiclesTemplate", "modules/import/controllers/ImportController.php");
+$router->add("GET", "/import/download-documents-template", "ImportController@downloadDocumentsTemplate", "modules/import/controllers/ImportController.php");
+$router->add("GET", "/import/download-drivers-template", "ImportController@downloadDriversTemplate", "modules/import/controllers/ImportController.php");
+$router->add("POST", "/import/upload-vehicles", "ImportController@uploadVehicles", "modules/import/controllers/ImportController.php");
+$router->add("POST", "/import/upload-documents", "ImportController@uploadDocuments", "modules/import/controllers/ImportController.php");
+$router->add("POST", "/import/upload-drivers", "ImportController@uploadDrivers", "modules/import/controllers/ImportController.php");
