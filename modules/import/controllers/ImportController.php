@@ -6,7 +6,8 @@ class ImportController extends Controller
     {
         parent::__construct();
         // Verificare autentificare
-        if (!Auth::check()) {
+        $auth = new Auth();
+        if (!$auth->check()) {
             $this->redirect('/login');
         }
     }

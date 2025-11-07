@@ -212,6 +212,15 @@ $router->addRoute('GET', '/users/edit', 'UserController', 'edit');
 $router->addRoute('POST', '/users/edit', 'UserController', 'edit');
 $router->addRoute('POST', '/users/delete', 'UserController', 'delete');
 
+// Rute import CSV
+$router->addRoute('GET', '/import', 'ImportController', 'index');
+$router->addRoute('GET', '/import/download-vehicles-template', 'ImportController', 'downloadVehiclesTemplate');
+$router->addRoute('GET', '/import/download-documents-template', 'ImportController', 'downloadDocumentsTemplate');
+$router->addRoute('GET', '/import/download-drivers-template', 'ImportController', 'downloadDriversTemplate');
+$router->addRoute('POST', '/import/upload-vehicles', 'ImportController', 'uploadVehicles');
+$router->addRoute('POST', '/import/upload-documents', 'ImportController', 'uploadDocuments');
+$router->addRoute('POST', '/import/upload-drivers', 'ImportController', 'uploadDrivers');
+
 // Obține calea curentă
 
 // Normalizează calea pentru rutare corectă (suport și pentru subdirector ex: /fleet-management)

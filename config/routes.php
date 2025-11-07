@@ -1,4 +1,15 @@
 ﻿<?php
+/**
+ * Route definitions file (DEPRECAT - nu este folosit)
+ * 
+ * NOTA: Acest fisier NU este folosit in aplicatie!
+ * Rutele sunt definite direct in index.php folosind $router->addRoute()
+ * 
+ * Acest fisier foloseste $router->add() care nu exista in clasa Router.
+ * Pentru a adauga rute noi, editeaza index.php, NU acest fisier!
+ * 
+ * @var Router $router
+ */
 
 // Authentication routes
 $router->add("GET", "/login", "LoginController@index", "modules/auth/controllers/LoginController.php");
