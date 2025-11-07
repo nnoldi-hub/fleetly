@@ -47,7 +47,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <h6 class="text-muted mb-3">Pasul 1: Descarcă template-ul CSV</h6>
-                    <a href="/import/download-vehicles-template" class="btn btn-outline-primary mb-3">
+                    <a href="<?= ROUTE_BASE ?>import/download-vehicles-template" class="btn btn-outline-primary mb-3">
                         <i class="bi bi-download me-2"></i>Descarcă Template Vehicule
                     </a>
                     
@@ -102,7 +102,7 @@
 
                 <div class="col-md-6">
                     <h6 class="text-muted mb-3">Pasul 2: Încarcă fișierul CSV</h6>
-                    <form action="/import/upload-vehicles" method="POST" enctype="multipart/form-data">
+                    <form action="<?= ROUTE_BASE ?>import/upload-vehicles" method="POST" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="vehicles_csv" class="form-label">Selectează fișier CSV:</label>
                             <input type="file" class="form-control" id="vehicles_csv" name="csv_file" accept=".csv" required>
@@ -135,7 +135,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <h6 class="text-muted mb-3">Pasul 1: Descarcă template-ul CSV</h6>
-                    <a href="/import/download-documents-template" class="btn btn-outline-success mb-3">
+                    <a href="<?= ROUTE_BASE ?>import/download-documents-template" class="btn btn-outline-success mb-3">
                         <i class="bi bi-download me-2"></i>Descarcă Template Documente
                     </a>
                     
@@ -184,7 +184,7 @@
 
                 <div class="col-md-6">
                     <h6 class="text-muted mb-3">Pasul 2: Încarcă fișierul CSV</h6>
-                    <form action="/import/upload-documents" method="POST" enctype="multipart/form-data">
+                    <form action="<?= ROUTE_BASE ?>import/upload-documents" method="POST" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="documents_csv" class="form-label">Selectează fișier CSV:</label>
                             <input type="file" class="form-control" id="documents_csv" name="csv_file" accept=".csv" required>
@@ -217,7 +217,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <h6 class="text-muted mb-3">Pasul 1: Descarcă template-ul CSV</h6>
-                    <a href="/import/download-drivers-template" class="btn btn-outline-warning mb-3">
+                    <a href="<?= ROUTE_BASE ?>import/download-drivers-template" class="btn btn-outline-warning mb-3">
                         <i class="bi bi-download me-2"></i>Descarcă Template Șoferi
                     </a>
                     
@@ -269,7 +269,7 @@
 
                 <div class="col-md-6">
                     <h6 class="text-muted mb-3">Pasul 2: Încarcă fișierul CSV</h6>
-                    <form action="/import/upload-drivers" method="POST" enctype="multipart/form-data">
+                    <form action="<?= ROUTE_BASE ?>import/upload-drivers" method="POST" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="drivers_csv" class="form-label">Selectează fișier CSV:</label>
                             <input type="file" class="form-control" id="drivers_csv" name="csv_file" accept=".csv" required>
