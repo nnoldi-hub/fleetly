@@ -4,31 +4,47 @@ class LandingController extends Controller
 {
     public function index()
     {
-        $this->view('public/landing', [
+        // Landing page nu are header/footer standard, afisam direct view-ul
+        $data = [
             'title' => 'Fleet Management - Sistem Profesional de Gestiune Flote Auto',
             'meta_description' => 'Solutie completa pentru managementul flotelor de vehicule. Multi-tenant, rapoarte avansate, notificari automate. Created by conectica-it.ro'
-        ]);
+        ];
+        
+        extract($data);
+        $viewFile = "modules/public/views/landing.php";
+        
+        if (file_exists($viewFile)) {
+            include $viewFile;
+        } else {
+            echo "View not found: $viewFile";
+        }
     }
 
     public function features()
     {
-        $this->view('public/features', [
-            'title' => 'Caracteristici - Fleet Management'
-        ]);
+        $data = ['title' => 'Caracteristici - Fleet Management'];
+        extract($data);
+        include 'modules/public/views/features.php';
     }
 
     public function pricing()
     {
-        $this->view('public/pricing', [
-            'title' => 'Planuri si Preturi - Fleet Management'
-        ]);
+        $data = ['title' => 'Planuri si Preturi - Fleet Management'];
+        extract($data);
+        include 'modules/public/views/pricing.php';
     }
 
     public function contact()
     {
-        $this->view('public/contact', [
-            'title' => 'Contact - Fleet Management'
-        ]);
+        $data = ['title' => 'Contact - Fleet Management'];
+        extract($data);
+        $viewFile = "modules/public/views/contact.php";
+        
+        if (file_exists($viewFile)) {
+            include $viewFile;
+        } else {
+            echo "View not found: $viewFile";
+        }
     }
 
     public function submitContact()
@@ -43,6 +59,7 @@ class LandingController extends Controller
         $phone = $_POST['phone'] ?? '';
         $company = $_POST['company'] ?? '';
         $message = $_POST['message'] ?? '';
+        $plan = $_POST['plan'] ?? '';
 
         // Validare
         if (empty($name) || empty($email) || empty($message)) {
@@ -57,28 +74,36 @@ class LandingController extends Controller
             exit;
         }
 
-        // Trimite email catre admin
-        $mailer = new Mailer();
-        $emailContent = "
-            <h2>Mesaj nou de pe site-ul Fleet Management</h2>
-            <p><strong>Nume:</strong> {$name}</p>
-            <p><strong>Email:</strong> {$email}</p>
-            <p><strong>Telefon:</strong> {$phone}</p>
-            <p><strong>Companie:</strong> {$company}</p>
-            <p><strong>Mesaj:</strong></p>
-            <p>{$message}</p>
-        ";
+        // Trimite email catre admin (daca mail este configurat)
+        try {
+            require_once 'core/Mailer.php';
+            $mailer = new Mailer();
+            $emailContent = "
+                <h2>Mesaj nou de pe site-ul Fleet Management</h2>
+                <p><strong>Nume:</strong> {$name}</p>
+                <p><strong>Email:</strong> {$email}</p>
+                <p><strong>Telefon:</strong> {$phone}</p>
+                <p><strong>Companie:</strong> {$company}</p>
+                <p><strong>Plan interes:</strong> {$plan}</p>
+                <p><strong>Mesaj:</strong></p>
+                <p>{$message}</p>
+            ";
 
-        $sent = $mailer->send(
-            'support@conectica-it.ro', // sau email-ul tau
-            'Mesaj nou de contact - Fleet Management',
-            $emailContent
-        );
+            $sent = $mailer->send(
+                'support@conectica-it.ro',
+                'Mesaj nou de contact - Fleet Management',
+                $emailContent
+            );
 
-        if ($sent) {
-            $_SESSION['success'] = 'Multumim! Mesajul dvs. a fost trimis. Va vom contacta in cel mai scurt timp.';
-        } else {
-            $_SESSION['error'] = 'A aparut o eroare. Va rugam incercati din nou sau contactati-ne telefonic.';
+            if ($sent) {
+                $_SESSION['success'] = 'Multumim! Mesajul dvs. a fost trimis. Va vom contacta in cel mai scurt timp.';
+            } else {
+                $_SESSION['error'] = 'A aparut o eroare la trimiterea mesajului. Va rugam incercati din nou sau contactati-ne telefonic.';
+            }
+        } catch (Exception $e) {
+            // Daca mailer nu e configurat, salvam in log
+            error_log("Contact form submission: $name ($email) - $message");
+            $_SESSION['success'] = 'Multumim! Mesajul dvs. a fost inregistrat. Va vom contacta in cel mai scurt timp.';
         }
 
         header('Location: ' . ROUTE_BASE . 'contact');
