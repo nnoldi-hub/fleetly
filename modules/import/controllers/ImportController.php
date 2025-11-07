@@ -258,11 +258,16 @@ class ImportController extends Controller
             throw new Exception('Nu se poate deschide fisierul CSV');
         }
 
-        // Citeste header
+        // Citeste header si normalizeaza (trim + lowercase)
         $headers = fgetcsv($handle, 1000, ',');
         if (!$headers) {
             throw new Exception('Fisier CSV invalid');
         }
+        
+        // Normalizeaza headerele: trim spații + lowercase
+        $headers = array_map(function($h) {
+            return strtolower(trim($h));
+        }, $headers);
 
         $success = 0;
         $errors = 0;
@@ -275,9 +280,23 @@ class ImportController extends Controller
         while (($data = fgetcsv($handle, 1000, ',')) !== false) {
             $lineNumber++;
             
+            // Skip rânduri goale
+            if (empty(array_filter($data))) {
+                continue;
+            }
+            
             try {
+                // Trim pe fiecare valoare
+                $data = array_map('trim', $data);
+                
                 // Map data to associative array
                 $row = array_combine($headers, $data);
+                
+                // Debug: loghează headerele și datele pentru prima linie
+                if ($lineNumber == 2) {
+                    error_log("Headers: " . print_r($headers, true));
+                    error_log("Row data: " . print_r($row, true));
+                }
                 
                 // Validare date obligatorii
                 if (empty($row['marca']) || empty($row['model']) || empty($row['numar_inmatriculare'])) {
@@ -336,7 +355,20 @@ class ImportController extends Controller
     private function processDocumentsCSV($filePath)
     {
         $handle = fopen($filePath, 'r');
+        if (!$handle) {
+            throw new Exception('Nu se poate deschide fisierul CSV');
+        }
+        
+        // Citeste header si normalizeaza
         $headers = fgetcsv($handle, 1000, ',');
+        if (!$headers) {
+            throw new Exception('Fisier CSV invalid');
+        }
+        
+        // Normalizeaza headerele: trim spații + lowercase
+        $headers = array_map(function($h) {
+            return strtolower(trim($h));
+        }, $headers);
         
         $success = 0;
         $errors = 0;
@@ -352,8 +384,33 @@ class ImportController extends Controller
         while (($data = fgetcsv($handle, 1000, ',')) !== false) {
             $lineNumber++;
             
+            // Skip rânduri goale
+            if (empty(array_filter($data))) {
+                continue;
+            }
+            
             try {
+                // Trim pe fiecare valoare
+                $data = array_map('trim', $data);
+                
                 $row = array_combine($headers, $data);
+                
+                // Debug pentru prima linie
+                if ($lineNumber == 2) {
+                    error_log("Documents Headers: " . print_r($headers, true));
+                    error_log("Documents Row: " . print_r($row, true));
+                }
+                
+                // Validare campuri obligatorii
+                if (empty($row['numar_inmatriculare_vehicul'])) {
+                    throw new Exception('Numar inmatriculare vehicul lipsa');
+                }
+                if (empty($row['tip_document'])) {
+                    throw new Exception('Tip document lipsa');
+                }
+                if (empty($row['data_expirare'])) {
+                    throw new Exception('Data expirare lipsa');
+                }
                 
                 // Gaseste vehiculul dupa numar inmatriculare - mapping romana -> engleza
                 $vehicles = $vehicleModel->findAll(['registration_number' => $row['numar_inmatriculare_vehicul']]);
@@ -397,7 +454,20 @@ class ImportController extends Controller
     private function processDriversCSV($filePath)
     {
         $handle = fopen($filePath, 'r');
+        if (!$handle) {
+            throw new Exception('Nu se poate deschide fisierul CSV');
+        }
+        
+        // Citeste header si normalizeaza
         $headers = fgetcsv($handle, 1000, ',');
+        if (!$headers) {
+            throw new Exception('Fisier CSV invalid');
+        }
+        
+        // Normalizeaza headerele: trim spații + lowercase
+        $headers = array_map(function($h) {
+            return strtolower(trim($h));
+        }, $headers);
         
         $success = 0;
         $errors = 0;
@@ -410,11 +480,29 @@ class ImportController extends Controller
         while (($data = fgetcsv($handle, 1000, ',')) !== false) {
             $lineNumber++;
             
+            // Skip rânduri goale
+            if (empty(array_filter($data))) {
+                continue;
+            }
+            
             try {
+                // Trim pe fiecare valoare
+                $data = array_map('trim', $data);
+                
                 $row = array_combine($headers, $data);
                 
-                if (empty($row['nume_complet']) || empty($row['numar_permis'])) {
-                    throw new Exception('Nume complet si numar permis sunt obligatorii');
+                // Debug pentru prima linie
+                if ($lineNumber == 2) {
+                    error_log("Drivers Headers: " . print_r($headers, true));
+                    error_log("Drivers Row: " . print_r($row, true));
+                }
+                
+                // Validare campuri obligatorii
+                if (empty($row['nume_complet'])) {
+                    throw new Exception('Nume complet lipsa');
+                }
+                if (empty($row['numar_permis'])) {
+                    throw new Exception('Numar permis lipsa');
                 }
 
                 // Mapping romana -> engleza
