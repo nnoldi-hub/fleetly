@@ -253,7 +253,20 @@ class ImportController extends Controller
      */
     private function processVehiclesCSV($filePath)
     {
-        $handle = fopen($filePath, 'r');
+        // Citeste fisierul complet pentru a sterge BOM
+        $content = file_get_contents($filePath);
+        if ($content === false) {
+            throw new Exception('Nu se poate citi fisierul CSV');
+        }
+        
+        // Sterge BOM UTF-8 daca exista
+        $content = $this->removeBOM($content);
+        
+        // Creaza fisier temporar fara BOM
+        $tmpFile = tempnam(sys_get_temp_dir(), 'csv_');
+        file_put_contents($tmpFile, $content);
+        
+        $handle = fopen($tmpFile, 'r');
         if (!$handle) {
             throw new Exception('Nu se poate deschide fisierul CSV');
         }
@@ -261,12 +274,18 @@ class ImportController extends Controller
         // Citeste header si normalizeaza (trim + lowercase)
         $headers = fgetcsv($handle, 1000, ',');
         if (!$headers) {
+            fclose($handle);
+            unlink($tmpFile);
             throw new Exception('Fisier CSV invalid');
         }
         
-        // Normalizeaza headerele: trim spații + lowercase
+        // Normalizeaza headerele: trim spații + lowercase + sterge caractere invizibile
         $headers = array_map(function($h) {
-            return strtolower(trim($h));
+            // Sterge BOM, trim, lowercase
+            $h = str_replace("\xEF\xBB\xBF", '', $h);
+            $h = trim($h);
+            $h = strtolower($h);
+            return $h;
         }, $headers);
 
         $success = 0;
@@ -341,6 +360,7 @@ class ImportController extends Controller
         }
 
         fclose($handle);
+        unlink($tmpFile); // Sterge fisierul temporar
 
         return [
             'success' => $success,
@@ -354,7 +374,20 @@ class ImportController extends Controller
      */
     private function processDocumentsCSV($filePath)
     {
-        $handle = fopen($filePath, 'r');
+        // Citeste fisierul complet pentru a sterge BOM
+        $content = file_get_contents($filePath);
+        if ($content === false) {
+            throw new Exception('Nu se poate citi fisierul CSV');
+        }
+        
+        // Sterge BOM UTF-8 daca exista
+        $content = $this->removeBOM($content);
+        
+        // Creaza fisier temporar fara BOM
+        $tmpFile = tempnam(sys_get_temp_dir(), 'csv_');
+        file_put_contents($tmpFile, $content);
+        
+        $handle = fopen($tmpFile, 'r');
         if (!$handle) {
             throw new Exception('Nu se poate deschide fisierul CSV');
         }
@@ -362,12 +395,17 @@ class ImportController extends Controller
         // Citeste header si normalizeaza
         $headers = fgetcsv($handle, 1000, ',');
         if (!$headers) {
+            fclose($handle);
+            unlink($tmpFile);
             throw new Exception('Fisier CSV invalid');
         }
         
-        // Normalizeaza headerele: trim spații + lowercase
+        // Normalizeaza headerele: trim spații + lowercase + sterge BOM
         $headers = array_map(function($h) {
-            return strtolower(trim($h));
+            $h = str_replace("\xEF\xBB\xBF", '', $h);
+            $h = trim($h);
+            $h = strtolower($h);
+            return $h;
         }, $headers);
         
         $success = 0;
@@ -440,6 +478,7 @@ class ImportController extends Controller
         }
 
         fclose($handle);
+        unlink($tmpFile); // Sterge fisierul temporar
 
         return [
             'success' => $success,
@@ -453,7 +492,20 @@ class ImportController extends Controller
      */
     private function processDriversCSV($filePath)
     {
-        $handle = fopen($filePath, 'r');
+        // Citeste fisierul complet pentru a sterge BOM
+        $content = file_get_contents($filePath);
+        if ($content === false) {
+            throw new Exception('Nu se poate citi fisierul CSV');
+        }
+        
+        // Sterge BOM UTF-8 daca exista
+        $content = $this->removeBOM($content);
+        
+        // Creaza fisier temporar fara BOM
+        $tmpFile = tempnam(sys_get_temp_dir(), 'csv_');
+        file_put_contents($tmpFile, $content);
+        
+        $handle = fopen($tmpFile, 'r');
         if (!$handle) {
             throw new Exception('Nu se poate deschide fisierul CSV');
         }
@@ -461,12 +513,17 @@ class ImportController extends Controller
         // Citeste header si normalizeaza
         $headers = fgetcsv($handle, 1000, ',');
         if (!$headers) {
+            fclose($handle);
+            unlink($tmpFile);
             throw new Exception('Fisier CSV invalid');
         }
         
-        // Normalizeaza headerele: trim spații + lowercase
+        // Normalizeaza headerele: trim spații + lowercase + sterge BOM
         $headers = array_map(function($h) {
-            return strtolower(trim($h));
+            $h = str_replace("\xEF\xBB\xBF", '', $h);
+            $h = trim($h);
+            $h = strtolower($h);
+            return $h;
         }, $headers);
         
         $success = 0;
@@ -531,6 +588,7 @@ class ImportController extends Controller
         }
 
         fclose($handle);
+        unlink($tmpFile); // Sterge fisierul temporar
 
         return [
             'success' => $success,
@@ -564,5 +622,15 @@ class ImportController extends Controller
 
         fclose($output);
         exit;
+    }
+    
+    /**
+     * Sterge BOM (Byte Order Mark) din continut
+     */
+    private function removeBOM($text)
+    {
+        $bom = pack('H*','EFBBBF'); // UTF-8 BOM
+        $text = preg_replace("/^$bom/", '', $text);
+        return $text;
     }
 }
