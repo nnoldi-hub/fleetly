@@ -54,10 +54,34 @@
                     <div class="alert alert-info">
                         <strong>Coloane obligatorii:</strong>
                         <ul class="mb-0 mt-2">
+                            <li><code>numar_inmatriculare</code> - Ex: B-123-ABC (UNIC)</li>
                             <li><code>marca</code> - Ex: Dacia, Ford, Mercedes</li>
                             <li><code>model</code> - Ex: Logan, Focus, Sprinter</li>
-                            <li><code>numar_inmatriculare</code> - Ex: B-123-ABC</li>
+                            <li><code>an</code> - Ex: 2020, 2021</li>
+                            <li><code>tip_vehicul_id</code> - ID-ul tipului (vezi mai jos)</li>
                         </ul>
+                        
+                        <strong class="mt-2 d-block">Tipuri vehicul (tip_vehicul_id):</strong>
+                        <div class="row mt-1">
+                            <div class="col-6">
+                                <small>
+                                    1 = Autoturism Personal<br>
+                                    2 = Autoutilitara Mica<br>
+                                    3 = Camion<br>
+                                    4 = Autobus/Microbuz<br>
+                                    5 = Motostivuitor
+                                </small>
+                            </div>
+                            <div class="col-6">
+                                <small>
+                                    6 = Excavator<br>
+                                    7 = Buldozer<br>
+                                    8 = Trailer/Remorca<br>
+                                    9 = Utilaj Agricol<br>
+                                    10 = Generator/Compresor
+                                </small>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="card bg-light">
@@ -67,34 +91,33 @@
                                 <table class="table table-sm table-bordered bg-white">
                                     <thead class="table-dark">
                                         <tr style="font-size: 0.75rem;">
+                                            <th>numar_inmatriculare</th>
                                             <th>marca</th>
                                             <th>model</th>
-                                            <th>an_fabricatie</th>
-                                            <th>numar_inmatriculare</th>
-                                            <th>vin</th>
-                                            <th>tip_vehicul</th>
+                                            <th>an</th>
+                                            <th>tip_vehicul_id</th>
                                             <th>culoare</th>
                                             <th>tip_combustibil</th>
+                                            <th>status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr style="font-size: 0.75rem;">
+                                            <td>B-123-ABC</td>
                                             <td>Dacia</td>
                                             <td>Logan</td>
                                             <td>2020</td>
-                                            <td>B-123-ABC</td>
-                                            <td>UU1LSDA12ABC123456</td>
-                                            <td>sedan</td>
+                                            <td>1</td>
                                             <td>Alb</td>
-                                            <td>benzina</td>
+                                            <td>petrol</td>
+                                            <td>active</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                             <p class="text-muted mb-0" style="font-size: 0.85rem;">
-                                <strong>Tipuri vehicul:</strong> sedan, suv, van, camion, autoutilitara, motocicleta<br>
-                                <strong>Combustibil:</strong> benzina, motorina, hibrid, electric, gpl<br>
-                                <strong>Status:</strong> activ, inactiv, service, scos_din_uz
+                                <strong>Tip combustibil:</strong> petrol, diesel, electric, hybrid, gas<br>
+                                <strong>Status:</strong> active, inactive, maintenance, deleted
                             </p>
                         </div>
                     </div>

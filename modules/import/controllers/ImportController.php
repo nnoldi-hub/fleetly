@@ -61,7 +61,7 @@ class ImportController extends Controller
             '1500',
             'petrol',
             'Alb',
-            'Vehicul in stare buna'
+            'tip_vehicul_id: 1=Autoturism, 2=Autoutilitara, 3=Camion, 4=Autobus, 5=Motostivuitor, 6=Excavator, 7=Buldozer, 8=Trailer, 9=Utilaj Agricol, 10=Generator'
         ];
 
         $this->generateCSV('template_vehicule.csv', $headers, [$example]);
