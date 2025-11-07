@@ -30,48 +30,75 @@ class PublicStats
                 "SELECT COUNT(*) as total FROM companies WHERE status = 'active'"
             );
             $stmtCompanies->execute();
-            $activeCompanies = $stmtCompanies->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+            $result = $stmtCompanies->fetch(PDO::FETCH_ASSOC);
+            $activeCompanies = (int)($result['total'] ?? 0);
+            
+            // Debug logging
+            error_log("PublicStats - Active companies query result: " . print_r($result, true));
+            error_log("PublicStats - Active companies count: " . $activeCompanies);
             
             // Total vehicule din toate tenant-urile
             $totalVehicles = 0;
             $stmtTenants = $this->coreDb->prepare(
-                "SELECT id, tenant_db FROM companies WHERE status = 'active' AND tenant_db IS NOT NULL"
+                "SELECT id, database_name FROM companies WHERE status = 'active' AND database_name IS NOT NULL AND database_name != ''"
             );
             $stmtTenants->execute();
             $companies = $stmtTenants->fetchAll(PDO::FETCH_ASSOC);
             
+            error_log("PublicStats - Found " . count($companies) . " companies with tenant DB");
+            
             foreach ($companies as $company) {
                 try {
-                    $tenantDb = $company['tenant_db'];
+                    $tenantDb = trim($company['database_name']);
+                    if (empty($tenantDb)) {
+                        continue;
+                    }
+                    
+                    // Verifică dacă database există
+                    $checkDb = $this->coreDb->prepare("SHOW DATABASES LIKE ?");
+                    $checkDb->execute([$tenantDb]);
+                    if (!$checkDb->fetch()) {
+                        error_log("PublicStats - Tenant DB not found: " . $tenantDb);
+                        continue;
+                    }
+                    
+                    // Verifică dacă tabela vehicles există
+                    $checkTable = $this->coreDb->prepare("SHOW TABLES FROM `{$tenantDb}` LIKE 'vehicles'");
+                    $checkTable->execute();
+                    if (!$checkTable->fetch()) {
+                        error_log("PublicStats - Vehicles table not found in: " . $tenantDb);
+                        continue;
+                    }
+                    
                     $stmtVehicles = $this->coreDb->prepare(
-                        "SELECT COUNT(*) as total FROM {$tenantDb}.vehicles"
+                        "SELECT COUNT(*) as total FROM `{$tenantDb}`.vehicles"
                     );
                     $stmtVehicles->execute();
-                    $count = $stmtVehicles->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+                    $vehicleResult = $stmtVehicles->fetch(PDO::FETCH_ASSOC);
+                    $count = (int)($vehicleResult['total'] ?? 0);
                     $totalVehicles += $count;
+                    
+                    error_log("PublicStats - Tenant {$tenantDb} has {$count} vehicles");
                 } catch (Exception $e) {
                     // Daca tenant DB nu exista sau nu are tabelul vehicles, continua
+                    error_log("PublicStats - Error processing tenant {$tenantDb}: " . $e->getMessage());
                     continue;
                 }
             }
             
-            // Total utilizatori
-            $stmtUsers = $this->coreDb->prepare(
-                "SELECT COUNT(*) as total FROM users WHERE company_id IN (SELECT id FROM companies WHERE status = 'active')"
-            );
-            $stmtUsers->execute();
-            $totalUsers = $stmtUsers->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+            error_log("PublicStats - Total vehicles: " . $totalVehicles);
             
             return [
-                'companies' => $activeCompanies > 0 ? $activeCompanies : 1, // Minim 1 pentru display
-                'vehicles' => $totalVehicles > 0 ? $totalVehicles : 1,
-                'uptime' => 99.9, // Poate fi calculat dintr-un log de monitoring
-                'support' => '24/7' // Static
+                'companies' => max(1, $activeCompanies), // Minim 1 pentru display
+                'vehicles' => max(1, $totalVehicles),
+                'uptime' => 99.9,
+                'support' => '24/7'
             ];
             
         } catch (Exception $e) {
             // Fallback la valori default daca apare o eroare
-            error_log("Error fetching public stats: " . $e->getMessage());
+            error_log("PublicStats - Error fetching stats: " . $e->getMessage());
+            error_log("PublicStats - Stack trace: " . $e->getTraceAsString());
             return [
                 'companies' => 1,
                 'vehicles' => 1,
