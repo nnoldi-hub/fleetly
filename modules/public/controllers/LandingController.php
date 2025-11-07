@@ -59,7 +59,7 @@ class LandingController extends Controller
         $phone = $_POST['phone'] ?? '';
         $company = $_POST['company'] ?? '';
         $message = $_POST['message'] ?? '';
-        $plan = $_POST['plan'] ?? '';
+        $interest = $_POST['interest'] ?? '';
 
         // Validare
         if (empty($name) || empty($email) || empty($message)) {
@@ -84,13 +84,13 @@ class LandingController extends Controller
                 <p><strong>Email:</strong> {$email}</p>
                 <p><strong>Telefon:</strong> {$phone}</p>
                 <p><strong>Companie:</strong> {$company}</p>
-                <p><strong>Plan interes:</strong> {$plan}</p>
+                <p><strong>Interes:</strong> {$interest}</p>
                 <p><strong>Mesaj:</strong></p>
                 <p>{$message}</p>
             ";
 
             $sent = $mailer->send(
-                'support@conectica-it.ro',
+                'office@fleetly.ro',
                 'Mesaj nou de contact - Fleet Management',
                 $emailContent
             );

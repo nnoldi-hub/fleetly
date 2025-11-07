@@ -357,9 +357,6 @@
                         <a class="nav-link" href="#features">Caracteristici</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#pricing">Preturi</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="<?= ROUTE_BASE ?>contact">Contact</a>
                     </li>
                     <li class="nav-item">
@@ -387,14 +384,14 @@
                             <i class="fas fa-rocket"></i> Incepe Gratuit
                         </a>
                         <a href="#features" class="btn btn-hero btn-hero-outline">
-                            <i class="fas fa-play-circle"></i> Vezi Demo
+                            <i class="fas fa-info-circle"></i> Afla Mai Mult
                         </a>
                     </div>
                     <div class="mt-4">
                         <small class="opacity-75">
-                            <i class="fas fa-check-circle"></i> Fara card necesar
+                            <i class="fas fa-check-circle"></i> 100% Gratuit
                             <i class="fas fa-check-circle ms-3"></i> Setup in 5 minute
-                            <i class="fas fa-check-circle ms-3"></i> Suport 24/7
+                            <i class="fas fa-check-circle ms-3"></i> Suport dedicat
                         </small>
                     </div>
                 </div>
@@ -526,7 +523,7 @@
         </div>
     </section>
 
-    <!-- Pricing Section -->
+    <!-- Pricing Section - COMENTAT (momentan gratuit)
     <section id="pricing" class="pricing-section bg-light">
         <div class="container">
             <div class="text-center mb-5">
@@ -603,14 +600,15 @@
             </div>
         </div>
     </section>
+    -->
 
     <!-- CTA Section -->
     <section class="cta-section">
         <div class="container">
             <h2 class="cta-title">Gata sa revolutionezi managementul flotei?</h2>
-            <p class="lead mb-4">Incepe gratuit astazi. Nu este nevoie de card.</p>
+            <p class="lead mb-4">Incepe gratuit astazi! Solutie 100% gratuita pentru managementul flotei tale.</p>
             <a href="<?= ROUTE_BASE ?>contact" class="btn btn-hero btn-hero-primary btn-lg">
-                <i class="fas fa-rocket"></i> Incepe Acum
+                <i class="fas fa-rocket"></i> Incepe Gratuit Acum
             </a>
         </div>
     </section>
@@ -637,9 +635,8 @@
                     <h4 class="footer-title">Produs</h4>
                     <ul class="footer-links">
                         <li><a href="#features">Caracteristici</a></li>
-                        <li><a href="#pricing">Preturi</a></li>
+                        <li><a href="<?= ROUTE_BASE ?>contact">Contact</a></li>
                         <li><a href="#">Documentatie</a></li>
-                        <li><a href="#">API</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
@@ -654,9 +651,9 @@
                 <div class="col-lg-4">
                     <h4 class="footer-title">Contact</h4>
                     <ul class="footer-links">
-                        <li><i class="fas fa-envelope me-2"></i> support@conectica-it.ro</li>
-                        <li><i class="fas fa-phone me-2"></i> +40 700 000 000</li>
-                        <li><i class="fas fa-map-marker-alt me-2"></i> Bucuresti, Romania</li>
+                        <li><i class="fas fa-envelope me-2"></i> office@fleetly.ro</li>
+                        <li><i class="fas fa-phone me-2"></i> 0740 173 581</li>
+                        <li><i class="fas fa-user me-2"></i> Noldi Nyikora</li>
                     </ul>
                 </div>
             </div>

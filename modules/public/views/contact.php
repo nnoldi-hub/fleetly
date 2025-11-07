@@ -145,7 +145,7 @@
                             <i class="fas fa-envelope"></i>
                             <div>
                                 <strong>Email</strong>
-                                <p class="mb-0 text-muted">support@conectica-it.ro</p>
+                                <p class="mb-0 text-muted">office@fleetly.ro</p>
                             </div>
                         </div>
                     </div>
@@ -154,16 +154,16 @@
                             <i class="fas fa-phone"></i>
                             <div>
                                 <strong>Telefon</strong>
-                                <p class="mb-0 text-muted">+40 700 000 000</p>
+                                <p class="mb-0 text-muted">0740 173 581</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-4 mb-3">
                         <div class="info-box">
-                            <i class="fas fa-clock"></i>
+                            <i class="fas fa-user"></i>
                             <div>
-                                <strong>Program</strong>
-                                <p class="mb-0 text-muted">Luni-Vineri: 9-18</p>
+                                <strong>Contact</strong>
+                                <p class="mb-0 text-muted">Noldi Nyikora</p>
                             </div>
                         </div>
                     </div>
@@ -193,12 +193,13 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Plan de interes</label>
-                        <select class="form-select" name="plan">
+                        <label class="form-label">Sunt interesat de:</label>
+                        <select class="form-select" name="interest">
                             <option value="">Selecteaza...</option>
-                            <option value="starter" <?= isset($_GET['plan']) && $_GET['plan'] == 'starter' ? 'selected' : '' ?>>Starter (49€/luna)</option>
-                            <option value="professional" <?= isset($_GET['plan']) && $_GET['plan'] == 'professional' ? 'selected' : '' ?>>Professional (149€/luna)</option>
-                            <option value="enterprise" <?= isset($_GET['plan']) && $_GET['plan'] == 'enterprise' ? 'selected' : '' ?>>Enterprise (Custom)</option>
+                            <option value="demo">Demonstratie sistem</option>
+                            <option value="info">Informatii generale</option>
+                            <option value="support">Suport tehnic</option>
+                            <option value="custom">Solutie personalizata</option>
                         </select>
                     </div>
 
