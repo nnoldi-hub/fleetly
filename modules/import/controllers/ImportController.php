@@ -452,41 +452,51 @@ class ImportController extends Controller
                 // Trim pe fiecare valoare
                 $data = array_map('trim', $data);
                 
+                // Verificare numar coloane
+                if (count($headers) !== count($data)) {
+                    throw new Exception(sprintf(
+                        'Numar coloane invalid: asteptate %d, gasite %d (verifica ca toate coloanele sunt completate sau goale)',
+                        count($headers),
+                        count($data)
+                    ));
+                }
+                
                 $row = array_combine($headers, $data);
                 
                 // Debug pentru prima linie
                 if ($lineNumber == 2) {
-                    error_log("Documents Headers: " . print_r($headers, true));
-                    error_log("Documents Row: " . print_r($row, true));
+                    error_log("Documents Headers (" . count($headers) . "): " . implode(', ', $headers));
+                    error_log("Documents Data (" . count($data) . "): " . implode(', ', $data));
                 }
                 
-                // Validare campuri obligatorii
-                if (empty($row['numar_inmatriculare_vehicul'])) {
+                // Validare campuri obligatorii (accepta romana SAU engleza)
+                if (empty($row['numar_inmatriculare_vehicul']) && empty($row['registration_number'])) {
                     throw new Exception('Numar inmatriculare vehicul lipsa');
                 }
-                if (empty($row['tip_document'])) {
+                if (empty($row['tip_document']) && empty($row['document_type'])) {
                     throw new Exception('Tip document lipsa');
                 }
-                if (empty($row['data_expirare'])) {
+                if (empty($row['data_expirare']) && empty($row['expiry_date'])) {
                     throw new Exception('Data expirare lipsa');
                 }
                 
                 // Gaseste vehiculul dupa numar inmatriculare - mapping romana -> engleza
-                $vehicles = $vehicleModel->findAll(['registration_number' => $row['numar_inmatriculare_vehicul']]);
+                $registrationNumber = $row['numar_inmatriculare_vehicul'] ?? $row['registration_number'] ?? null;
+                $vehicles = $vehicleModel->findAll(['registration_number' => $registrationNumber]);
                 if (!$vehicles || empty($vehicles)) {
-                    throw new Exception('Vehicul negasit: ' . $row['numar_inmatriculare_vehicul']);
+                    throw new Exception('Vehicul negasit: ' . $registrationNumber);
                 }
                 $vehicleId = $vehicles[0]['id'];
 
-                // Mapping romana -> engleza
+                // Mapping romana -> engleza (accepta atat romana cat si engleza)
                 $documentData = [
                     'vehicle_id' => $vehicleId,
-                    'document_type' => $row['tip_document'],
-                    'document_number' => $row['numar_document'] ?? null,
-                    'issue_date' => !empty($row['data_emitere']) ? $row['data_emitere'] : null,
-                    'expiry_date' => $row['data_expirare'],
-                    'issuer' => $row['emitent'] ?? null,
-                    'notes' => $row['observatii'] ?? null
+                    'document_type' => $row['tip_document'] ?? $row['document_type'] ?? null,
+                    'document_number' => $row['numar_document'] ?? $row['document_number'] ?? null,
+                    'issue_date' => !empty($row['data_emitere']) ? $row['data_emitere'] : (!empty($row['issue_date']) ? $row['issue_date'] : null),
+                    'expiry_date' => $row['data_expirare'] ?? $row['expiry_date'] ?? null,
+                    'provider' => $row['emitent'] ?? $row['issuer'] ?? $row['provider'] ?? null,  // DB column is 'provider' not 'issuer'
+                    'notes' => $row['observatii'] ?? $row['notes'] ?? null
                 ];
 
                 $documentModel->create($documentData);
@@ -567,12 +577,21 @@ class ImportController extends Controller
                 // Trim pe fiecare valoare
                 $data = array_map('trim', $data);
                 
+                // Verificare numar coloane
+                if (count($headers) !== count($data)) {
+                    throw new Exception(sprintf(
+                        'Numar coloane invalid: asteptate %d, gasite %d (verifica ca toate coloanele sunt completate sau goale)',
+                        count($headers),
+                        count($data)
+                    ));
+                }
+                
                 $row = array_combine($headers, $data);
                 
                 // Debug pentru prima linie
                 if ($lineNumber == 2) {
-                    error_log("Drivers Headers: " . print_r($headers, true));
-                    error_log("Drivers Row: " . print_r($row, true));
+                    error_log("Drivers Headers (" . count($headers) . "): " . implode(', ', $headers));
+                    error_log("Drivers Data (" . count($data) . "): " . implode(', ', $data));
                 }
                 
                 // Validare campuri obligatorii

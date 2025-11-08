@@ -8,6 +8,17 @@ class DriverController extends Controller {
     
     public function __construct() {
         parent::__construct();
+        // Require authentication to ensure tenant context is available
+        Auth::getInstance()->requireAuth();
+        // Ensure tenant database is selected based on current company
+        try {
+            $companyId = Auth::getInstance()->effectiveCompanyId();
+            if ($companyId) {
+                Database::getInstance()->setTenantDatabaseByCompanyId($companyId);
+            }
+        } catch (Throwable $e) {
+            // ignore, fallback connections will still work
+        }
         $this->driverModel = new Driver();
         $this->vehicleModel = new Vehicle();
     }
@@ -152,7 +163,7 @@ class DriverController extends Controller {
                 try {
                     $driverId = $this->driverModel->create($data);
                     $_SESSION['success'] = 'Șoferul a fost adăugat cu succes!';
-                    $this->redirect(BASE_URL . 'drivers/view?id=' . urlencode($driverId));
+                    $this->redirect('/drivers/view?id=' . urlencode($driverId));
                 } catch (Exception $e) {
                     $errors['general'] = 'Eroare la salvarea șoferului: ' . $e->getMessage();
                 }
@@ -242,7 +253,7 @@ class DriverController extends Controller {
                 try {
                     $this->driverModel->update($id, $data);
                     $_SESSION['success'] = 'Șoferul a fost actualizat cu succes!';
-                    $this->redirect(BASE_URL . 'drivers/view?id=' . urlencode($id));
+                    $this->redirect('/drivers/view?id=' . urlencode($id));
                 } catch (Exception $e) {
                     $errors['general'] = 'Eroare la actualizarea șoferului: ' . $e->getMessage();
                 }
@@ -466,20 +477,24 @@ class DriverController extends Controller {
     }
     
     private function getAvailableVehicles($excludeVehicleId = null) {
-        // Obține vehiculele care nu sunt asignate
-        $sql = "SELECT v.* FROM vehicles v 
-                LEFT JOIN drivers d ON v.id = d.assigned_vehicle_id 
-                WHERE d.assigned_vehicle_id IS NULL AND v.status = 'active'";
-        
+        // Obține vehiculele active din baza de date a tenantului
+        // NOTĂ: folosim fetchAllOn('vehicles', ...) pentru a interoga DB-ul corect (tenant),
+        // altfel o interogare generică ar lovi baza "core" unde tabelul vehicles NU există.
+        $sql = "SELECT DISTINCT v.* FROM vehicles v 
+                WHERE v.status = 'active'";
+
         $params = [];
+
         if ($excludeVehicleId) {
-            $sql .= " OR v.id = ?";
+            // Include vehiculul deja asignat acestui șofer chiar dacă e ocupat
+            $sql .= " AND (v.id NOT IN (SELECT assigned_vehicle_id FROM drivers WHERE assigned_vehicle_id IS NOT NULL AND assigned_vehicle_id != ?) OR v.id = ?)";
+            $params[] = $excludeVehicleId;
             $params[] = $excludeVehicleId;
         }
-        
+
         $sql .= " ORDER BY v.registration_number";
-        
-        return $this->db->fetchAll($sql, $params);
+
+        return $this->db->fetchAllOn('vehicles', $sql, $params);
     }
     
     private function getLicenseCategories() {

@@ -245,6 +245,18 @@ if (strpos($path, '/index.php') === 0) {
     $path = substr($path, strlen('/index.php'));
 }
 
+// Patch: acceptă și varianta /index.php/drivers/edit?id=XX când path rămâne gol după decupare
+if ($path === '' || $path === '/') {
+    // Dacă REQUEST_URI conține index.php/drivers/edit dar path a fost golit
+    $raw = $_SERVER['REQUEST_URI'] ?? '';
+    if (preg_match('#/index\.php/(drivers|vehicles|users|maintenance|fuel|documents)/#', $raw)) {
+        $parts = parse_url($raw, PHP_URL_PATH);
+        // Elimină orice prefix până la /index.php/
+        $parts = preg_replace('#^.*?/index\.php/#','/', $parts);
+        if ($parts) { $path = rtrim($parts,'/'); if ($path[0] !== '/') $path = '/'.$path; }
+    }
+}
+
 // Asigură leading slash
 if ($path === '' || $path[0] !== '/') { $path = '/' . ltrim($path, '/'); }
 // Elimină eventuale dubluri de slash

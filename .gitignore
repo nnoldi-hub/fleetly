@@ -19,6 +19,7 @@ composer.lock
 
 # Environment / Secrets
 /config/database.php
+/config/database.override.php
 /config/mail.php
 
 # Cache/Temp

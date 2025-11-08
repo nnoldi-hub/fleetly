@@ -101,7 +101,7 @@ unset($_SESSION['errors'], $_SESSION['success']);
                         <td>
                             <div class="btn-group btn-group-sm">
                                 <a class="btn btn-outline-info" href="<?= BASE_URL ?>drivers/view?id=<?= (int)$d['id'] ?>" title="Vizualizează"><i class="fas fa-eye"></i></a>
-                                <a class="btn btn-outline-primary" href="<?= BASE_URL ?>drivers/edit?id=<?= (int)$d['id'] ?>" title="Editează"><i class="fas fa-edit"></i></a>
+                                <a class="btn btn-outline-primary" href="<?= ROUTE_BASE ?>drivers/edit?id=<?= (int)$d['id'] ?>" title="Editează"><i class="fas fa-edit"></i></a>
                                 <button class="btn btn-outline-danger" onclick="deleteDriver(<?= (int)$d['id'] ?>)" title="Șterge"><i class="fas fa-trash"></i></button>
                             </div>
                         </td>

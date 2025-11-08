@@ -45,6 +45,9 @@ class Router {
         // Normalizează pentru a trata trailing slash-uri
         $r = $this->normalizePath($routePath);
         $u = $this->normalizePath($uri);
+        // Ignoră orice prefix "/index.php" în comparații (suport URL-uri cu/ fără index.php)
+        $r = str_replace('/index.php', '', $r);
+        $u = str_replace('/index.php', '', $u);
         if ($r === $u) return true;
         // Extra safety: allow when the URI ends with the route path (helps when base path trimming fails)
         if (strlen($u) > strlen($r)) {

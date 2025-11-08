@@ -1,65 +1,163 @@
 ﻿<?php
 /**
- * Route definitions file (DEPRECAT - nu este folosit)
- * 
- * NOTA: Acest fisier NU este folosit in aplicatie!
- * Rutele sunt definite direct in index.php folosind $router->addRoute()
- * 
- * Acest fisier foloseste $router->add() care nu exista in clasa Router.
- * Pentru a adauga rute noi, editeaza index.php, NU acest fisier!
- * 
- * @var Router $router
+ * config/routes.php
+ *
+ * Scop: centralizarea DEFINIȚIILOR DE RUTE într-un singur loc.
+ * Acum acest fișier ESTE utilizabil dacă îl incluzi după ce instanțiezi $router în index.php:
+ *    require_once 'config/routes.php';
+ *
+ * IMPORTANT: Clasa Router are metoda addRoute($method, $path, $controller, $action)
+ *            NU există $router->add(). Versiunea veche era greșită și cauza confuzii.
+ *
+ * Recomandare: menține acest fișier doar ca sursă a listelor de rute; nu pune logica aici.
  */
 
-// Authentication routes
-$router->add("GET", "/login", "LoginController@index", "modules/auth/controllers/LoginController.php");
-$router->add("POST", "/login", "LoginController@login", "modules/auth/controllers/LoginController.php");
-$router->add("GET", "/logout", "LoginController@logout", "modules/auth/controllers/LoginController.php");
-$router->add("GET", "/forgot-password", "LoginController@forgotPassword", "modules/auth/controllers/LoginController.php");
+if (!isset($router) || !is_object($router)) {
+	throw new RuntimeException('Router nu este inițializat înainte de includerea config/routes.php');
+}
 
-// Dashboard
-$router->add("GET", "/", "DashboardController@index", "modules/dashboard/controllers/DashboardController.php");
-$router->add("GET", "/dashboard", "DashboardController@index", "modules/dashboard/controllers/DashboardController.php");
+// Autentificare
+$router->addRoute('GET', '/login', 'LoginController', 'index');
+$router->addRoute('POST', '/login', 'LoginController', 'login');
+$router->addRoute('GET', '/logout', 'LoginController', 'logout');
+$router->addRoute('GET', '/forgot-password', 'LoginController', 'forgotPassword');
 
-// Vehicles
-$router->add("GET", "/vehicles", "VehicleController@index", "modules/vehicles/controllers/VehicleController.php");
-$router->add("GET", "/vehicles/add", "VehicleController@add", "modules/vehicles/controllers/VehicleController.php");
-$router->add("POST", "/vehicles/add", "VehicleController@store", "modules/vehicles/controllers/VehicleController.php");
-$router->add("GET", "/vehicles/edit/{id}", "VehicleController@edit", "modules/vehicles/controllers/VehicleController.php");
-$router->add("POST", "/vehicles/edit/{id}", "VehicleController@update", "modules/vehicles/controllers/VehicleController.php");
+// Dashboard / Home
+$router->addRoute('GET', '/', 'HomeController', 'index');
+$router->addRoute('GET', '/dashboard', 'DashboardController', 'index');
 
-// Drivers
-$router->add("GET", "/drivers", "DriverController@index", "modules/drivers/controllers/DriverController.php");
-$router->add("GET", "/drivers/add", "DriverController@add", "modules/drivers/controllers/DriverController.php");
-$router->add("POST", "/drivers/add", "DriverController@store", "modules/drivers/controllers/DriverController.php");
+// Vehicule
+$router->addRoute('GET', '/vehicles', 'VehicleController', 'index');
+$router->addRoute('GET', '/vehicles/add', 'VehicleController', 'add');
+$router->addRoute('POST', '/vehicles/add', 'VehicleController', 'add');
+$router->addRoute('GET', '/vehicles/edit', 'VehicleController', 'edit'); // id prin ?id=XX
+$router->addRoute('POST', '/vehicles/edit', 'VehicleController', 'edit');
+$router->addRoute('GET', '/vehicles/view', 'VehicleController', 'view');
+$router->addRoute('GET', '/vehicles/delete', 'VehicleController', 'delete');
+$router->addRoute('POST', '/vehicles/delete', 'VehicleController', 'delete');
+$router->addRoute('POST', '/vehicles/updateMileage', 'VehicleController', 'updateMileage');
+$router->addRoute('GET', '/vehicles/export', 'VehicleController', 'export');
+$router->addRoute('POST', '/vehicles/store', 'VehicleController', 'store');
 
-// Fuel
-$router->add("GET", "/fuel", "FuelController@index", "modules/fuel/controllers/FuelController.php");
-$router->add("GET", "/fuel/add", "FuelController@add", "modules/fuel/controllers/FuelController.php");
-$router->add("POST", "/fuel/add", "FuelController@store", "modules/fuel/controllers/FuelController.php");
-$router->add("GET", "/fuel/reports", "FuelController@reports", "modules/fuel/controllers/FuelController.php");
+// Tipuri vehicule
+$router->addRoute('GET', '/vehicle-types', 'VehicleTypeController', 'index');
+$router->addRoute('GET', '/vehicle-types/add', 'VehicleTypeController', 'add');
+$router->addRoute('POST', '/vehicle-types/add', 'VehicleTypeController', 'add');
+$router->addRoute('GET', '/vehicle-types/edit', 'VehicleTypeController', 'edit');
+$router->addRoute('POST', '/vehicle-types/edit', 'VehicleTypeController', 'edit');
+$router->addRoute('POST', '/vehicle-types/delete', 'VehicleTypeController', 'delete');
 
-// Maintenance
-$router->add("GET", "/maintenance", "MaintenanceController@index", "modules/maintenance/controllers/MaintenanceController.php");
-$router->add("GET", "/maintenance/add", "MaintenanceController@add", "modules/maintenance/controllers/MaintenanceController.php");
-$router->add("POST", "/maintenance/add", "MaintenanceController@store", "modules/maintenance/controllers/MaintenanceController.php");
+// Documente
+$router->addRoute('GET', '/documents', 'DocumentController', 'index');
+$router->addRoute('GET', '/documents/add', 'DocumentController', 'add');
+$router->addRoute('POST', '/documents/add', 'DocumentController', 'add');
+$router->addRoute('GET', '/documents/edit', 'DocumentController', 'edit');
+$router->addRoute('POST', '/documents/edit', 'DocumentController', 'edit');
+$router->addRoute('GET', '/documents/expiring', 'DocumentController', 'expiring');
+$router->addRoute('POST', '/documents/delete', 'DocumentController', 'delete');
+$router->addRoute('GET', '/documents/export', 'DocumentController', 'export');
+$router->addRoute('GET', '/documents/view', 'DocumentController', 'view');
 
-// SuperAdmin routes
-$router->add("GET", "/superadmin/dashboard", "SuperAdminController@dashboard", "modules/superadmin/controllers/SuperAdminController.php");
-$router->add("GET", "/superadmin/companies", "CompanyController@index", "modules/superadmin/controllers/CompanyController.php");
-$router->add("GET", "/superadmin/companies/add", "CompanyController@add", "modules/superadmin/controllers/CompanyController.php");
-$router->add("POST", "/superadmin/companies/add", "CompanyController@store", "modules/superadmin/controllers/CompanyController.php");
+// Asigurări
+$router->addRoute('GET', '/insurance', 'InsuranceController', 'index');
+$router->addRoute('GET', '/insurance/add', 'InsuranceController', 'add');
+$router->addRoute('POST', '/insurance/add', 'InsuranceController', 'add');
+$router->addRoute('GET', '/insurance/edit', 'InsuranceController', 'edit');
+$router->addRoute('POST', '/insurance/edit', 'InsuranceController', 'edit');
+$router->addRoute('GET', '/insurance/view', 'InsuranceController', 'view');
+$router->addRoute('POST', '/insurance/delete', 'InsuranceController', 'delete');
+$router->addRoute('GET', '/insurance/expiring', 'InsuranceController', 'expiring');
 
-// Admin routes
-$router->add("GET", "/admin/users", "UserController@index", "modules/admin/controllers/UserController.php");
-$router->add("GET", "/admin/users/add", "UserController@add", "modules/admin/controllers/UserController.php");
-$router->add("POST", "/admin/users/add", "UserController@store", "modules/admin/controllers/UserController.php");
+// Șoferi
+$router->addRoute('GET', '/drivers', 'DriverController', 'index');
+$router->addRoute('GET', '/drivers/add', 'DriverController', 'add');
+$router->addRoute('POST', '/drivers/add', 'DriverController', 'add');
+$router->addRoute('GET', '/drivers/edit', 'DriverController', 'edit');
+$router->addRoute('POST', '/drivers/edit', 'DriverController', 'edit');
+$router->addRoute('GET', '/drivers/view', 'DriverController', 'view');
+$router->addRoute('POST', '/drivers/delete', 'DriverController', 'delete');
 
-// Import routes
-$router->add("GET", "/import", "ImportController@index", "modules/import/controllers/ImportController.php");
-$router->add("GET", "/import/download-vehicles-template", "ImportController@downloadVehiclesTemplate", "modules/import/controllers/ImportController.php");
-$router->add("GET", "/import/download-documents-template", "ImportController@downloadDocumentsTemplate", "modules/import/controllers/ImportController.php");
-$router->add("GET", "/import/download-drivers-template", "ImportController@downloadDriversTemplate", "modules/import/controllers/ImportController.php");
-$router->add("POST", "/import/upload-vehicles", "ImportController@uploadVehicles", "modules/import/controllers/ImportController.php");
-$router->add("POST", "/import/upload-documents", "ImportController@uploadDocuments", "modules/import/controllers/ImportController.php");
-$router->add("POST", "/import/upload-drivers", "ImportController@uploadDrivers", "modules/import/controllers/ImportController.php");
+// Întreținere
+$router->addRoute('GET', '/maintenance', 'MaintenanceController', 'index');
+$router->addRoute('GET', '/maintenance/add', 'MaintenanceController', 'add');
+$router->addRoute('POST', '/maintenance/add', 'MaintenanceController', 'add');
+$router->addRoute('GET', '/maintenance/edit', 'MaintenanceController', 'edit');
+$router->addRoute('POST', '/maintenance/edit', 'MaintenanceController', 'edit');
+$router->addRoute('GET', '/maintenance/schedule', 'MaintenanceController', 'schedule');
+$router->addRoute('GET', '/maintenance/history', 'MaintenanceController', 'history');
+$router->addRoute('GET', '/maintenance/delete', 'MaintenanceController', 'delete');
+$router->addRoute('POST', '/maintenance/delete', 'MaintenanceController', 'delete');
+
+// Combustibil
+$router->addRoute('GET', '/fuel', 'FuelController', 'index');
+$router->addRoute('GET', '/fuel/add', 'FuelController', 'add');
+$router->addRoute('POST', '/fuel/add', 'FuelController', 'add');
+$router->addRoute('GET', '/fuel/last-odometer', 'FuelController', 'getVehicleLastOdometer');
+$router->addRoute('GET', '/fuel/reports', 'FuelController', 'reports');
+$router->addRoute('GET', '/fuel/consumption', 'FuelController', 'consumption');
+
+// Rapoarte
+$router->addRoute('GET', '/reports', 'ReportController', 'index');
+$router->addRoute('GET', '/reports/fleet', 'ReportController', 'fleetReport');
+$router->addRoute('GET', '/reports/vehicle', 'ReportController', 'vehicleReport');
+$router->addRoute('GET', '/reports/costs', 'ReportController', 'costAnalysis');
+$router->addRoute('GET', '/reports/maintenance', 'ReportController', 'maintenanceReport');
+$router->addRoute('GET', '/reports/fuel', 'ReportController', 'fuelReport');
+$router->addRoute('GET', '/reports/custom', 'ReportController', 'customReport');
+$router->addRoute('GET', '/reports/fleet-overview-data', 'ReportController', 'fleetOverviewData');
+$router->addRoute('GET', '/reports/cost-data', 'ReportController', 'costData');
+$router->addRoute('GET', '/reports/maintenance-data', 'ReportController', 'maintenanceData');
+$router->addRoute('GET', '/reports/fuel-consumption-data', 'ReportController', 'fuelConsumptionData');
+$router->addRoute('POST', '/reports/generate', 'ReportController', 'generateAjax');
+$router->addRoute('POST', '/reports/export', 'ReportController', 'exportAjax');
+
+// SuperAdmin
+$router->addRoute('GET', '/superadmin', 'SuperAdminController', 'dashboard');
+$router->addRoute('GET', '/superadmin/dashboard', 'SuperAdminController', 'dashboard');
+$router->addRoute('GET', '/superadmin/companies', 'SuperAdminController', 'companies');
+$router->addRoute('GET', '/superadmin/companies/add', 'SuperAdminController', 'add');
+$router->addRoute('POST', '/superadmin/companies/add', 'SuperAdminController', 'add');
+$router->addRoute('GET', '/superadmin/companies/edit', 'SuperAdminController', 'edit');
+$router->addRoute('POST', '/superadmin/companies/edit', 'SuperAdminController', 'edit');
+$router->addRoute('POST', '/superadmin/companies/change-status', 'SuperAdminController', 'changeStatus');
+$router->addRoute('POST', '/superadmin/companies/reset-admin', 'SuperAdminController', 'resetAdmin');
+$router->addRoute('GET', '/superadmin/act-as', 'SuperAdminController', 'actAs');
+$router->addRoute('GET', '/superadmin/stop-acting', 'SuperAdminController', 'stopActing');
+
+// Utilizatori (profil & management)
+$router->addRoute('GET', '/profile', 'UserController', 'profile');
+$router->addRoute('POST', '/profile', 'UserController', 'saveProfile');
+$router->addRoute('GET', '/settings', 'UserController', 'settings');
+$router->addRoute('GET', '/users', 'UserController', 'index');
+$router->addRoute('GET', '/users/add', 'UserController', 'add');
+$router->addRoute('POST', '/users/add', 'UserController', 'add');
+$router->addRoute('GET', '/users/edit', 'UserController', 'edit');
+$router->addRoute('POST', '/users/edit', 'UserController', 'edit');
+$router->addRoute('POST', '/users/delete', 'UserController', 'delete');
+
+// Import CSV
+$router->addRoute('GET', '/import', 'ImportController', 'index');
+$router->addRoute('GET', '/import/download-vehicles-template', 'ImportController', 'downloadVehiclesTemplate');
+$router->addRoute('GET', '/import/download-documents-template', 'ImportController', 'downloadDocumentsTemplate');
+$router->addRoute('GET', '/import/download-drivers-template', 'ImportController', 'downloadDriversTemplate');
+$router->addRoute('POST', '/import/upload-vehicles', 'ImportController', 'uploadVehicles');
+$router->addRoute('POST', '/import/upload-documents', 'ImportController', 'uploadDocuments');
+$router->addRoute('POST', '/import/upload-drivers', 'ImportController', 'uploadDrivers');
+
+// Notificări & API
+$router->addRoute('GET', '/notifications', 'NotificationController', 'index');
+$router->addRoute('POST', '/notifications/dismiss', 'NotificationController', 'dismiss');
+$router->addRoute('POST', '/notifications/mark-read', 'NotificationController', 'markAsRead');
+$router->addRoute('POST', '/notifications/mark-all-read', 'NotificationController', 'markAllAsRead');
+$router->addRoute('GET', '/notifications/unread-count', 'NotificationController', 'getUnreadCount');
+$router->addRoute('POST', '/notifications/generate-system', 'NotificationController', 'generateSystemNotifications');
+$router->addRoute('GET', '/notifications/settings', 'NotificationController', 'settings');
+$router->addRoute('POST', '/notifications/settings', 'NotificationController', 'settings');
+$router->addRoute('GET', '/api/notifications', 'ApiController', 'notifications');
+
+// Public landing pages (dacă există controllerele)
+$router->addRoute('GET', '/home', 'LandingController', 'index');
+$router->addRoute('GET', '/contact', 'LandingController', 'contact');
+$router->addRoute('POST', '/contact/submit', 'LandingController', 'submitContact');
+
+// Sfârșit liste

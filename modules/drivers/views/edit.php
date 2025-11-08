@@ -27,7 +27,7 @@ $val = function($arr, $key){ return htmlspecialchars($arr[$key] ?? '', ENT_QUOTE
     <div class="alert alert-success"><i class="fas fa-check-circle me-2"></i><?= htmlspecialchars($success) ?></div>
   <?php endif; ?>
 
-  <form action="<?= BASE_URL ?>drivers/edit?id=<?= (int)$driver['id'] ?>" method="POST" id="editDriverForm">
+  <form action="<?= ROUTE_BASE ?>drivers/edit?id=<?= (int)$driver['id'] ?>" method="POST" id="editDriverForm">
     <!-- Informații personale -->
     <div class="card shadow-sm mb-4">
       <div class="card-header bg-primary text-white"><h5 class="mb-0"><i class="fas fa-user me-2"></i> Informații personale</h5></div>

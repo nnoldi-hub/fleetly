@@ -48,12 +48,24 @@ class Database {
 
     // ---------- Multi-tenant helpers ----------
     public function setTenantDatabaseByCompanyId($companyId) {
-        $dbName = 'fm_tenant_' . (int)$companyId;
+        $prefix = method_exists('DatabaseConfig', 'getTenantDbPrefix') ? DatabaseConfig::getTenantDbPrefix() : '';
+        $dbName = $prefix . 'fm_tenant_' . (int)$companyId;
         return $this->setTenantDatabase($dbName);
     }
 
     public function setTenantDatabase($dbName) {
         $dbName = preg_replace('/[^a-zA-Z0-9_]/','_', $dbName);
+
+        // Single-DB tenancy mode (shared hosting friendly): reuse CORE DB
+        if (method_exists('DatabaseConfig', 'getTenancyMode') && DatabaseConfig::getTenancyMode() === 'single') {
+            // Use core connection as tenant connection as well
+            $this->installTenantSchemaIfNeeded($this->core);
+            $this->tenants[$dbName] = $this->core;
+            $this->currentTenantDb = DatabaseConfig::getDbName();
+            $_SESSION['acting_company']['db'] = $this->currentTenantDb;
+            return $this->core;
+        }
+
         if (isset($this->tenants[$dbName])) {
             $this->currentTenantDb = $dbName;
             $_SESSION['acting_company']['db'] = $dbName;
@@ -81,9 +93,9 @@ class Database {
 
     private function createPdoForDb($dbName) {
         // Connect to server and ensure DB exists
-        $host = (new ReflectionClass('DatabaseConfig'))->getConstant('HOST');
-        $user = (new ReflectionClass('DatabaseConfig'))->getConstant('USERNAME');
-        $pass = (new ReflectionClass('DatabaseConfig'))->getConstant('PASSWORD');
+        $host = DatabaseConfig::getHost();
+        $user = DatabaseConfig::getUsername();
+        $pass = DatabaseConfig::getPassword();
         $charset = 'utf8mb4';
         $serverDsn = 'mysql:host=' . $host . ';charset=' . $charset;
         $pdo = new PDO($serverDsn, $user, $pass, [
@@ -244,16 +256,21 @@ class Database {
 
         $pdo->exec("CREATE TABLE IF NOT EXISTS notifications (
             id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NULL,
             type ENUM('document_expiry', 'maintenance_due', 'inspection_due', 'license_expiry', 'mileage_alert', 'cost_alert', 'general') NOT NULL,
             priority ENUM('low', 'medium', 'high', 'critical') DEFAULT 'medium',
             vehicle_id INT NULL,
             driver_id INT NULL,
             related_id INT NULL,
+            related_type VARCHAR(50) NULL,
             title VARCHAR(200) NOT NULL,
             message TEXT NOT NULL,
             target_date DATE,
             due_date DATE,
             status ENUM('pending', 'sent', 'acknowledged', 'dismissed', 'expired') DEFAULT 'pending',
+            is_read TINYINT(1) NOT NULL DEFAULT 0,
+            read_at TIMESTAMP NULL,
+            action_url VARCHAR(255) NULL,
             notification_methods JSON,
             recipients JSON,
             sent_at TIMESTAMP NULL,
@@ -264,9 +281,11 @@ class Database {
             FOREIGN KEY (driver_id) REFERENCES drivers(id) ON DELETE CASCADE,
             INDEX idx_status_date (status, due_date),
             INDEX idx_vehicle_notifications (vehicle_id),
-            INDEX idx_type_priority (type, priority)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
-
+            INDEX idx_type_priority (type, priority),
+            INDEX idx_notifications_user_unread (user_id, is_read),
+            INDEX idx_notifications_user_created (user_id, created_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
         // Seed default vehicle types if empty
         try {
             $count = (int)$pdo->query("SELECT COUNT(*) AS c FROM vehicle_types")->fetch()['c'];

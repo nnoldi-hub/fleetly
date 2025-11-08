@@ -9,7 +9,7 @@ unset($_SESSION['errors'], $_SESSION['success']);
     <h1 class="h3 mb-0"><i class="fas fa-id-card text-primary me-2"></i> Detalii Șofer</h1>
     <div class="d-flex gap-2">
       <a href="<?= BASE_URL ?>drivers" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i> Înapoi la listă</a>
-      <a href="<?= BASE_URL ?>drivers/edit?id=<?= (int)$driver['id'] ?>" class="btn btn-primary"><i class="fas fa-edit me-1"></i> Editează</a>
+      <a href="<?= ROUTE_BASE ?>drivers/edit?id=<?= (int)$driver['id'] ?>" class="btn btn-primary"><i class="fas fa-edit me-1"></i> Editează</a>
       <button class="btn btn-danger" id="deleteDriverBtn"><i class="fas fa-trash me-1"></i> Șterge</button>
     </div>
   </div>
