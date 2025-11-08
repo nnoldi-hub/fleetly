@@ -23,8 +23,8 @@ class Notification extends Model {
             $data['action_url'] ?? null
         ];
         
-        $this->db->query($sql, $params);
-        $id = $this->db->lastInsertId();
+        $this->db->queryOn($this->table, $sql, $params);
+        $id = $this->db->lastInsertIdOn($this->table);
 
         // Încercare trimitere imediată pe email/SMS conform preferințelor utilizatorului (non-blocking)
         try {
@@ -35,7 +35,7 @@ class Notification extends Model {
             if ($userId > 0) {
                 // Preferințe
                 $prefsKey = 'notifications_prefs_user_' . $userId;
-                $prefsRow = $this->db->fetch("SELECT setting_value FROM system_settings WHERE setting_key = ?", [$prefsKey]);
+                $prefsRow = $this->db->fetchOn($this->table, "SELECT setting_value FROM system_settings WHERE setting_key = ?", [$prefsKey]);
                 $prefs = ['methods' => ['in_app'=>1,'email'=>0,'sms'=>0]];
                 if ($prefsRow && !empty($prefsRow['setting_value'])) {
                     $dec = json_decode($prefsRow['setting_value'], true);
@@ -48,7 +48,7 @@ class Notification extends Model {
                 if (!empty($data['action_url'])) { $body .= "\n\nVezi detalii: " . rtrim(BASE_URL, '/') . $data['action_url']; }
 
                 if (!empty($prefs['methods']['email'])) {
-                    $user = $this->db->fetch("SELECT email FROM users WHERE id = ?", [$userId]);
+                    $user = $this->db->fetchOn($this->table, "SELECT email FROM users WHERE id = ?", [$userId]);
                     $emailTo = $user['email'] ?? '';
                     if ($emailTo) {
                         [$ok, $err] = $notifier->sendEmail($emailTo, $subject, $body);
@@ -57,8 +57,8 @@ class Notification extends Model {
                 }
 
                 if (!empty($prefs['methods']['sms'])) {
-                    $userPhoneRow = $this->db->fetch("SELECT setting_value FROM system_settings WHERE setting_key = ?", ['user_'.$userId.'_sms_to']);
-                    $smsSettingsRow = $this->db->fetch("SELECT setting_value FROM system_settings WHERE setting_key = 'sms_settings'");
+                    $userPhoneRow = $this->db->fetchOn($this->table, "SELECT setting_value FROM system_settings WHERE setting_key = ?", ['user_'.$userId.'_sms_to']);
+                    $smsSettingsRow = $this->db->fetchOn($this->table, "SELECT setting_value FROM system_settings WHERE setting_key = 'sms_settings'");
                     $smsSettings = $smsSettingsRow && $smsSettingsRow['setting_value'] ? json_decode($smsSettingsRow['setting_value'], true) : [];
                     $toPhone = '';
                     if ($userPhoneRow && !empty($userPhoneRow['setting_value'])) { $toPhone = trim($userPhoneRow['setting_value']); }
@@ -70,7 +70,7 @@ class Notification extends Model {
                 }
 
                 if ($sentAny) {
-                    $this->db->query("UPDATE notifications SET status='sent', sent_at = NOW() WHERE id = ?", [$id]);
+                    $this->db->queryOn($this->table, "UPDATE notifications SET status='sent', sent_at = NOW() WHERE id = ?", [$id]);
                 }
             }
         } catch (Throwable $e) {
@@ -98,7 +98,7 @@ class Notification extends Model {
         $params[] = $limit;
         $params[] = $offset;
         
-        return $this->db->fetchAll($sql, $params);
+        return $this->db->fetchAllOn($this->table, $sql, $params);
     }
     
     public function getTotalCount($conditions = []) {
@@ -107,33 +107,33 @@ class Notification extends Model {
         $sql = "SELECT COUNT(*) as count FROM notifications n {$whereClause}";
         $params = array_values($conditions);
         
-        $result = $this->db->fetch($sql, $params);
+        $result = $this->db->fetchOn($this->table, $sql, $params);
         return $result['count'] ?? 0;
     }
     
     public function getById($id) {
         $sql = "SELECT * FROM notifications WHERE id = ?";
-        return $this->db->fetch($sql, [$id]);
+        return $this->db->fetchOn($this->table, $sql, [$id]);
     }
     
     public function markAsRead($id) {
         $sql = "UPDATE notifications SET is_read = 1, read_at = NOW() WHERE id = ?";
-        return $this->db->query($sql, [$id]);
+        return $this->db->queryOn($this->table, $sql, [$id]);
     }
     
     public function markAllAsRead($userId) {
         $sql = "UPDATE notifications SET is_read = 1, read_at = NOW() WHERE user_id = ? AND is_read = 0";
-        return $this->db->query($sql, [$userId]);
+        return $this->db->queryOn($this->table, $sql, [$userId]);
     }
     
     public function delete($id) {
         $sql = "DELETE FROM notifications WHERE id = ?";
-        return $this->db->query($sql, [$id]);
+        return $this->db->queryOn($this->table, $sql, [$id]);
     }
     
     public function getUnreadCount($userId) {
         $sql = "SELECT COUNT(*) as count FROM notifications WHERE user_id = ? AND is_read = 0";
-        $result = $this->db->fetch($sql, [$userId]);
+        $result = $this->db->fetchOn($this->table, $sql, [$userId]);
         return $result['count'] ?? 0;
     }
     
@@ -148,7 +148,7 @@ class Notification extends Model {
                 FROM notifications 
                 WHERE `user_id` = ?";
         
-        return $this->db->fetch($sql, [$userId]);
+        return $this->db->fetchOn($this->table, $sql, [$userId]);
     }
     
     public function getRecentNotifications($userId, $limit = 10) {
@@ -163,7 +163,7 @@ class Notification extends Model {
                 ORDER BY n.is_read ASC, n.created_at DESC 
                 LIMIT ?";
         
-        return $this->db->fetchAll($sql, [$userId, $limit]);
+        return $this->db->fetchAllOn($this->table, $sql, [$userId, $limit]);
     }
     
     public function exists($data) {
@@ -183,7 +183,7 @@ class Notification extends Model {
             $data['related_type'] ?? null
         ];
         
-        $result = $this->db->fetch($sql, $params);
+        $result = $this->db->fetchOn($this->table, $sql, $params);
         return ($result['count'] ?? 0) > 0;
     }
     
@@ -199,7 +199,7 @@ class Notification extends Model {
                 ORDER BY n.is_read ASC, n.created_at DESC 
                 LIMIT ?";
         
-        return $this->db->fetchAll($sql, [$userId, $type, $limit]);
+        return $this->db->fetchAllOn($this->table, $sql, [$userId, $type, $limit]);
     }
     
     public function cleanup($days = 30) {
@@ -208,7 +208,7 @@ class Notification extends Model {
                 WHERE is_read = 1 
                   AND read_at < DATE_SUB(NOW(), INTERVAL ? DAY)";
         
-        return $this->db->query($sql, [$days]);
+        return $this->db->queryOn($this->table, $sql, [$days]);
     }
     
     public function bulkMarkAsRead($ids, $userId) {
@@ -220,7 +220,7 @@ class Notification extends Model {
                 WHERE id IN ($placeholders) AND user_id = ?";
         
         $params = array_merge($ids, [$userId]);
-        return $this->db->query($sql, $params);
+        return $this->db->queryOn($this->table, $sql, $params);
     }
     
     public function bulkDelete($ids, $userId) {
@@ -231,7 +231,7 @@ class Notification extends Model {
                 WHERE id IN ($placeholders) AND user_id = ?";
         
         $params = array_merge($ids, [$userId]);
-        return $this->db->query($sql, $params);
+        return $this->db->queryOn($this->table, $sql, $params);
     }
     
     private function buildWhereClause($conditions) {
