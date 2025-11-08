@@ -35,7 +35,7 @@ ob_start('fm_output_no_diacritics');
 
 // Include fișierele de configurare
 require_once 'config/config.php';
-require_once 'config/Database.php';
+require_once 'config/database.php';
 
 // Include clasele de bază
 require_once 'core/Database.php';

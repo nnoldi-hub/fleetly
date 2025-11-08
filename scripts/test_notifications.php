@@ -1,6 +1,6 @@
 <?php
 // Simple smoke test to create a few notifications and exercise immediate + background send
-require_once __DIR__ . '/../config/Database.php';
+require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/../modules/notifications/models/notification.php';
 

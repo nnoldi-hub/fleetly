@@ -1,7 +1,7 @@
 <?php
 // modules/notifications/models/notification.php
 
-require_once __DIR__ . '/../../../config/Database.php';
+require_once __DIR__ . '/../../../config/database.php';
 require_once __DIR__ . '/../../../core/Database.php';
 require_once __DIR__ . '/../../../core/Model.php';
 
