@@ -1,6 +1,9 @@
 <?php
 // modules/notifications/controllers/NotificationController.php
 
+require_once __DIR__ . '/../../../core/Controller.php';
+require_once __DIR__ . '/../models/Notification.php';
+
 class NotificationController extends Controller {
     private $notificationModel;
     
