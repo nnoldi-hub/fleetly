@@ -9,6 +9,10 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 require_once __DIR__ . '/../../config/config.php';
+require_once __DIR__ . '/../../core/Controller.php';
+require_once __DIR__ . '/../../core/Model.php';
+require_once __DIR__ . '/../../core/Database.php';
+require_once __DIR__ . '/models/Notification.php';
 require_once __DIR__ . '/controllers/NotificationController.php';
 
 $controller = new NotificationController();
