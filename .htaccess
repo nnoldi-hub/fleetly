@@ -1,3 +1,6 @@
+# Set production environment
+SetEnv FM_ENV prod
+
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
