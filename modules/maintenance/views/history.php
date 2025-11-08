@@ -1,6 +1,6 @@
 <?php
 require_once '../../../config/config.php';
-require_once '../../../core/database.php';
+require_once '../../../core/Database.php';
 require_once '../controllers/MaintenanceController.php';
 
 $vehicleId = $_GET['vehicle_id'] ?? null;

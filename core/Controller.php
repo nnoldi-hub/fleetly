@@ -4,8 +4,8 @@ if (!class_exists('Database', false)) {
     $dbPath = __DIR__ . '/Database.php';
     if (file_exists($dbPath)) {
         require_once $dbPath;
-    } elseif (file_exists(__DIR__ . '/database.php')) {
-        require_once __DIR__ . '/database.php';
+    } elseif (file_exists(__DIR__ . '/Database.php')) {
+        require_once __DIR__ . '/Database.php';
     } elseif (file_exists(__DIR__ . '/../core/Database.php')) {
         require_once __DIR__ . '/../core/Database.php';
     } elseif (file_exists(__DIR__ . '/../Database.php')) {

@@ -1,6 +1,6 @@
 <?php
 // Ensure Database class is available
-require_once __DIR__ . '/database.php';
+require_once __DIR__ . '/Database.php';
 
 abstract class Model {
     protected $db;

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $pageTitle = 'Lista Intretinere';
 ?>
 <div class="container-fluid">
@@ -94,7 +94,7 @@ $pageTitle = 'Lista Intretinere';
                   <a href="<?= BASE_URL ?>maintenance/edit?id=<?= $record['id'] ?>" class="btn btn-sm btn-primary">
                     <i class="fas fa-edit"></i>
                   </a>
-                  <form method="post" action="<?= BASE_URL ?>maintenance/delete" style="display:inline" onsubmit="return confirm('Sigur ștergi această înregistrare?');">
+                  <form method="post" action="<?= BASE_URL ?>maintenance/delete" style="display:inline" onsubmit="return confirm('Sigur ?tergi aceasta �nregistrare?');">
                     <input type="hidden" name="id" value="<?= $record['id'] ?>">
                     <button type="submit" class="btn btn-sm btn-danger">
                       <i class="fas fa-trash"></i>

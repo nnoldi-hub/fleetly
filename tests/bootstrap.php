@@ -9,5 +9,5 @@ if (file_exists($vendor)) {
 }
 
 // Minimal requires for core classes used in tests
-require_once BASE_PATH . '/core/router.php';
+require_once BASE_PATH . '/core/Router.php';
 require_once BASE_PATH . '/core/Util.php';

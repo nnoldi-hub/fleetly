@@ -1,8 +1,8 @@
 <?php
 // Quick smoke tests for report generation endpoints
-require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../core/database.php';
-require_once __DIR__ . '/../core/model.php';
+require_once __DIR__ . '/../config/Database.php';
+require_once __DIR__ . '/../core/Database.php';
+require_once __DIR__ . '/../core/Model.php';
 require_once __DIR__ . '/../modules/reports/models/report.php';
 require_once __DIR__ . '/../modules/vehicles/models/vehicle.php';
 require_once __DIR__ . '/../modules/fuel/models/FuelConsumption.php';

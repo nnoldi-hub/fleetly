@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ro">
 <head>
     <meta charset="UTF-8">
@@ -68,10 +68,10 @@
                         <input type="text" class="form-control" name="username" required placeholder="Username / Email">
                     </div>
                     <div class="mb-3">
-                        <input type="password" class="form-control" name="password" required placeholder="Parolă">
+                        <input type="password" class="form-control" name="password" required placeholder="Parola">
                     </div>
                     <div class="mb-3">
-                        <input type="checkbox" name="remember_me"> Ține-mă minte
+                        <input type="checkbox" name="remember_me"> ?ine-ma minte
                     </div>
                     <button type="submit" class="btn btn-login text-white">Autentificare</button>
                 </form>

@@ -1,19 +1,19 @@
-﻿<?php
+<?php
 /**
  * config/routes.php
  *
- * Scop: centralizarea DEFINIȚIILOR DE RUTE într-un singur loc.
- * Acum acest fișier ESTE utilizabil dacă îl incluzi după ce instanțiezi $router în index.php:
+ * Scop: centralizarea DEFINI?IILOR DE RUTE �ntr-un singur loc.
+ * Acum acest fi?ier ESTE utilizabil daca �l incluzi dupa ce instan?iezi $router �n index.php:
  *    require_once 'config/routes.php';
  *
  * IMPORTANT: Clasa Router are metoda addRoute($method, $path, $controller, $action)
- *            NU există $router->add(). Versiunea veche era greșită și cauza confuzii.
+ *            NU exista $router->add(). Versiunea veche era gre?ita ?i cauza confuzii.
  *
- * Recomandare: menține acest fișier doar ca sursă a listelor de rute; nu pune logica aici.
+ * Recomandare: men?ine acest fi?ier doar ca sursa a listelor de rute; nu pune logica aici.
  */
 
 if (!isset($router) || !is_object($router)) {
-	throw new RuntimeException('Router nu este inițializat înainte de includerea config/routes.php');
+	throw new RuntimeException('Router nu este ini?ializat �nainte de includerea config/routes.php');
 }
 
 // Autentificare
@@ -58,7 +58,7 @@ $router->addRoute('POST', '/documents/delete', 'DocumentController', 'delete');
 $router->addRoute('GET', '/documents/export', 'DocumentController', 'export');
 $router->addRoute('GET', '/documents/view', 'DocumentController', 'view');
 
-// Asigurări
+// Asigurari
 $router->addRoute('GET', '/insurance', 'InsuranceController', 'index');
 $router->addRoute('GET', '/insurance/add', 'InsuranceController', 'add');
 $router->addRoute('POST', '/insurance/add', 'InsuranceController', 'add');
@@ -68,7 +68,7 @@ $router->addRoute('GET', '/insurance/view', 'InsuranceController', 'view');
 $router->addRoute('POST', '/insurance/delete', 'InsuranceController', 'delete');
 $router->addRoute('GET', '/insurance/expiring', 'InsuranceController', 'expiring');
 
-// Șoferi
+// ?oferi
 $router->addRoute('GET', '/drivers', 'DriverController', 'index');
 $router->addRoute('GET', '/drivers/add', 'DriverController', 'add');
 $router->addRoute('POST', '/drivers/add', 'DriverController', 'add');
@@ -77,7 +77,7 @@ $router->addRoute('POST', '/drivers/edit', 'DriverController', 'edit');
 $router->addRoute('GET', '/drivers/view', 'DriverController', 'view');
 $router->addRoute('POST', '/drivers/delete', 'DriverController', 'delete');
 
-// Întreținere
+// �ntre?inere
 $router->addRoute('GET', '/maintenance', 'MaintenanceController', 'index');
 $router->addRoute('GET', '/maintenance/add', 'MaintenanceController', 'add');
 $router->addRoute('POST', '/maintenance/add', 'MaintenanceController', 'add');
@@ -144,7 +144,7 @@ $router->addRoute('POST', '/import/upload-vehicles', 'ImportController', 'upload
 $router->addRoute('POST', '/import/upload-documents', 'ImportController', 'uploadDocuments');
 $router->addRoute('POST', '/import/upload-drivers', 'ImportController', 'uploadDrivers');
 
-// Notificări & API
+// Notificari & API
 $router->addRoute('GET', '/notifications', 'NotificationController', 'index');
 $router->addRoute('POST', '/notifications/dismiss', 'NotificationController', 'dismiss');
 $router->addRoute('POST', '/notifications/mark-read', 'NotificationController', 'markAsRead');
@@ -155,9 +155,9 @@ $router->addRoute('GET', '/notifications/settings', 'NotificationController', 's
 $router->addRoute('POST', '/notifications/settings', 'NotificationController', 'settings');
 $router->addRoute('GET', '/api/notifications', 'ApiController', 'notifications');
 
-// Public landing pages (dacă există controllerele)
+// Public landing pages (daca exista controllerele)
 $router->addRoute('GET', '/home', 'LandingController', 'index');
 $router->addRoute('GET', '/contact', 'LandingController', 'contact');
 $router->addRoute('POST', '/contact/submit', 'LandingController', 'submitContact');
 
-// Sfârșit liste
+// Sf�r?it liste

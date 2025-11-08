@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $pageTitle = 'Detalii Vehicul';
 $success = $_SESSION['flash_success'] ?? '';
 unset($_SESSION['flash_success']);

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 $pageTitle = 'Adauga Intretinere';
 $errors = $_SESSION['errors'] ?? [];
 $formData = $_SESSION['form_data'] ?? [];

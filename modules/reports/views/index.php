@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // modules/reports/views/index.php (template-only)
 // Expect: $totalVehicles, $totalFuelRecords, $totalMaintenanceRecords, $totalInsuranceRecords
 ?>
@@ -20,7 +20,7 @@
     <div class="col-md-3">
       <div class="card border-success h-100">
         <div class="card-body text-center">
-          <div class="text-muted">Înregistrări combustibil</div>
+          <div class="text-muted">�nregistrari combustibil</div>
           <div class="display-6 fw-bold text-success"><?= (int)($totalFuelRecords ?? 0) ?></div>
         </div>
       </div>
@@ -28,7 +28,7 @@
     <div class="col-md-3">
       <div class="card border-warning h-100">
         <div class="card-body text-center">
-          <div class="text-muted">Înregistrări mentenanță</div>
+          <div class="text-muted">�nregistrari mentenan?a</div>
           <div class="display-6 fw-bold text-warning"><?= (int)($totalMaintenanceRecords ?? 0) ?></div>
         </div>
       </div>
@@ -36,7 +36,7 @@
     <div class="col-md-3">
       <div class="card border-secondary h-100">
         <div class="card-body text-center">
-          <div class="text-muted">Polițe asigurare</div>
+          <div class="text-muted">Poli?e asigurare</div>
           <div class="display-6 fw-bold text-secondary"><?= (int)($totalInsuranceRecords ?? 0) ?></div>
         </div>
       </div>
@@ -47,8 +47,8 @@
     <div class="col-lg-6">
       <div class="card h-100">
         <div class="card-body">
-          <h5 class="card-title"><i class="fas fa-clipboard-list me-2"></i> Raport flotă</h5>
-          <p class="card-text text-muted">Rezumat combustibil, mentenanță și costuri pe întreaga flotă, într-o perioadă selectată.</p>
+          <h5 class="card-title"><i class="fas fa-clipboard-list me-2"></i> Raport flota</h5>
+          <p class="card-text text-muted">Rezumat combustibil, mentenan?a ?i costuri pe �ntreaga flota, �ntr-o perioada selectata.</p>
           <a class="btn btn-primary" href="<?= BASE_URL ?>reports/fleet">Deschide</a>
         </div>
       </div>
@@ -56,9 +56,9 @@
     <div class="col-lg-6">
       <div class="card h-100">
         <div class="card-body">
-          <h5 class="card-title"><i class="fas fa-coins me-2"></i> Analiză costuri</h5>
-          <p class="card-text text-muted">Evoluția costurilor (combustibil, mentenanță, asigurări) pe perioade (lunar, săptămânal, anual).</p>
-          <a class="btn btn-primary" href="<?= BASE_URL ?>reports/costs">Analizează</a>
+          <h5 class="card-title"><i class="fas fa-coins me-2"></i> Analiza costuri</h5>
+          <p class="card-text text-muted">Evolu?ia costurilor (combustibil, mentenan?a, asigurari) pe perioade (lunar, saptam�nal, anual).</p>
+          <a class="btn btn-primary" href="<?= BASE_URL ?>reports/costs">Analizeaza</a>
         </div>
       </div>
     </div>

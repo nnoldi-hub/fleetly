@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // Safe defaults
 $pageTitle = $pageTitle ?? 'Rapoarte Combustibil';
 $report_type = $report_type ?? ($_GET['report_type'] ?? 'overview');
@@ -35,14 +35,14 @@ $drivers = $drivers ?? [];
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 <h1 class="h3 mb-1"><i class="fas fa-chart-bar me-2"></i><?= htmlspecialchars($pageTitle) ?></h1>
-                <p class="mb-0 opacity-75">Analiză detaliată a consumului de combustibil și costuri</p>
+                <p class="mb-0 opacity-75">Analiza detaliata a consumului de combustibil ?i costuri</p>
             </div>
             <div class="d-flex gap-2">
                 <button onclick="window.print()" class="btn btn-outline-secondary">
                     <i class="fas fa-file-pdf"></i> Export PDF
                 </button>
-                <a href="<?= BASE_URL ?>fuel" class="btn btn-light"><i class="fas fa-list"></i> Listă</a>
-                <a href="<?= BASE_URL ?>fuel/add" class="btn btn-success"><i class="fas fa-plus"></i> Adaugă</a>
+                <a href="<?= BASE_URL ?>fuel" class="btn btn-light"><i class="fas fa-list"></i> Lista</a>
+                <a href="<?= BASE_URL ?>fuel/add" class="btn btn-success"><i class="fas fa-plus"></i> Adauga</a>
             </div>
         </div>
     </div>
@@ -56,13 +56,13 @@ $drivers = $drivers ?? [];
             <i class="fas fa-car"></i> Vehicule
         </a>
         <a href="?<?= http_build_query(array_merge($_GET, ['report_type' => 'driver'])) ?>" class="report-tab <?= $report_type === 'driver' ? 'active' : '' ?>">
-            <i class="fas fa-user"></i> Șoferi
+            <i class="fas fa-user"></i> ?oferi
         </a>
         <a href="?<?= http_build_query(array_merge($_GET, ['report_type' => 'cost'])) ?>" class="report-tab <?= $report_type === 'cost' ? 'active' : '' ?>">
             <i class="fas fa-money-bill"></i> Costuri
         </a>
         <a href="?<?= http_build_query(array_merge($_GET, ['report_type' => 'efficiency'])) ?>" class="report-tab <?= $report_type === 'efficiency' ? 'active' : '' ?>">
-            <i class="fas fa-tachometer-alt"></i> Eficiență
+            <i class="fas fa-tachometer-alt"></i> Eficien?a
         </a>
     </div>
 
@@ -76,7 +76,7 @@ $drivers = $drivers ?? [];
                     <input type="date" class="form-control" name="date_from" value="<?= htmlspecialchars($filters['date_from']) ?>">
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">Până la</label>
+                    <label class="form-label">P�na la</label>
                     <input type="date" class="form-control" name="date_to" value="<?= htmlspecialchars($filters['date_to']) ?>">
                 </div>
                 <div class="col-md-3">
@@ -91,9 +91,9 @@ $drivers = $drivers ?? [];
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Șofer</label>
+                    <label class="form-label">?ofer</label>
                     <select class="form-select" name="driver">
-                        <option value="">Toți șoferii</option>
+                        <option value="">To?i ?oferii</option>
                         <?php foreach ($drivers as $d): ?>
                             <option value="<?= $d['id'] ?>" <?= $filters['driver'] == $d['id'] ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($d['name'] ?? '') ?>
@@ -102,7 +102,7 @@ $drivers = $drivers ?? [];
                     </select>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Filtrează</button>
+                    <button type="submit" class="btn btn-primary w-100"><i class="fas fa-search"></i> Filtreaza</button>
                 </div>
             </form>
         </div>
@@ -148,7 +148,7 @@ $drivers = $drivers ?? [];
                         <thead>
                             <tr>
                                 <th>Vehicul</th>
-                                <th>Alimentări</th>
+                                <th>Alimentari</th>
                                 <th>Litri</th>
                                 <th>Cost</th>
                                 <th>Consum Mediu</th>
@@ -172,16 +172,16 @@ $drivers = $drivers ?? [];
     <?php elseif ($report_type === 'driver' && !empty($reports['driver_consumption'])): ?>
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <i class="fas fa-user me-2"></i>Raport Detaliat pe Șoferi
+                <i class="fas fa-user me-2"></i>Raport Detaliat pe ?oferi
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Șofer</th>
+                                <th>?ofer</th>
                                 <th>Vehicule</th>
-                                <th>Alimentări</th>
+                                <th>Alimentari</th>
                                 <th>Litri</th>
                                 <th>Cost</th>
                             </tr>

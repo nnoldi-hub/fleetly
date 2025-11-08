@@ -1,8 +1,8 @@
 <?php
 // modules/vehicles/models/Vehicle.php
-require_once __DIR__ . '/../../../config/database.php';
-require_once __DIR__ . '/../../../core/database.php';
-require_once __DIR__ . '/../../../core/model.php';
+require_once __DIR__ . '/../../../config/Database.php';
+require_once __DIR__ . '/../../../core/Database.php';
+require_once __DIR__ . '/../../../core/Model.php';
 
 class Vehicle extends Model {
     protected $table = 'vehicles';

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 class Company extends Model {
     protected $table = 'companies';
@@ -65,7 +65,7 @@ class Company extends Model {
                 // Choose password: provided or generated (do early to reuse later)
                 if ($newPassword !== null && $newPassword !== '') {
                     if (strlen($newPassword) < 6) {
-                        return ['success' => false, 'message' => 'Parola trebuie să aibă minim 6 caractere.'];
+                        return ['success' => false, 'message' => 'Parola trebuie sa aiba minim 6 caractere.'];
                     }
                     $plain = $newPassword;
                 } else {
@@ -132,7 +132,7 @@ class Company extends Model {
                         'password' => $plain,
                     ];
                 } catch (Throwable $ce) {
-                    return ['success' => false, 'message' => 'Nu a fost găsit contul admin și nu s-a putut crea automat.'];
+                    return ['success' => false, 'message' => 'Nu a fost gasit contul admin ?i nu s-a putut crea automat.'];
                 }
             }
 
@@ -151,7 +151,7 @@ class Company extends Model {
             // Choose password: provided or generated
             if ($newPassword !== null && $newPassword !== '') {
                 if (strlen($newPassword) < 6) {
-                    return ['success' => false, 'message' => 'Parola trebuie să aibă minim 6 caractere.'];
+                    return ['success' => false, 'message' => 'Parola trebuie sa aiba minim 6 caractere.'];
                 }
                 $plain = $newPassword;
             } else {
@@ -199,7 +199,7 @@ class Company extends Model {
      * Get all companies (SuperAdmin only)
      */
     public function getAll($filters = []) {
-    // Pentru compatibilitate, nu facem join cu vehicles (în unele instalări nu există company_id pe vehicles)
+    // Pentru compatibilitate, nu facem join cu vehicles (�n unele instalari nu exista company_id pe vehicles)
     $sql = "SELECT c.*, 
         COUNT(DISTINCT u.id) as users_count,
         0 as vehicles_count
@@ -245,7 +245,7 @@ class Company extends Model {
      */
     public function getById($id) {
         try {
-            // Fără join cu vehicles pentru compatibilitate cu scheme vechi
+            // Fara join cu vehicles pentru compatibilitate cu scheme vechi
             $stmt = $this->conn->prepare(
                 "SELECT c.*, creator.username as created_by_username
                  FROM companies c
@@ -256,12 +256,12 @@ class Company extends Model {
             $company = $stmt->fetch(PDO::FETCH_OBJ);
             if (!$company) return null;
 
-            // Adăugăm număr utilizatori activi
+            // Adaugam numar utilizatori activi
             $uc = $this->conn->prepare("SELECT COUNT(*) FROM users WHERE company_id = ? AND status = 'active'");
             $uc->execute([$id]);
             $company->users_count = (int)$uc->fetchColumn();
 
-            // Fără relație vehicles->company în schema veche
+            // Fara rela?ie vehicles->company �n schema veche
             $company->vehicles_count = 0;
             return $company;
         } catch (Throwable $e) {
@@ -291,7 +291,7 @@ class Company extends Model {
                 $data['phone'] ?? null,
                 $data['address'] ?? null,
                 $data['city'] ?? null,
-                $data['country'] ?? 'România',
+                $data['country'] ?? 'Rom�nia',
                 $data['subscription_type'] ?? 'basic',
                 $data['max_users'] ?? 5,
                 $data['max_vehicles'] ?? 10,
@@ -383,7 +383,7 @@ class Company extends Model {
                 $data['phone'] ?? null,
                 $data['address'] ?? null,
                 $data['city'] ?? null,
-                $data['country'] ?? 'România',
+                $data['country'] ?? 'Rom�nia',
                 $data['status'] ?? 'active',
                 $data['subscription_type'] ?? 'basic',
                 $data['max_users'] ?? 5,
@@ -433,7 +433,7 @@ class Company extends Model {
             return ['success' => true];
             
         } catch (Exception $e) {
-            return ['success' => false, 'message' => 'Eroare la ștergerea companiei'];
+            return ['success' => false, 'message' => 'Eroare la ?tergerea companiei'];
         }
     }
     

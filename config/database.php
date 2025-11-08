@@ -1,5 +1,5 @@
 <?php
-// config/database.php
+// config/Database.php
 //
 // Production-ready configuration with safe overrides:
 // - Defaults are for local dev (WAMP). DO NOT commit secrets.
