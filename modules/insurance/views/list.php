@@ -69,7 +69,7 @@ include __DIR__ . '/../../../includes/header.php';
                             <select class="form-select" id="vehicle_id" name="vehicle_id">
                                 <option value="">Toate vehiculele</option>
                                 <?php
-                                require_once __DIR__ . '/../../vehicles/models/vehicle.php';
+                                require_once __DIR__ . '/../../vehicles/models/Vehicle.php';
                                 $vehicleModel = new Vehicle();
                                 $vehicles = $vehicleModel->getActiveVehicles();
                                 foreach ($vehicles as $vehicle):

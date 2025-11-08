@@ -3,10 +3,10 @@
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/../core/Model.php';
-require_once __DIR__ . '/../modules/reports/models/report.php';
-require_once __DIR__ . '/../modules/vehicles/models/vehicle.php';
+require_once __DIR__ . '/../modules/reports/models/Report.php';
+require_once __DIR__ . '/../modules/vehicles/models/Vehicle.php';
 require_once __DIR__ . '/../modules/fuel/models/FuelConsumption.php';
-require_once __DIR__ . '/../modules/maintenance/models/maintenance.php';
+require_once __DIR__ . '/../modules/maintenance/models/Maintenance.php';
 
 function out($label, $value) { echo str_pad($label, 35, ' ') . ": " . $value . PHP_EOL; }
 

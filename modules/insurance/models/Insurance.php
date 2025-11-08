@@ -1,5 +1,5 @@
 <?php
-// modules/insurance/models/insurance.php
+// modules/insurance/models/Insurance.php
 require_once __DIR__ . '/../../../config/database.php';
 require_once __DIR__ . '/../../../core/Database.php';
 require_once __DIR__ . '/../../../core/Model.php';

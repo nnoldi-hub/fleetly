@@ -1,5 +1,5 @@
 <?php
-// modules/reports/models/report.php
+// modules/reports/models/Report.php
 
 require_once __DIR__ . '/../../../config/database.php';
 require_once __DIR__ . '/../../../core/Database.php';

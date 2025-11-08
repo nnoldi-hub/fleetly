@@ -8,7 +8,7 @@ require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/../core/Model.php';
-require_once __DIR__ . '/../modules/notifications/models/notification.php';
+require_once __DIR__ . '/../modules/notifications/models/Notification.php';
 require_once __DIR__ . '/../modules/notifications/services/Notifier.php';
 
 $db = Database::getInstance();

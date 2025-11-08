@@ -1,5 +1,5 @@
 <?php
-// modules/notifications/models/notification.php
+// modules/notifications/models/Notification.php
 
 require_once __DIR__ . '/../../../config/database.php';
 require_once __DIR__ . '/../../../core/Database.php';

@@ -472,7 +472,7 @@ class MaintenanceController extends Controller {
         
         if ($notificationDate >= date('Y-m-d')) {
             // Check if notification model exists
-            $notificationModelPath = '../../notifications/models/notification.php';
+            $notificationModelPath = '../../notifications/models/Notification.php';
             if (file_exists($notificationModelPath)) {
                 require_once $notificationModelPath;
                 

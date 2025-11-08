@@ -434,7 +434,7 @@ class ImportController extends Controller
         $errorDetails = [];
         $lineNumber = 1;
 
-        require_once 'modules/documents/models/document.php';
+        require_once 'modules/documents/models/Document.php';
         require_once 'modules/vehicles/models/Vehicle.php';
         
         $documentModel = new Document();
@@ -562,7 +562,7 @@ class ImportController extends Controller
         $errorDetails = [];
         $lineNumber = 1;
 
-        require_once 'modules/drivers/models/driver.php';
+        require_once 'modules/drivers/models/Driver.php';
         $driverModel = new Driver();
 
         while (($data = fgetcsv($handle, 1000, ',')) !== false) {
