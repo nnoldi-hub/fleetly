@@ -6,5 +6,13 @@ deployment:
     - /bin/rm -f $DEPLOYPATH/core/model.php
     - /bin/rm -f $DEPLOYPATH/core/controller.php
     - /bin/rm -f $DEPLOYPATH/core/router.php
+    - /bin/rm -f $DEPLOYPATH/modules/maintenance/models/maintenance.php
+    - /bin/rm -f $DEPLOYPATH/modules/documents/models/document.php
+    - /bin/rm -f $DEPLOYPATH/modules/drivers/models/driver.php
+    - /bin/rm -f $DEPLOYPATH/modules/insurance/models/insurance.php
+    - /bin/rm -f $DEPLOYPATH/modules/notifications/models/notification.php
+    - /bin/rm -f $DEPLOYPATH/modules/reports/models/report.php
+    - /bin/rm -f $DEPLOYPATH/modules/vehicles/models/vehicle.php
+    - /bin/rm -f $DEPLOYPATH/modules/vehicles/models/vehicletype.php
     - /bin/cp -R * $DEPLOYPATH
     - /bin/cp -R .htaccess $DEPLOYPATH
