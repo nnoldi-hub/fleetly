@@ -2,5 +2,9 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/wclsgzyf/public_html/
+    - /bin/rm -f $DEPLOYPATH/core/database.php
+    - /bin/rm -f $DEPLOYPATH/core/model.php
+    - /bin/rm -f $DEPLOYPATH/core/controller.php
+    - /bin/rm -f $DEPLOYPATH/core/router.php
     - /bin/cp -R * $DEPLOYPATH
     - /bin/cp -R .htaccess $DEPLOYPATH
