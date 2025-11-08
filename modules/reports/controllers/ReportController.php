@@ -24,11 +24,11 @@ class ReportController extends Controller {
         };
 
         $data = [
-            'totalVehicles' => $safeCount(fn() => $this->vehicleModel->getTotalCount()),
-            'totalFuelRecords' => $safeCount(fn() => $this->fuelModel->getTotalCount()),
-            'totalMaintenanceRecords' => $safeCount(fn() => $this->maintenanceModel->getTotalCount()),
+            'totalVehicles' => $safeCount(function() { return $this->vehicleModel->getTotalCount(); }),
+            'totalFuelRecords' => $safeCount(function() { return $this->fuelModel->getTotalCount(); }),
+            'totalMaintenanceRecords' => $safeCount(function() { return $this->maintenanceModel->getTotalCount(); }),
             // Poate lipsi tabela insurance în unele instalații; tratăm sigur
-            'totalInsuranceRecords' => $safeCount(fn() => $this->insuranceModel->getTotalCount())
+            'totalInsuranceRecords' => $safeCount(function() { return $this->insuranceModel->getTotalCount(); })
         ];
 
         $this->render('index', $data);

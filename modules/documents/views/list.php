@@ -107,8 +107,8 @@ $documents_page = array_slice($documents, $offset, $per_page);
 // Calculăm statistici
 $stats = [
     'total' => $total_documents,
-    'active' => count(array_filter($documents, fn($d) => $d['status'] === 'active')),
-    'expired' => count(array_filter($documents, fn($d) => $d['status'] === 'expired')),
+    'active' => count(array_filter($documents, function($d) { return $d['status'] === 'active'; })),
+    'expired' => count(array_filter($documents, function($d) { return $d['status'] === 'expired'; })),
     'expiring_soon' => count(array_filter($documents, function($d) {
         if ($d['status'] !== 'active') return false;
         $days_until = (strtotime($d['expiry_date']) - time()) / (24 * 3600);

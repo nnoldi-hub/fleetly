@@ -52,7 +52,7 @@ abstract class Model {
     
     public function update($id, $data) {
         $columns = array_keys($data);
-        $setClauses = array_map(fn($col) => "$col = ?", $columns);
+        $setClauses = array_map(function($col) { return "$col = ?"; }, $columns);
         
         $sql = "UPDATE {$this->table} SET " . implode(', ', $setClauses) . 
                " WHERE {$this->primaryKey} = ?";
