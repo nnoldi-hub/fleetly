@@ -78,7 +78,10 @@ class Notifier {
                 $w('AUTH LOGIN'); $r();
                 $w(base64_encode($smtp['username'])); $r();
                 $w(base64_encode($smtp['password'] ?? '')); $auth = $r();
-                if (strpos($auth, '235') !== 0) { fclose($fp); return [false, 'Autentificarea SMTP a eșuat']; }
+                if (strpos($auth, '235') !== 0) { 
+                    fclose($fp); 
+                    return [false, 'Autentificarea SMTP a eșuat. Răspuns server: ' . trim($auth)]; 
+                }
             }
             $from = $smtp['from_email'] ?: $smtp['username'];
             $w('MAIL FROM:<'.$from.'>'); $r();
