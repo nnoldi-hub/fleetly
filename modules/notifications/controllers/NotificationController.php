@@ -359,151 +359,185 @@ class NotificationController extends Controller {
 
     // Setări notificări: vizualizare și salvare preferințe per utilizator
     public function settings() {
+        // Asigurăm existența tabelei system_settings în baza CORE pentru a evita 404 pe shared hosting
+        $this->ensureSystemSettingsTable();
         $userId = $_SESSION['user_id'] ?? 1;
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $section = $_POST['section'] ?? 'prefs';
+        // Wrap entire method in try/catch to render friendly error instead of bubbling 404
+        try {
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $section = $_POST['section'] ?? 'prefs';
 
-            if ($section === 'prefs') {
-                // Colectăm preferințele din formular
-                $enabledCategories = isset($_POST['categories']) && is_array($_POST['categories']) ? array_values($_POST['categories']) : [];
-                $methods = [
-                    'in_app' => isset($_POST['method_in_app']) ? 1 : 0,
-                    'email'  => isset($_POST['method_email']) ? 1 : 0,
-                    'sms'    => isset($_POST['method_sms']) ? 1 : 0,
-                ];
-                $daysBefore = isset($_POST['days_before']) ? max(0, (int)$_POST['days_before']) : 30;
-                $minPriority = $_POST['min_priority'] ?? 'low';
+                if ($section === 'prefs') {
+                    // Colectăm preferințele din formular
+                    $enabledCategories = isset($_POST['categories']) && is_array($_POST['categories']) ? array_values($_POST['categories']) : [];
+                    $methods = [
+                        'in_app' => isset($_POST['method_in_app']) ? 1 : 0,
+                        'email'  => isset($_POST['method_email']) ? 1 : 0,
+                        'sms'    => isset($_POST['method_sms']) ? 1 : 0,
+                    ];
+                    $daysBefore = isset($_POST['days_before']) ? max(0, (int)$_POST['days_before']) : 30;
+                    $minPriority = $_POST['min_priority'] ?? 'low';
 
-                $prefs = [
-                    'enabledCategories' => $enabledCategories,
-                    'methods' => $methods,
-                    'daysBefore' => $daysBefore,
-                    'minPriority' => in_array($minPriority, ['low','medium','high','critical']) ? $minPriority : 'low',
-                ];
+                    $prefs = [
+                        'enabledCategories' => $enabledCategories,
+                        'methods' => $methods,
+                        'daysBefore' => $daysBefore,
+                        'minPriority' => in_array($minPriority, ['low','medium','high','critical']) ? $minPriority : 'low',
+                    ];
 
-                $this->setSetting('notifications_prefs_user_' . $userId, $prefs, 'json', 'Preferințe notificări utilizator');
-                $_SESSION['success'] = 'Preferințele de notificări au fost salvate.';
-                $this->redirect('/notifications/settings');
-                return;
-            }
-
-            if ($section === 'smtp') {
-                $smtp = [
-                    'transport'  => $_POST['smtp_transport'] ?? 'smtp', // smtp | php_mail
-                    'host'       => trim($_POST['smtp_host'] ?? ''),
-                    'port'       => (int)($_POST['smtp_port'] ?? 587),
-                    'encryption' => $_POST['smtp_encryption'] ?? 'tls', // none|ssl|tls
-                    'username'   => trim($_POST['smtp_username'] ?? ''),
-                    'password'   => $_POST['smtp_password'] ?? '',
-                    'from_email' => trim($_POST['smtp_from_email'] ?? ''),
-                    'from_name'  => trim($_POST['smtp_from_name'] ?? ''),
-                ];
-
-                $this->setSetting('smtp_settings', $smtp, 'json', 'Setări email SMTP');
-
-                if (isset($_POST['action']) && $_POST['action'] === 'test_email') {
-                    require_once __DIR__ . '/../services/Notifier.php';
-                    $to = trim($_POST['test_email_to'] ?? '');
-                    $ok = false; $err = '';
-                    if ($to) {
-                        $notifier = new Notifier();
-                        [$ok, $err] = $notifier->sendEmail($to, 'Test email - ' . (APP_NAME ?? 'Fleet Management'), 'Acesta este un mesaj de test din aplicatie.', $smtp);
-                    } else {
-                        $err = 'Introduceți adresa destinatarului pentru test.';
-                    }
-                    $_SESSION[$ok ? 'success' : 'errors'] = $ok ? 'Emailul de test a fost trimis (sau programat) cu succes.' : [$err];
-                } else {
-                    $_SESSION['success'] = 'Setările SMTP au fost salvate.';
+                    $this->setSetting('notifications_prefs_user_' . $userId, $prefs, 'json', 'Preferințe notificări utilizator');
+                    $_SESSION['success'] = 'Preferințele de notificări au fost salvate.';
+                    $this->redirect('/notifications/settings');
+                    return;
                 }
-                $this->redirect('/notifications/settings');
-                return;
-            }
 
-            if ($section === 'sms') {
-                $sms = [
-                    'provider'   => $_POST['sms_provider'] ?? 'twilio', // twilio|http
-                    'from'       => trim($_POST['sms_from'] ?? ''),
-                    'account_sid'=> trim($_POST['sms_account_sid'] ?? ''),
-                    'auth_token' => $_POST['sms_auth_token'] ?? '',
-                    // HTTP generic
-                    'http_url'   => trim($_POST['sms_http_url'] ?? ''),
-                    'http_method'=> $_POST['sms_http_method'] ?? 'GET',
-                    'http_params'=> $_POST['sms_http_params'] ?? '',
-                    'sms_default_to' => trim($_POST['sms_default_to'] ?? '')
-                ];
-                $this->setSetting('sms_settings', $sms, 'json', 'Setări SMS');
+                if ($section === 'smtp') {
+                    $smtp = [
+                        'transport'  => $_POST['smtp_transport'] ?? 'smtp', // smtp | php_mail
+                        'host'       => trim($_POST['smtp_host'] ?? ''),
+                        'port'       => (int)($_POST['smtp_port'] ?? 587),
+                        'encryption' => $_POST['smtp_encryption'] ?? 'tls', // none|ssl|tls
+                        'username'   => trim($_POST['smtp_username'] ?? ''),
+                        'password'   => $_POST['smtp_password'] ?? '',
+                        'from_email' => trim($_POST['smtp_from_email'] ?? ''),
+                        'from_name'  => trim($_POST['smtp_from_name'] ?? ''),
+                    ];
 
-                if (isset($_POST['action']) && $_POST['action'] === 'test_sms') {
-                    require_once __DIR__ . '/../services/Notifier.php';
-                    $to = trim($_POST['test_sms_to'] ?? '');
-                    $msg = trim($_POST['test_sms_message'] ?? 'Test SMS din Fleet Management');
-                    $ok = false; $err = '';
-                    if ($to) {
-                        $notifier = new Notifier();
-                        [$ok, $err] = $notifier->sendSms($to, $msg, $sms);
+                    $this->setSetting('smtp_settings', $smtp, 'json', 'Setări email SMTP');
+
+                    if (isset($_POST['action']) && $_POST['action'] === 'test_email') {
+                        require_once __DIR__ . '/../services/Notifier.php';
+                        $to = trim($_POST['test_email_to'] ?? '');
+                        $ok = false; $err = '';
+                        if ($to) {
+                            $notifier = new Notifier();
+                            [$ok, $err] = $notifier->sendEmail($to, 'Test email - ' . (APP_NAME ?? 'Fleet Management'), 'Acesta este un mesaj de test din aplicatie.', $smtp);
+                        } else {
+                            $err = 'Introduceți adresa destinatarului pentru test.';
+                        }
+                        $_SESSION[$ok ? 'success' : 'errors'] = $ok ? 'Emailul de test a fost trimis (sau programat) cu succes.' : [$err];
                     } else {
-                        $err = 'Introduceți numărul de telefon pentru test.';
+                        $_SESSION['success'] = 'Setările SMTP au fost salvate.';
                     }
-                    $_SESSION[$ok ? 'success' : 'errors'] = $ok ? 'SMS-ul de test a fost trimis.' : [$err];
-                } else {
-                    $_SESSION['success'] = 'Setările SMS au fost salvate.';
+                    $this->redirect('/notifications/settings');
+                    return;
                 }
-                $this->redirect('/notifications/settings');
-                return;
+
+                if ($section === 'sms') {
+                    $sms = [
+                        'provider'   => $_POST['sms_provider'] ?? 'twilio', // twilio|http
+                        'from'       => trim($_POST['sms_from'] ?? ''),
+                        'account_sid'=> trim($_POST['sms_account_sid'] ?? ''),
+                        'auth_token' => $_POST['sms_auth_token'] ?? '',
+                        // HTTP generic
+                        'http_url'   => trim($_POST['sms_http_url'] ?? ''),
+                        'http_method'=> $_POST['sms_http_method'] ?? 'GET',
+                        'http_params'=> $_POST['sms_http_params'] ?? '',
+                        'sms_default_to' => trim($_POST['sms_default_to'] ?? '')
+                    ];
+                    $this->setSetting('sms_settings', $sms, 'json', 'Setări SMS');
+
+                    if (isset($_POST['action']) && $_POST['action'] === 'test_sms') {
+                        require_once __DIR__ . '/../services/Notifier.php';
+                        $to = trim($_POST['test_sms_to'] ?? '');
+                        $msg = trim($_POST['test_sms_message'] ?? 'Test SMS din Fleet Management');
+                        $ok = false; $err = '';
+                        if ($to) {
+                            $notifier = new Notifier();
+                            [$ok, $err] = $notifier->sendSms($to, $msg, $sms);
+                        } else {
+                            $err = 'Introduceți numărul de telefon pentru test.';
+                        }
+                        $_SESSION[$ok ? 'success' : 'errors'] = $ok ? 'SMS-ul de test a fost trimis.' : [$err];
+                    } else {
+                        $_SESSION['success'] = 'Setările SMS au fost salvate.';
+                    }
+                    $this->redirect('/notifications/settings');
+                    return;
+                }
             }
-        }
 
-        // GET: încărcăm preferințele din system_settings sau valorile implicite
-        $key = 'notifications_prefs_user_' . $userId;
-        $row = $this->db->fetch("SELECT setting_value FROM system_settings WHERE setting_key = ?", [$key]);
-        $prefs = [
-            'enabledCategories' => ['insurance_expiry','maintenance_due','document_expiry'],
-            'methods' => ['in_app' => 1, 'email' => 0, 'sms' => 0],
-            'daysBefore' => 30,
-            'minPriority' => 'low',
-        ];
-        if ($row && !empty($row['setting_value'])) {
-            $decoded = json_decode($row['setting_value'], true);
-            if (is_array($decoded)) {
-                $prefs = array_replace_recursive($prefs, $decoded);
+            // GET: încărcăm preferințele din system_settings sau valorile implicite
+            $key = 'notifications_prefs_user_' . $userId;
+            $row = $this->db->fetch("SELECT setting_value FROM system_settings WHERE setting_key = ?", [$key]);
+            $prefs = [
+                'enabledCategories' => ['insurance_expiry','maintenance_due','document_expiry'],
+                'methods' => ['in_app' => 1, 'email' => 0, 'sms' => 0],
+                'daysBefore' => 30,
+                'minPriority' => 'low',
+            ];
+            if ($row && !empty($row['setting_value'])) {
+                $decoded = json_decode($row['setting_value'], true);
+                if (is_array($decoded)) {
+                    $prefs = array_replace_recursive($prefs, $decoded);
+                }
             }
-        }
 
-        // SMTP & SMS config
-        $smtpRow = $this->db->fetch("SELECT setting_value FROM system_settings WHERE setting_key = 'smtp_settings'");
-        $smsRow  = $this->db->fetch("SELECT setting_value FROM system_settings WHERE setting_key = 'sms_settings'");
-        $smtp = [
-            'transport' => 'smtp',
-            'host' => defined('EMAIL_HOST') ? EMAIL_HOST : 'smtp.example.com',
-            'port' => defined('EMAIL_PORT') ? EMAIL_PORT : 587,
-            'encryption' => 'tls',
-            'username' => defined('EMAIL_USERNAME') ? EMAIL_USERNAME : '',
-            'password' => defined('EMAIL_PASSWORD') ? EMAIL_PASSWORD : '',
-            'from_email' => defined('EMAIL_USERNAME') ? EMAIL_USERNAME : 'noreply@example.com',
-            'from_name' => APP_NAME ?? 'Fleet Management',
-        ];
-        if ($smtpRow && !empty($smtpRow['setting_value'])) {
-            $dec = json_decode($smtpRow['setting_value'], true);
-            if (is_array($dec)) { $smtp = array_replace($smtp, $dec); }
-        }
+            // SMTP & SMS config
+            $smtpRow = $this->db->fetch("SELECT setting_value FROM system_settings WHERE setting_key = 'smtp_settings'");
+            $smsRow  = $this->db->fetch("SELECT setting_value FROM system_settings WHERE setting_key = 'sms_settings'");
+            $smtp = [
+                'transport' => 'smtp',
+                'host' => defined('EMAIL_HOST') ? EMAIL_HOST : 'smtp.example.com',
+                'port' => defined('EMAIL_PORT') ? EMAIL_PORT : 587,
+                'encryption' => 'tls',
+                'username' => defined('EMAIL_USERNAME') ? EMAIL_USERNAME : '',
+                'password' => defined('EMAIL_PASSWORD') ? EMAIL_PASSWORD : '',
+                'from_email' => defined('EMAIL_USERNAME') ? EMAIL_USERNAME : 'noreply@example.com',
+                'from_name' => APP_NAME ?? 'Fleet Management',
+            ];
+            if ($smtpRow && !empty($smtpRow['setting_value'])) {
+                $dec = json_decode($smtpRow['setting_value'], true);
+                if (is_array($dec)) { $smtp = array_replace($smtp, $dec); }
+            }
 
-        $sms = [
-            'provider' => 'twilio',
-            'from' => '',
-            'account_sid' => '',
-            'auth_token' => '',
-            'http_url' => '',
-            'http_method' => 'GET',
-            'http_params' => '',
-            'sms_default_to' => ''
-        ];
-        if ($smsRow && !empty($smsRow['setting_value'])) {
-            $dec = json_decode($smsRow['setting_value'], true);
-            if (is_array($dec)) { $sms = array_replace($sms, $dec); }
-        }
+            $sms = [
+                'provider' => 'twilio',
+                'from' => '',
+                'account_sid' => '',
+                'auth_token' => '',
+                'http_url' => '',
+                'http_method' => 'GET',
+                'http_params' => '',
+                'sms_default_to' => ''
+            ];
+            if ($smsRow && !empty($smsRow['setting_value'])) {
+                $dec = json_decode($smsRow['setting_value'], true);
+                if (is_array($dec)) { $sms = array_replace($sms, $dec); }
+            }
 
-        $this->render('settings', [ 'prefs' => $prefs, 'smtp' => $smtp, 'sms' => $sms ]);
+            $this->render('settings', [ 'prefs' => $prefs, 'smtp' => $smtp, 'sms' => $sms ]);
+        } catch (Throwable $e) {
+            // Dacă orice eroare DB sau logică, afișăm o pagină prietenoasă în loc de 404
+            http_response_code(500);
+            include 'includes/header.php';
+            echo '<div class="container py-4">';
+            echo '<div class="alert alert-danger"><h4>Eroare la încărcarea setărilor notificări</h4>';
+            echo '<p>' . htmlspecialchars($e->getMessage()) . '</p></div>';
+            echo '<a href="' . ROUTE_BASE . 'notifications" class="btn btn-outline-secondary">Înapoi la notificări</a>';
+            echo '</div>';
+            include 'includes/footer.php';
+            exit;
+        }
+    }
+
+    private function ensureSystemSettingsTable() {
+        try {
+            $this->db->query("CREATE TABLE IF NOT EXISTS system_settings (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                setting_key VARCHAR(100) NOT NULL,
+                setting_value TEXT,
+                setting_type ENUM('string','number','boolean','json') DEFAULT 'string',
+                description TEXT,
+                is_system BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                UNIQUE KEY unique_setting_key (setting_key)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+        } catch (Throwable $e) {
+            // Ignorăm – dacă nu se poate crea, restul paginii va încerca fallback-uri
+        }
     }
 
     private function setSetting($key, $value, $type = 'json', $desc = null) {
