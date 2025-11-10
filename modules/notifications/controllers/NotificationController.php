@@ -265,6 +265,11 @@ class NotificationController extends Controller {
         // Generăm notificări automate pentru sistem
         $notifications = [];
         
+        // Obținem company_id al utilizatorului curent pentru broadcast
+        $userId = $_SESSION['user_id'] ?? 1;
+        $user = $this->db->fetch("SELECT company_id, role FROM users WHERE id = ?", [$userId]);
+        $companyId = $user['company_id'] ?? null;
+        
         // Verificăm asigurările care expiră
         $insuranceModel = new Insurance();
         $expiringInsurance = $insuranceModel->getExpiring(30); // 30 de zile
@@ -277,16 +282,15 @@ class NotificationController extends Controller {
             elseif ($daysUntilExpiry <= 14) $priority = 'medium';
             else $priority = 'low';
             
-            $notifications[] = [
-                'user_id' => 1, // Admin user - ar trebui să fie dinamic
-                'type' => 'insurance_expiry',
-                'title' => 'Asigurare în expirare',
-                'message' => "Asigurarea {$insurance['insurance_type']} pentru vehiculul {$insurance['license_plate']} expiră în " . ceil($daysUntilExpiry) . " zile.",
-                'priority' => $priority,
-                'related_id' => $insurance['id'],
-                'related_type' => 'insurance',
-                'action_url' => "/modules/insurance/views/view.php?id={$insurance['id']}"
-            ];
+            // Folosim metoda statică care respectă preferința de broadcast
+            Notification::createInsuranceExpiryNotification(
+                $insurance['id'],
+                $insurance['license_plate'],
+                $insurance['insurance_type'],
+                $insurance['end_date'],
+                $priority,
+                $companyId
+            );
         }
         
         // Verificăm mentenanța scadentă
@@ -294,33 +298,22 @@ class NotificationController extends Controller {
         $dueMaintenance = $maintenanceModel->getDueMaintenance();
         
         foreach ($dueMaintenance as $maintenance) {
-            $notifications[] = [
-                'user_id' => 1, // Admin user
-                'type' => 'maintenance_due',
-                'title' => 'Mentenanță scadentă',
-                'message' => "Vehiculul {$maintenance['license_plate']} necesită mentenanță: {$maintenance['maintenance_type']}",
-                'priority' => 'medium',
-                'related_id' => $maintenance['vehicle_id'],
-                'related_type' => 'vehicle',
-                'action_url' => "/modules/maintenance/views/add.php?vehicle_id={$maintenance['vehicle_id']}"
-            ];
+            // Folosim metoda statică care respectă preferința de broadcast
+            Notification::createMaintenanceNotification(
+                $maintenance['vehicle_id'],
+                $maintenance['license_plate'],
+                $maintenance['maintenance_type'],
+                $companyId
+            );
         }
         
-        // Creăm notificările în baza de date
-        $created = 0;
-        foreach ($notifications as $notification) {
-            // Verificăm dacă nu există deja o notificare similară
-            if (!$this->notificationModel->exists($notification)) {
-                if ($this->notificationModel->create($notification)) {
-                    $created++;
-                }
-            }
-        }
+        // Contorizăm notificările create (broadcast creează mai multe înregistrări)
+        $created = count($expiringInsurance) + count($dueMaintenance);
         
         if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
-            $this->json(['success' => true, 'message' => "Au fost generate $created notificări", 'created' => $created]);
+            $this->json(['success' => true, 'message' => "Au fost generate notificări pentru $created evenimente", 'created' => $created]);
         } else {
-            $_SESSION['success'] = "Au fost generate $created notificări automate!";
+            $_SESSION['success'] = "Au fost generate notificări automate pentru $created evenimente!";
             $this->redirect('/notifications');
         }
     }
@@ -378,12 +371,20 @@ class NotificationController extends Controller {
                     ];
                     $daysBefore = isset($_POST['days_before']) ? max(0, (int)$_POST['days_before']) : 30;
                     $minPriority = $_POST['min_priority'] ?? 'low';
+                    
+                    // Doar admin/manager poate seta broadcast la companie
+                    $userRole = $_SESSION['user_role'] ?? 'user';
+                    $broadcastToCompany = 0;
+                    if (in_array($userRole, ['admin', 'manager', 'superadmin'])) {
+                        $broadcastToCompany = isset($_POST['broadcast_to_company']) ? 1 : 0;
+                    }
 
                     $prefs = [
                         'enabledCategories' => $enabledCategories,
                         'methods' => $methods,
                         'daysBefore' => $daysBefore,
                         'minPriority' => in_array($minPriority, ['low','medium','high','critical']) ? $minPriority : 'low',
+                        'broadcastToCompany' => $broadcastToCompany,
                     ];
 
                     $this->setSetting('notifications_prefs_user_' . $userId, $prefs, 'json', 'Preferințe notificări utilizator');

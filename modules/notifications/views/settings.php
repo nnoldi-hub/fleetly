@@ -42,6 +42,29 @@ $priorities = [
 
           <form method="post" action="<?php echo ROUTE_BASE; ?>notifications/settings">
             <input type="hidden" name="section" value="prefs" />
+            
+            <?php 
+            // Verificăm dacă utilizatorul are rol de admin/manager pentru opțiuni avansate
+            $userRole = $_SESSION['user_role'] ?? 'user';
+            $isAdminOrManager = in_array($userRole, ['admin', 'manager', 'superadmin']);
+            ?>
+            
+            <?php if ($isAdminOrManager): ?>
+            <div class="mb-4">
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Rol de administrator:</strong> Puteți configura notificările să fie trimise tuturor utilizatorilor din companie.
+              </div>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="broadcast_to_company" name="broadcast_to_company" <?php echo !empty($prefs['broadcastToCompany']) ? 'checked' : ''; ?>>
+                <label class="form-check-label" for="broadcast_to_company">
+                  <strong>Trimite notificările automate către toți utilizatorii companiei</strong>
+                  <br><small class="text-muted">Când este activat, notificările despre asigurări/mentenanță/documente vor fi trimise tuturor utilizatorilor activi, nu doar vouă.</small>
+                </label>
+              </div>
+            </div>
+            <?php endif; ?>
+            
             <div class="mb-4">
               <h6 class="mb-2">Categorii active</h6>
               <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-2">

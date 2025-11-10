@@ -9,11 +9,32 @@ class Notification extends Model {
     protected $table = 'notifications';
     
     public function create($data) {
-        $sql = "INSERT INTO notifications (user_id, type, title, message, priority, related_id, related_type, action_url, created_at) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+        // Suport pentru notificări broadcast la nivel de companie
+        $companyId = $data['company_id'] ?? null;
+        $userId = $data['user_id'] ?? null;
+        
+        // Dacă e notificare broadcast (company_id set, user_id null), creăm câte o notificare pentru fiecare user activ
+        if ($companyId && !$userId) {
+            $users = $this->db->fetchAllOn('users', "SELECT id FROM users WHERE company_id = ? AND status = 'active'", [$companyId]);
+            $createdIds = [];
+            foreach ($users as $user) {
+                $userData = array_merge($data, ['user_id' => $user['id']]);
+                $createdIds[] = $this->createSingle($userData);
+            }
+            return $createdIds; // Returnăm array de ID-uri create
+        }
+        
+        // Notificare individuală standard
+        return $this->createSingle($data);
+    }
+    
+    private function createSingle($data) {
+        $sql = "INSERT INTO notifications (user_id, company_id, type, title, message, priority, related_id, related_type, action_url, created_at) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
         
         $params = [
-            $data['user_id'],
+            $data['user_id'] ?? null,
+            $data['company_id'] ?? null,
             $data['type'],
             $data['title'],
             $data['message'],
@@ -81,6 +102,7 @@ class Notification extends Model {
     }
     
     public function getAllWithDetails($conditions = [], $offset = 0, $limit = 25) {
+        // Notă: $conditions ar trebui să conțină deja user_id setat de controller
         $whereClause = $this->buildWhereClause($conditions);
         
         $sql = "SELECT n.*, 
@@ -249,8 +271,31 @@ class Notification extends Model {
         return empty($whereConditions) ? '' : 'WHERE ' . implode(' AND ', $whereConditions);
     }
     
+    private function getAdminBroadcastPreference($companyId) {
+        // Căutăm un admin/manager al companiei și citim preferințele sale
+        try {
+            $admin = $this->db->fetchOn('users', 
+                "SELECT id FROM users WHERE company_id = ? AND role IN ('admin','manager') AND status = 'active' LIMIT 1", 
+                [$companyId]
+            );
+            if ($admin) {
+                $key = 'notifications_prefs_user_' . $admin['id'];
+                $row = $this->db->fetchOn($this->table, "SELECT setting_value FROM system_settings WHERE setting_key = ?", [$key]);
+                if ($row && !empty($row['setting_value'])) {
+                    $prefs = json_decode($row['setting_value'], true);
+                    if (is_array($prefs) && isset($prefs['broadcastToCompany'])) {
+                        return ['broadcastToCompany' => (bool)$prefs['broadcastToCompany']];
+                    }
+                }
+            }
+        } catch (Throwable $e) {
+            // Ignorăm erorile și returnăm valori implicite
+        }
+        return ['broadcastToCompany' => false];
+    }
+    
     // Metode pentru crearea notificărilor automate
-    public static function createInsuranceExpiryNotification($insuranceId, $vehicleLicensePlate, $insuranceType, $daysUntilExpiry) {
+    public static function createInsuranceExpiryNotification($insuranceId, $vehicleLicensePlate, $insuranceType, $daysUntilExpiry, $companyId = null) {
         $notification = new self();
         
         $priority = 'medium';
@@ -258,8 +303,10 @@ class Notification extends Model {
         elseif ($daysUntilExpiry <= 14) $priority = 'medium';
         else $priority = 'low';
         
+        // Verificăm preferințele admin pentru broadcast
+        $adminPrefs = $notification->getAdminBroadcastPreference($companyId);
+        
         $data = [
-            'user_id' => 1, // Admin user - ar trebui să fie dinamic
             'type' => 'insurance_expiry',
             'title' => 'Asigurare în expirare',
             'message' => "Asigurarea $insuranceType pentru vehiculul $vehicleLicensePlate expiră în $daysUntilExpiry zile.",
@@ -269,6 +316,13 @@ class Notification extends Model {
             'action_url' => "/modules/insurance/views/view.php?id=$insuranceId"
         ];
         
+        // Dacă broadcast e activ, setăm company_id; altfel, user_id = 1 (admin)
+        if ($adminPrefs['broadcastToCompany'] && $companyId) {
+            $data['company_id'] = $companyId;
+        } else {
+            $data['user_id'] = 1; // Admin user implicit
+        }
+        
         if (!$notification->exists($data)) {
             return $notification->create($data);
         }
@@ -276,11 +330,15 @@ class Notification extends Model {
         return false;
     }
     
-    public static function createMaintenanceNotification($vehicleId, $vehicleLicensePlate, $maintenanceType) {
+    public static function createMaintenanceNotification($vehicleId, $vehicleLicensePlate, $maintenanceType, $companyId = null) {
         $notification = new self();
         
+        // Verificăm dacă admin-ul companiei a activat broadcast
+        $broadcastPrefs = $companyId ? $notification->getAdminBroadcastPreference($companyId) : ['broadcastToCompany' => false];
+        
         $data = [
-            'user_id' => 1, // Admin user
+            'user_id' => $broadcastPrefs['broadcastToCompany'] ? null : 1,
+            'company_id' => $broadcastPrefs['broadcastToCompany'] ? $companyId : null,
             'type' => 'maintenance_due',
             'title' => 'Mentenanță scadentă',
             'message' => "Vehiculul $vehicleLicensePlate necesită mentenanță: $maintenanceType",
@@ -297,7 +355,7 @@ class Notification extends Model {
         return false;
     }
     
-    public static function createDocumentExpiryNotification($documentId, $vehicleLicensePlate, $documentType, $daysUntilExpiry) {
+    public static function createDocumentExpiryNotification($documentId, $vehicleLicensePlate, $documentType, $daysUntilExpiry, $companyId = null) {
         $notification = new self();
         
         $priority = 'medium';
@@ -305,8 +363,12 @@ class Notification extends Model {
         elseif ($daysUntilExpiry <= 14) $priority = 'medium';
         else $priority = 'low';
         
+        // Verificăm dacă admin-ul companiei a activat broadcast
+        $broadcastPrefs = $companyId ? $notification->getAdminBroadcastPreference($companyId) : ['broadcastToCompany' => false];
+        
         $data = [
-            'user_id' => 1, // Admin user
+            'user_id' => $broadcastPrefs['broadcastToCompany'] ? null : 1,
+            'company_id' => $broadcastPrefs['broadcastToCompany'] ? $companyId : null,
             'type' => 'document_expiry',
             'title' => 'Document în expirare',
             'message' => "Documentul $documentType pentru vehiculul $vehicleLicensePlate expiră în $daysUntilExpiry zile.",
