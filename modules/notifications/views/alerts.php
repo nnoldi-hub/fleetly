@@ -1,11 +1,4 @@
 <?php
-// Verificăm dacă utilizatorul este autentificat
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-// Fallback pentru demo fără autentificare: considerăm user 1
-if (!isset($_SESSION['user_id'])) { $_SESSION['user_id'] = 1; }
-
-require_once __DIR__ . '/../../../config/config.php';
-
 // Dacă nu avem datele din controller, redirectăm
 if (!isset($notifications)) {
     header('Location: /modules/notifications/?action=alerts');
@@ -13,24 +6,19 @@ if (!isset($notifications)) {
 }
 
 $pageTitle = 'Alerte și Notificări';
-include __DIR__ . '/../../../includes/header.php';
 ?>
 
 <div class="container-fluid">
-    <div class="row">
-    <?php // Sidebar este inclus în header; evităm dublarea ?>
-        
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <?php 
-            $breadcrumbs = [
-                'Acasă' => '/',
-                'Notificări' => '/modules/notifications/',
-                'Alerte' => ''
-            ];
-            include __DIR__ . '/../../../includes/breadcrumb.php'; 
-            ?>
-            
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <?php 
+    $breadcrumbs = [
+        'Acasă' => '/',
+        'Notificări' => '/modules/notifications/',
+        'Alerte' => ''
+    ];
+    include __DIR__ . '/../../../includes/breadcrumb.php'; 
+    ?>
+    
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2">
                     <i class="fas fa-bell"></i> Alerte și Notificări
                     <?php if (!empty($unreadCount)): ?>
@@ -320,8 +308,6 @@ include __DIR__ . '/../../../includes/header.php';
                     <?php endif; ?>
                 </div>
             </div>
-        </main>
-    </div>
 </div>
 
 <script>
@@ -464,6 +450,3 @@ function timeAgo($datetime) {
     
     return date('d.m.Y H:i', strtotime($datetime));
 }
-
-include __DIR__ . '/../../../includes/footer.php'; 
-?>
