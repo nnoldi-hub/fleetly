@@ -373,7 +373,11 @@ class NotificationController extends Controller {
                     $minPriority = $_POST['min_priority'] ?? 'low';
                     
                     // Doar admin/manager poate seta broadcast la companie
-                    $userRole = $_SESSION['user_role'] ?? 'user';
+                    require_once __DIR__ . '/../../../core/Auth.php';
+                    $auth = Auth::getInstance();
+                    $currentUser = $auth->user();
+                    $userRole = $currentUser->role_slug ?? $currentUser->role ?? 'user';
+                    
                     $broadcastToCompany = 0;
                     if (in_array($userRole, ['admin', 'manager', 'superadmin'])) {
                         $broadcastToCompany = isset($_POST['broadcast_to_company']) ? 1 : 0;
@@ -467,6 +471,7 @@ class NotificationController extends Controller {
                 'methods' => ['in_app' => 1, 'email' => 0, 'sms' => 0],
                 'daysBefore' => 30,
                 'minPriority' => 'low',
+                'broadcastToCompany' => 0, // Preferința de broadcast (doar admin/manager)
             ];
             if ($row && !empty($row['setting_value'])) {
                 $decoded = json_decode($row['setting_value'], true);
