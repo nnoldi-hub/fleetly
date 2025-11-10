@@ -68,28 +68,33 @@ class NotificationController extends Controller {
         }
 
         // Aplicăm preferințele utilizatorului dacă nu sunt setate filtre explicite
-        $prefsKey = 'notifications_prefs_user_' . $userId;
-        $prefsRow = $this->db->fetch("SELECT setting_value FROM system_settings WHERE setting_key = ?", [$prefsKey]);
         $appliedPrefsFilter = false;
-        if ($prefsRow && empty($type) && empty($priority)) {
-            $prefs = json_decode($prefsRow['setting_value'] ?? '', true) ?: [];
-            $enabledCategories = $prefs['enabledCategories'] ?? [];
-            $minPriority = $prefs['minPriority'] ?? 'low';
+        try {
+            $prefsKey = 'notifications_prefs_user_' . $userId;
+            $prefsRow = $this->db->fetch("SELECT setting_value FROM system_settings WHERE setting_key = ?", [$prefsKey]);
+            if ($prefsRow && empty($type) && empty($priority)) {
+                $prefs = json_decode($prefsRow['setting_value'] ?? '', true) ?: [];
+                $enabledCategories = $prefs['enabledCategories'] ?? [];
+                $minPriority = $prefs['minPriority'] ?? 'low';
 
-            if (!empty($enabledCategories)) {
-                $notifications = array_values(array_filter($notifications, function($n) use ($enabledCategories) {
-                    return in_array($n['type'] ?? '', $enabledCategories);
+                if (!empty($enabledCategories)) {
+                    $notifications = array_values(array_filter($notifications, function($n) use ($enabledCategories) {
+                        return in_array($n['type'] ?? '', $enabledCategories);
+                    }));
+                }
+
+                $priorityOrder = ['low' => 1, 'medium' => 2, 'high' => 3, 'critical' => 4];
+                $minOrder = $priorityOrder[$minPriority] ?? 1;
+                $notifications = array_values(array_filter($notifications, function($n) use ($priorityOrder, $minOrder) {
+                    $p = $n['priority'] ?? 'medium';
+                    $order = $priorityOrder[$p] ?? 2;
+                    return $order >= $minOrder;
                 }));
+                $appliedPrefsFilter = true;
             }
-
-            $priorityOrder = ['low' => 1, 'medium' => 2, 'high' => 3, 'critical' => 4];
-            $minOrder = $priorityOrder[$minPriority] ?? 1;
-            $notifications = array_values(array_filter($notifications, function($n) use ($priorityOrder, $minOrder) {
-                $p = $n['priority'] ?? 'medium';
-                $order = $priorityOrder[$p] ?? 2;
-                return $order >= $minOrder;
-            }));
-            $appliedPrefsFilter = true;
+        } catch (Throwable $e) {
+            // Dacă system_settings lipsește sau altă problemă DB, ignorăm preferințele fără a opri pagina
+            $appliedPrefsFilter = false;
         }
         
         $data = [
