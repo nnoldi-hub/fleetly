@@ -1,6 +1,6 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-// $prefs is provided by controller
+// View simplificat: sesiunea & layout sunt gestionate de Controller::render
+// $prefs, $smtp, $sms sunt furnizate de controller
 $categories = [
     'insurance_expiry' => 'Asigurări în expirare',
     'maintenance_due' => 'Mentenanță scadentă',

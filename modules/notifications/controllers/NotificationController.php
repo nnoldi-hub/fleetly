@@ -104,17 +104,21 @@ class NotificationController extends Controller {
                 'type' => $type,
                 'priority' => $priority,
                 'status' => $status
-            ]
+            ],
+            'pageTitle' => 'Alerte și Notificări'
         ];
         
-        include 'modules/notifications/views/alerts.php';
+        // Folosim sistemul de layout standard
+        $this->render('alerts', $data);
     }
     
     public function create() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->handleCreate();
         } else {
-            include 'modules/notifications/views/create.php';
+            // Dacă va exista o vedere dedicată, o vom reda prin layout.
+            // Momentan nu există un fișier create.php în views, așa că redirecționăm la listă.
+            $this->redirect('/notifications');
         }
     }
     
@@ -139,7 +143,7 @@ class NotificationController extends Controller {
                     $this->json(['success' => true, 'message' => 'Notificarea a fost creată cu succes', 'id' => $result]);
                 } else {
                     $_SESSION['success'] = 'Notificarea a fost creată cu succes!';
-                    $this->redirect('/modules/notifications/');
+                    $this->redirect('/notifications');
                 }
             } else {
                 if (isset($_POST['ajax'])) {
@@ -147,7 +151,7 @@ class NotificationController extends Controller {
                 } else {
                     $_SESSION['errors'] = ['Eroare la crearea notificării'];
                     $_SESSION['old_input'] = $_POST;
-                    $this->redirect('/modules/notifications/views/create.php');
+                    $this->redirect('/notifications');
                 }
             }
         } else {
@@ -156,7 +160,7 @@ class NotificationController extends Controller {
             } else {
                 $_SESSION['errors'] = $errors;
                 $_SESSION['old_input'] = $_POST;
-                $this->redirect('/modules/notifications/views/create.php');
+                $this->redirect('/notifications');
             }
         }
     }
@@ -181,14 +185,14 @@ class NotificationController extends Controller {
                 $this->json(['success' => true, 'message' => 'Notificarea a fost marcată ca citită']);
             } else {
                 $_SESSION['success'] = 'Notificarea a fost marcată ca citită!';
-                $this->redirect('/modules/notifications/');
+                $this->redirect('/notifications');
             }
         } else {
             if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
                 $this->json(['success' => false, 'message' => 'Eroare la marcarea notificării'], 500);
             } else {
                 $_SESSION['errors'] = ['Eroare la marcarea notificării'];
-                $this->redirect('/modules/notifications/');
+                $this->redirect('/notifications');
             }
         }
     }
@@ -201,14 +205,14 @@ class NotificationController extends Controller {
                 $this->json(['success' => true, 'message' => 'Toate notificările au fost marcate ca citite']);
             } else {
                 $_SESSION['success'] = 'Toate notificările au fost marcate ca citite!';
-                $this->redirect('/modules/notifications/');
+                $this->redirect('/notifications');
             }
         } else {
             if (isset($_POST['ajax'])) {
                 $this->json(['success' => false, 'message' => 'Eroare la marcarea notificărilor'], 500);
             } else {
                 $_SESSION['errors'] = ['Eroare la marcarea notificărilor'];
-                $this->redirect('/modules/notifications/');
+                $this->redirect('/notifications');
             }
         }
     }
@@ -233,14 +237,14 @@ class NotificationController extends Controller {
                 $this->json(['success' => true, 'message' => 'Notificarea a fost ștearsă']);
             } else {
                 $_SESSION['success'] = 'Notificarea a fost ștearsă!';
-                $this->redirect('/modules/notifications/');
+                $this->redirect('/notifications');
             }
         } else {
             if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
                 $this->json(['success' => false, 'message' => 'Eroare la ștergerea notificării'], 500);
             } else {
                 $_SESSION['errors'] = ['Eroare la ștergerea notificării'];
-                $this->redirect('/modules/notifications/');
+                $this->redirect('/notifications');
             }
         }
     }
@@ -312,7 +316,7 @@ class NotificationController extends Controller {
             $this->json(['success' => true, 'message' => "Au fost generate $created notificări", 'created' => $created]);
         } else {
             $_SESSION['success'] = "Au fost generate $created notificări automate!";
-            $this->redirect('/modules/notifications/');
+            $this->redirect('/notifications');
         }
     }
     

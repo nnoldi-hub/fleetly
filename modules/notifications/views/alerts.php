@@ -1,33 +1,15 @@
 <?php
-// Verificăm dacă utilizatorul este autentificat
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-// Fallback pentru demo fără autentificare: considerăm user 1
-if (!isset($_SESSION['user_id'])) { $_SESSION['user_id'] = 1; }
-
-require_once __DIR__ . '/../../../config/config.php';
-
-// Dacă nu avem datele din controller, redirectăm
-if (!isset($notifications)) {
-    header('Location: /modules/notifications/?action=alerts');
-    exit;
-}
-
-$pageTitle = 'Alerte și Notificări';
-include __DIR__ . '/../../../includes/header.php';
+// View curățat: layout (header/footer, sesiune, config) este gestionat de Controller::render.
+// Presupunem că $notifications, $unreadCount, $stats, $filters sunt furnizate în $data.
 ?>
-
-<div class="container-fluid">
-    <div class="row">
-    <?php // Sidebar este inclus în header; evităm dublarea ?>
-        
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="container-fluid px-0">
             <?php 
             $breadcrumbs = [
                 'Acasă' => '/',
                 'Notificări' => '/modules/notifications/',
                 'Alerte' => ''
             ];
-            include __DIR__ . '/../../../includes/breadcrumb.php'; 
+            include 'includes/breadcrumb.php'; 
             ?>
             
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -52,12 +34,7 @@ include __DIR__ . '/../../../includes/header.php';
                 </div>
             </div>
 
-            <?php if (isset($_SESSION['success'])): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            <?php endif; ?>
+            <?php // Mesajele flash sunt deja afișate de header.php; nu duplicăm aici. ?>
 
             <!-- Filtre -->
             <div class="card mb-4">
@@ -205,7 +182,7 @@ include __DIR__ . '/../../../includes/header.php';
                 </div>
                 <div class="card-body">
                     <?php if (!empty($notifications)): ?>
-                        <div class="list-group list-group-flush">
+                        <div class="list-group list-group-flush" id="notificationListFull">
                             <?php foreach ($notifications as $notification): ?>
                                 <div class="list-group-item <?php echo $notification['is_read'] ? '' : 'list-group-item-light border-start border-4 border-primary'; ?>" 
                                      data-notification-id="<?php echo $notification['id']; ?>">
@@ -320,9 +297,7 @@ include __DIR__ . '/../../../includes/header.php';
                     <?php endif; ?>
                 </div>
             </div>
-        </main>
-    </div>
-</div>
+        </div>
 
 <script>
 // Marchează o notificare ca citită
@@ -452,18 +427,16 @@ setInterval(function() {
 }, 300000); // 5 minute
 </script>
 
-<?php 
-// Funcție helper pentru timpul relativ
-function timeAgo($datetime) {
-    $time = time() - strtotime($datetime);
-    
-    if ($time < 60) return 'acum ' . $time . ' secunde';
-    if ($time < 3600) return 'acum ' . floor($time/60) . ' minute';
-    if ($time < 86400) return 'acum ' . floor($time/3600) . ' ore';
-    if ($time < 2592000) return 'acum ' . floor($time/86400) . ' zile';
-    
-    return date('d.m.Y H:i', strtotime($datetime));
+<?php
+// Helper local (dacă nu există global). Ideal mutat într-un utilitar comun.
+if (!function_exists('timeAgo')) {
+    function timeAgo($datetime) {
+        $time = time() - strtotime($datetime);
+        if ($time < 60) return 'acum ' . $time . ' secunde';
+        if ($time < 3600) return 'acum ' . floor($time/60) . ' minute';
+        if ($time < 86400) return 'acum ' . floor($time/3600) . ' ore';
+        if ($time < 2592000) return 'acum ' . floor($time/86400) . ' zile';
+        return date('d.m.Y H:i', strtotime($datetime));
+    }
 }
-
-include __DIR__ . '/../../../includes/footer.php'; 
 ?>
