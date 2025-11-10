@@ -1,8 +1,6 @@
 <?php
 // modules/documents/views/list.php
-$pageTitle = "Lista Documente";
-require_once ROOT_PATH . '/includes/header.php';
-require_once ROOT_PATH . '/includes/sidebar.php';
+// View simplificat: sesiunea & layout sunt gestionate de Controller::render
 
 // Obținem parametrii de filtrare și sortare
 $search = $_GET['search'] ?? '';
@@ -147,15 +145,8 @@ function getSortIcon($column, $currentSort, $currentOrder) {
 }
 ?>
 
-<div class="main-content">
-    <div class="container-fluid">
-        <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="<?= BASE_URL ?>">Dashboard</a></li>
-                <li class="breadcrumb-item active">Documente</li>
-            </ol>
-        </nav>
+<div class="container-fluid py-4">
+    <?php include 'includes/breadcrumb.php'; ?>
 
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -788,5 +779,3 @@ const printStyles = `
 `;
 document.head.insertAdjacentHTML('beforeend', printStyles);
 </script>
-
-<?php require_once ROOT_PATH . '/includes/footer.php'; ?>
