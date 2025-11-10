@@ -66,21 +66,41 @@ class Notifier {
             stream_set_timeout($fp, 15);
             $r = function() use ($fp) { return fgets($fp, 512); };
             $w = function($cmd) use ($fp) { fwrite($fp, $cmd."\r\n"); };
-            $r();
-            $w('EHLO localhost'); $r();
+            
+            // Initial handshake
+            $r(); // Banner 220
+            $w('EHLO localhost'); 
+            
+            // Citim toate liniile EHLO (poate fi multi-line)
+            $ehloResp = '';
+            do {
+                $line = $r();
+                $ehloResp .= $line;
+            } while (preg_match('/^250-/', $line));
+            
+            // STARTTLS dacă este necesar
             if ($encr === 'tls') {
                 $w('STARTTLS'); $resp = $r();
                 if (strpos($resp, '220') !== 0) { fclose($fp); return [false, 'Serverul nu acceptă STARTTLS']; }
                 if (!stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) { fclose($fp); return [false, 'Negocierea TLS a eșuat']; }
-                $w('EHLO localhost'); $r();
+                $w('EHLO localhost'); 
+                // Citim din nou EHLO după TLS
+                do {
+                    $line = $r();
+                    $ehloResp .= $line;
+                } while (preg_match('/^250-/', $line));
             }
+            
+            // Autentificare
             if (!empty($smtp['username'])) {
-                $w('AUTH LOGIN'); $r();
-                $w(base64_encode($smtp['username'])); $r();
-                $w(base64_encode($smtp['password'] ?? '')); $auth = $r();
+                // Încercăm AUTH PLAIN (mai comun pe shared hosting)
+                $authString = base64_encode("\0" . $smtp['username'] . "\0" . ($smtp['password'] ?? ''));
+                $w('AUTH PLAIN ' . $authString); 
+                $auth = $r();
+                
                 if (strpos($auth, '235') !== 0) { 
                     fclose($fp); 
-                    return [false, 'Autentificarea SMTP a eșuat. Răspuns server: ' . trim($auth)]; 
+                    return [false, 'Autentificare SMTP eșuată. Răspuns: ' . trim($auth)]; 
                 }
             }
             $from = $smtp['from_email'] ?: $smtp['username'];
