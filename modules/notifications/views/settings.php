@@ -46,7 +46,7 @@ $priorities = [
             <?php 
             // Verificăm dacă utilizatorul are rol de admin/manager pentru opțiuni avansate
             require_once __DIR__ . '/../../../core/Auth.php';
-            $auth = new Auth();
+            $auth = Auth::getInstance();
             $currentUser = $auth->user();
             $userRole = $currentUser->role ?? 'user';
             $isAdminOrManager = in_array($userRole, ['admin', 'manager', 'superadmin']);
