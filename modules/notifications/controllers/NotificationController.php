@@ -107,14 +107,14 @@ class NotificationController extends Controller {
             ]
         ];
         
-        include 'modules/notifications/views/alerts.php';
+        $this->render('alerts', $data);
     }
     
     public function create() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->handleCreate();
         } else {
-            include 'modules/notifications/views/create.php';
+            $this->render('create');
         }
     }
     
