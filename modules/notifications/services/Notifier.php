@@ -81,8 +81,31 @@ class Notifier {
             // STARTTLS dacă este necesar
             if ($encr === 'tls') {
                 $w('STARTTLS'); $resp = $r();
-                if (strpos($resp, '220') !== 0) { fclose($fp); return [false, 'Serverul nu acceptă STARTTLS']; }
-                if (!stream_socket_enable_crypto($fp, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) { fclose($fp); return [false, 'Negocierea TLS a eșuat']; }
+                if (strpos($resp, '220') !== 0) { 
+                    fclose($fp); 
+                    return [false, 'Serverul nu acceptă STARTTLS. Răspuns: ' . trim($resp)]; 
+                }
+                
+                // Încercăm mai multe metode de criptare TLS
+                $cryptoMethods = [
+                    STREAM_CRYPTO_METHOD_TLS_CLIENT,
+                    STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
+                    STREAM_CRYPTO_METHOD_TLSv1_0_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT
+                ];
+                
+                $tlsSuccess = false;
+                foreach ($cryptoMethods as $method) {
+                    if (@stream_socket_enable_crypto($fp, true, $method)) {
+                        $tlsSuccess = true;
+                        break;
+                    }
+                }
+                
+                if (!$tlsSuccess) { 
+                    fclose($fp); 
+                    return [false, 'Negocierea TLS a eșuat. Încercați SSL pe port 465 sau fără criptare pe port 25.']; 
+                }
+                
                 $w('EHLO localhost'); 
                 // Citim din nou EHLO după TLS
                 do {
