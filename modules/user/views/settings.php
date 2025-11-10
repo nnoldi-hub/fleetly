@@ -1,25 +1,17 @@
 <?php
-// modules/user/views/settings.php
-$pageTitle = "Setări Aplicație";
+// View simplificat: layout gestionat de Controller::render()
 ?>
 
-<div class="main-content">
-    <div class="container-fluid">
-        <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="<?= BASE_URL ?>">Dashboard</a></li>
-                <li class="breadcrumb-item active">Setări</li>
-            </ol>
-        </nav>
-
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3 mb-0">
-                <i class="fas fa-cog text-primary me-2"></i>
-                Setări Aplicație
-            </h1>
-        </div>
+<div class="container-fluid py-4">
+    <?php include ROOT_PATH . '/includes/breadcrumb.php'; ?>
+    
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">
+            <i class="fas fa-cog text-primary me-2"></i>
+            Setări Aplicație
+        </h1>
+    </div>
 
         <div class="row">
             <div class="col-lg-6">
@@ -64,9 +56,32 @@ $pageTitle = "Setări Aplicație";
                         </h5>
                     </div>
                     <div class="card-body">
+                        <?php 
+                        require_once __DIR__ . '/../../../core/Auth.php';
+                        $auth = Auth::getInstance();
+                        $currentUser = $auth->user();
+                        $userRole = $currentUser->role_slug ?? $currentUser->role ?? 'user';
+                        $isAdminOrManager = in_array($userRole, ['admin', 'manager', 'superadmin']);
+                        ?>
+                        
+                        <?php if ($isAdminOrManager): ?>
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>Rol de administrator:</strong> Puteți configura notificările avansate (SMTP, SMS, broadcast).
+                        </div>
+                        
+                        <a href="<?= ROUTE_BASE ?>notifications/settings" class="btn btn-success w-100 mb-3">
+                            <i class="fas fa-cog me-2"></i>
+                            Configurare Avansată Notificări
+                        </a>
+                        
+                        <small class="text-muted">
+                            Setări disponibile: categorii, metode (email/SMS), broadcast către companie, SMTP, Twilio/SMS Gateway.
+                        </small>
+                        <?php else: ?>
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle me-2"></i>
-                            Setările de notificări vor fi dezvoltate în viitoarele versiuni.
+                            Setările de notificări sunt gestionate de administrator.
                         </div>
                         
                         <div class="form-check mb-3">
@@ -89,6 +104,7 @@ $pageTitle = "Setări Aplicație";
                                 Alertă întreținere scadentă
                             </label>
                         </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -135,4 +151,3 @@ $pageTitle = "Setări Aplicație";
             </div>
         </div>
     </div>
-</div>
