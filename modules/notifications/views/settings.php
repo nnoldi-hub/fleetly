@@ -40,7 +40,7 @@ $priorities = [
             </div>
           <?php endif; ?>
 
-          <form method="post" action="<?php echo BASE_URL; ?>notifications/settings">
+          <form method="post" action="<?php echo ROUTE_BASE; ?>notifications/settings">
             <input type="hidden" name="section" value="prefs" />
             <div class="mb-4">
               <h6 class="mb-2">Categorii active</h6>
@@ -94,7 +94,7 @@ $priorities = [
               <button type="submit" class="btn btn-primary">
                 <i class="bi bi-save me-1"></i> Salvează preferințele
               </button>
-              <a href="<?php echo BASE_URL; ?>notifications" class="btn btn-outline-secondary">Înapoi la notificări</a>
+              <a href="<?php echo ROUTE_BASE; ?>notifications" class="btn btn-outline-secondary">Înapoi la notificări</a>
             </div>
           </form>
         </div>
@@ -106,7 +106,7 @@ $priorities = [
           <h5 class="mb-0">Configurare Email (SMTP)</h5>
         </div>
         <div class="card-body">
-          <form method="post" action="<?php echo BASE_URL; ?>notifications/settings">
+          <form method="post" action="<?php echo ROUTE_BASE; ?>notifications/settings">
             <input type="hidden" name="section" value="smtp" />
             <div class="row g-3">
               <div class="col-12 col-md-4">
@@ -171,7 +171,7 @@ $priorities = [
           <h5 class="mb-0">Configurare SMS</h5>
         </div>
         <div class="card-body">
-          <form method="post" action="<?php echo BASE_URL; ?>notifications/settings">
+          <form method="post" action="<?php echo ROUTE_BASE; ?>notifications/settings">
             <input type="hidden" name="section" value="sms" />
             <div class="row g-3">
               <div class="col-12 col-md-4">

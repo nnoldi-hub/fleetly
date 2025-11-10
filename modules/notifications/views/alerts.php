@@ -27,7 +27,7 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshAlerts()">
                             <i class="fas fa-sync-alt"></i> Actualizează
                         </button>
-                        <a href="<?= BASE_URL ?>/notifications/settings" class="btn btn-sm btn-outline-dark">
+                        <a href="<?= ROUTE_BASE ?>notifications/settings" class="btn btn-sm btn-outline-dark">
                             <i class="fas fa-sliders-h"></i> Setări
                         </a>
                     </div>
@@ -302,7 +302,7 @@
 <script>
 // Marchează o notificare ca citită
 function markAsRead(notificationId) {
-    fetch('<?= BASE_URL ?>notifications/mark-read', {
+    fetch('<?= ROUTE_BASE ?>notifications/mark-read', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -339,7 +339,7 @@ function markAsRead(notificationId) {
 // Marchează toate notificările ca citite
 function markAllAsRead() {
     if (confirm('Sigur doriți să marcați toate notificările ca citite?')) {
-        fetch('<?= BASE_URL ?>notifications/mark-all-read', {
+    fetch('<?= ROUTE_BASE ?>notifications/mark-all-read', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -364,7 +364,7 @@ function markAllAsRead() {
 // Șterge o notificare
 function dismissNotification(notificationId) {
     if (confirm('Sigur doriți să ștergeți această notificare?')) {
-    fetch('<?= BASE_URL ?>notifications/dismiss', {
+    fetch('<?= ROUTE_BASE ?>notifications/dismiss', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -393,7 +393,7 @@ function dismissNotification(notificationId) {
 
 // Actualizează contorul de notificări
 function updateNotificationCount() {
-    fetch('<?= BASE_URL ?>notifications/unread-count', {
+    fetch('<?= ROUTE_BASE ?>notifications/unread-count', {
         method: 'GET'
     })
     .then(response => response.json())
