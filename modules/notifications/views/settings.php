@@ -49,15 +49,9 @@ $priorities = [
             $auth = Auth::getInstance();
             $currentUser = $auth->user();
             
-            // DEBUG: verificăm ce returnează auth
-            var_dump($currentUser); // TEMPORAR pentru debug
-            
             // Rolul poate fi în role_slug sau role
             $userRole = $currentUser->role_slug ?? $currentUser->role ?? 'user';
             $isAdminOrManager = in_array($userRole, ['admin', 'manager', 'superadmin']);
-            
-            // DEBUG: afișăm rol pentru verificare
-            echo "<!-- DEBUG: userRole = $userRole, isAdminOrManager = " . ($isAdminOrManager ? 'true' : 'false') . " -->";
             ?>
             
             <?php if ($isAdminOrManager): ?>
