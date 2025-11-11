@@ -275,58 +275,72 @@ class NotificationController extends Controller {
     }
     
     public function generateSystemNotifications() {
-        // Generăm notificări automate pentru sistem
-        $notifications = [];
-        
-        // Obținem company_id al utilizatorului curent pentru broadcast
-        $userId = $_SESSION['user_id'] ?? 1;
-        $user = $this->db->fetch("SELECT company_id, role FROM users WHERE id = ?", [$userId]);
-        $companyId = $user['company_id'] ?? null;
-        
-        // Verificăm asigurările care expiră
-        $insuranceModel = new Insurance();
-        $expiringInsurance = $insuranceModel->getExpiring(30); // 30 de zile
-        
-        foreach ($expiringInsurance as $insurance) {
-            $daysUntilExpiry = (strtotime($insurance['end_date']) - time()) / (24 * 3600);
-            
-            $priority = 'medium';
-            if ($daysUntilExpiry <= 7) $priority = 'high';
-            elseif ($daysUntilExpiry <= 14) $priority = 'medium';
-            else $priority = 'low';
-            
-            // Folosim metoda statică care respectă preferința de broadcast
-            Notification::createInsuranceExpiryNotification(
-                $insurance['id'],
-                $insurance['license_plate'],
-                $insurance['insurance_type'],
-                (int)round($daysUntilExpiry),
-                $companyId
-            );
-        }
-        
-        // Verificăm mentenanța scadentă
-        $maintenanceModel = new Maintenance();
-        $dueMaintenance = $maintenanceModel->getDueMaintenance();
-        
-        foreach ($dueMaintenance as $maintenance) {
-            // Folosim metoda statică care respectă preferința de broadcast
-            Notification::createMaintenanceNotification(
-                $maintenance['vehicle_id'],
-                $maintenance['license_plate'],
-                $maintenance['maintenance_type'],
-                $companyId
-            );
-        }
-        
-        // Contorizăm notificările create (broadcast creează mai multe înregistrări)
-        $created = count($expiringInsurance) + count($dueMaintenance);
-        
-        if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
-            $this->json(['success' => true, 'message' => "Au fost generate notificări pentru $created evenimente", 'created' => $created]);
-        } else {
-            $_SESSION['success'] = "Au fost generate notificări automate pentru $created evenimente!";
-            $this->redirect('/notifications');
+        try {
+            // Generăm notificări automate pentru sistem
+            $notifications = [];
+
+            // Obținem company_id al utilizatorului curent pentru broadcast
+            $userId = $_SESSION['user_id'] ?? 1;
+            $user = $this->db->fetch("SELECT company_id, role FROM users WHERE id = ?", [$userId]);
+            $companyId = $user['company_id'] ?? null;
+
+            // Verificăm asigurările care expiră (folosim metoda pe expiry_date care expune days_until_expiry)
+            $insuranceModel = new Insurance();
+            if (method_exists($insuranceModel, 'getExpiringInsurance')) {
+                $expiringInsurance = $insuranceModel->getExpiringInsurance(30);
+            } else {
+                // fallback pe metoda existentă
+                $expiringInsurance = $insuranceModel->getExpiring(30);
+            }
+
+            foreach ($expiringInsurance as $insurance) {
+                // days_until_expiry poate veni direct din query; dacă nu, îl calculăm
+                $daysUntilExpiry = isset($insurance['days_until_expiry'])
+                    ? (int)$insurance['days_until_expiry']
+                    : (isset($insurance['expiry_date'])
+                        ? (int)floor((strtotime($insurance['expiry_date']) - time()) / (24 * 3600))
+                        : (isset($insurance['end_date'])
+                            ? (int)floor((strtotime($insurance['end_date']) - time()) / (24 * 3600))
+                            : 30));
+
+                Notification::createInsuranceExpiryNotification(
+                    $insurance['id'],
+                    $insurance['license_plate'] ?? ($insurance['vehicle_info'] ?? 'Vehicul'),
+                    $insurance['insurance_type'] ?? 'asigurare',
+                    $daysUntilExpiry,
+                    $companyId
+                );
+            }
+
+            // Verificăm mentenanța scadentă
+            $maintenanceModel = new Maintenance();
+            $dueMaintenance = $maintenanceModel->getDueMaintenance();
+
+            foreach ($dueMaintenance as $maintenance) {
+                Notification::createMaintenanceNotification(
+                    $maintenance['vehicle_id'],
+                    $maintenance['license_plate'] ?? ($maintenance['vehicle_info'] ?? 'Vehicul'),
+                    $maintenance['maintenance_type'] ?? 'mentenanță',
+                    $companyId
+                );
+            }
+
+            // Contorizăm notificările create (broadcast creează mai multe înregistrări)
+            $created = (is_array($expiringInsurance) ? count($expiringInsurance) : 0) + (is_array($dueMaintenance) ? count($dueMaintenance) : 0);
+
+            if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+                $this->json(['success' => true, 'message' => "Au fost generate notificări pentru $created evenimente", 'created' => $created]);
+            } else {
+                $_SESSION['success'] = "Au fost generate notificări automate pentru $created evenimente!";
+                $this->redirect('/notifications');
+            }
+        } catch (Throwable $e) {
+            if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+                $this->json(['success' => false, 'message' => 'Eroare la generare: ' . $e->getMessage()], 500);
+            } else {
+                $_SESSION['errors'] = ['Eroare la generare: ' . $e->getMessage()];
+                $this->redirect('/notifications');
+            }
         }
     }
     
