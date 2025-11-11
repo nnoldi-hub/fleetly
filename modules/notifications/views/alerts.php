@@ -21,6 +21,9 @@
                 </h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <div class="btn-group me-2">
+                        <button type="button" class="btn btn-sm btn-success" onclick="generateSystemNotifications()">
+                            <i class="fas fa-magic"></i> Generează Notificări
+                        </button>
                         <button type="button" class="btn btn-sm btn-outline-primary" onclick="markAllAsRead()">
                             <i class="fas fa-check-double"></i> Marchează toate ca citite
                         </button>
@@ -425,6 +428,33 @@ function refreshAlerts() {
 setInterval(function() {
     updateNotificationCount();
 }, 300000); // 5 minute
+
+// Generează notificări automate de sistem
+function generateSystemNotifications() {
+    if (!confirm('Generez notificări pentru asigurări/mentenanță/documente în expirare?')) {
+        return;
+    }
+    
+    fetch('<?= ROUTE_BASE ?>notifications/generate-system', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Succes! Au fost generate notificări pentru ' + data.created + ' evenimente.');
+            location.reload();
+        } else {
+            alert('Eroare: ' + (data.message || 'Generare eșuată'));
+        }
+    })
+    .catch(error => {
+        console.error('Eroare:', error);
+        alert('Eroare la generarea notificărilor');
+    });
+}
 </script>
 
 <?php
