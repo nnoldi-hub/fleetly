@@ -139,17 +139,27 @@ class Notifier {
 
 ## ⏳ În Curs de Implementare
 
-### 🔧 Probleme Curente
+### ✅ Rezolvate Recent
 
 **1. Configurare SMTP/Email**
-- **Status:** Blocat de restricții anti-spam Hostico
-- **Eroare:** "220 and/or bulk e-mail" - serverul shared hosting blochează trimiteri automate
-- **Soluții propuse:**
-  - Contactare Hostico pentru whitelist `notificari@fleetly.ro`
-  - **[RECOMANDAT]** Migrare la serviciu extern:
-    - SendGrid (100 email/zi gratuit)
-    - Mailgun (5000 email/lună gratuit primele 3 luni)
-    - Amazon SES ($0.10/1000 emailuri)
+- **Status:** ✅ REZOLVAT (11 noiembrie 2025)
+- **Soluție:** Migrare la **SendGrid** (100 email/zi gratuit)
+- **Configurare:**
+  ```
+  Host: smtp.sendgrid.net
+  Port: 587
+  Encryption: TLS
+  Username: apikey
+  Password: [API Key SendGrid]
+  From: notificari@fleetly.ro
+  From Name: Fleet Management System
+  ```
+- **DNS Configurat:**
+  - `em2474.fleetly.ro` → `u57234831.wl082.sendgrid.net` (CNAME)
+  - `s1._domainkey.fleetly.ro` → `s1.domainkey.u57234831.wl082.sendgrid.net` (CNAME)
+  - `s2._domainkey.fleetly.ro` → `s2.domainkey.u57234831.wl082.sendgrid.net` (CNAME)
+  - `_dmarc.fleetly.ro` → `v=DMARC1; p=none;` (TXT)
+- **Verificare:** ✅ Email test trimis și primit cu succes
 
 **2. Salvare Preferință Broadcast**
 - **Status:** ✅ REZOLVAT (commit fb9cda5)
