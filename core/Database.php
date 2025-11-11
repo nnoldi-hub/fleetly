@@ -156,34 +156,6 @@ class Database {
             license_number VARCHAR(50) NOT NULL,
             license_category VARCHAR(20),
             license_issue_date DATE,
-
-        // Insurance table (lipsă în unele instalări tenant)
-        $pdo->exec("CREATE TABLE IF NOT EXISTS insurance (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            vehicle_id INT NOT NULL,
-            insurance_type VARCHAR(50) NOT NULL,
-            policy_number VARCHAR(100),
-            insurance_company VARCHAR(100),
-            start_date DATE,
-            expiry_date DATE,
-            coverage_amount DECIMAL(12,2),
-            premium_amount DECIMAL(12,2),
-            deductible DECIMAL(12,2),
-            payment_frequency VARCHAR(50),
-            agent_name VARCHAR(100),
-            agent_phone VARCHAR(30),
-            agent_email VARCHAR(100),
-            coverage_details TEXT,
-            policy_file VARCHAR(255),
-            status ENUM('active','inactive','cancelled','expired') DEFAULT 'active',
-            notes TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE,
-            INDEX idx_expiry_date (expiry_date),
-            INDEX idx_status (status)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-        ");
             license_expiry_date DATE,
             phone VARCHAR(20),
             email VARCHAR(100),
@@ -223,6 +195,34 @@ class Database {
             INDEX idx_expiry_date (expiry_date),
             INDEX idx_status (status)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+        // Insurance table (lipsă în unele instalări tenant)
+        $pdo->exec("CREATE TABLE IF NOT EXISTS insurance (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            vehicle_id INT NOT NULL,
+            insurance_type VARCHAR(50) NOT NULL,
+            policy_number VARCHAR(100),
+            insurance_company VARCHAR(100),
+            start_date DATE,
+            expiry_date DATE,
+            coverage_amount DECIMAL(12,2),
+            premium_amount DECIMAL(12,2),
+            deductible DECIMAL(12,2),
+            payment_frequency VARCHAR(50),
+            agent_name VARCHAR(100),
+            agent_phone VARCHAR(30),
+            agent_email VARCHAR(100),
+            coverage_details TEXT,
+            policy_file VARCHAR(255),
+            status ENUM('active','inactive','cancelled','expired') DEFAULT 'active',
+            notes TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE,
+            INDEX idx_expiry_date (expiry_date),
+            INDEX idx_status (status)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        ");
 
         $pdo->exec("CREATE TABLE IF NOT EXISTS maintenance (
             id INT AUTO_INCREMENT PRIMARY KEY,
