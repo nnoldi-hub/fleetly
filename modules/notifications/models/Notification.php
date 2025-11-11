@@ -4,6 +4,7 @@
 require_once __DIR__ . '/../../../config/database.php';
 require_once __DIR__ . '/../../../core/Database.php';
 require_once __DIR__ . '/../../../core/Model.php';
+require_once __DIR__ . '/NotificationLog.php';
 
 class Notification extends Model {
     protected $table = 'notifications';
@@ -46,6 +47,14 @@ class Notification extends Model {
         
         $this->db->queryOn($this->table, $sql, $params);
         $id = $this->db->lastInsertIdOn($this->table);
+        // Log creare
+        NotificationLog::log($data['type'] ?? 'unknown', 'created', [
+            'user_id' => $data['user_id'] ?? null,
+            'company_id' => $data['company_id'] ?? null,
+            'related_id' => $data['related_id'] ?? null,
+            'related_type' => $data['related_type'] ?? null,
+            'priority' => $data['priority'] ?? 'medium'
+        ], $id);
 
         // Încercare trimitere imediată pe email/SMS conform preferințelor utilizatorului (non-blocking)
         try {
@@ -92,6 +101,7 @@ class Notification extends Model {
 
                 if ($sentAny) {
                     $this->db->queryOn($this->table, "UPDATE notifications SET status='sent', sent_at = NOW() WHERE id = ?", [$id]);
+                    NotificationLog::log($data['type'] ?? 'unknown', 'sent', ['notification_id' => $id], $id);
                 }
             }
         } catch (Throwable $e) {
@@ -354,11 +364,15 @@ class Notification extends Model {
             $data['user_id'] = $actorId;
         }
         
-        if (!$notification->exists($data)) {
-            return $notification->create($data);
+        if ($notification->exists($data)) {
+            NotificationLog::log('insurance_expiry', 'skipped', [
+                'reason' => 'duplicate_within_24h',
+                'related_id' => $insuranceId,
+                'company_id' => $companyId
+            ], null);
+            return false;
         }
-        
-        return false;
+        return $notification->create($data);
     }
     
     public static function createMaintenanceNotification($vehicleId, $vehicleLicensePlate, $maintenanceType, $companyId = null) {
@@ -380,11 +394,15 @@ class Notification extends Model {
             'action_url' => "/modules/maintenance/views/add.php?vehicle_id=$vehicleId"
         ];
         
-        if (!$notification->exists($data)) {
-            return $notification->create($data);
+        if ($notification->exists($data)) {
+            NotificationLog::log('maintenance_due', 'skipped', [
+                'reason' => 'duplicate_within_24h',
+                'vehicle_id' => $vehicleId,
+                'company_id' => $companyId
+            ], null);
+            return false;
         }
-        
-        return false;
+        return $notification->create($data);
     }
     
     public static function createDocumentExpiryNotification($documentId, $vehicleLicensePlate, $documentType, $daysUntilExpiry, $companyId = null) {
@@ -411,11 +429,15 @@ class Notification extends Model {
             'action_url' => "/modules/documents/views/view.php?id=$documentId"
         ];
         
-        if (!$notification->exists($data)) {
-            return $notification->create($data);
+        if ($notification->exists($data)) {
+            NotificationLog::log('document_expiry', 'skipped', [
+                'reason' => 'duplicate_within_24h',
+                'document_id' => $documentId,
+                'company_id' => $companyId
+            ], null);
+            return false;
         }
-        
-        return false;
+        return $notification->create($data);
     }
 }
 ?>
