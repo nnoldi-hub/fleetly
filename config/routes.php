@@ -2,8 +2,8 @@
 /**
  * config/routes.php
  *
- * Scop: centralizarea DEFINI?IILOR DE RUTE într-un singur loc.
- * Acum acest fi?ier ESTE utilizabil daca îl incluzi dupa ce instan?iezi $router în index.php:
+ * Scop: centralizarea DEFINI?IILOR DE RUTE ï¿½ntr-un singur loc.
+ * Acum acest fi?ier ESTE utilizabil daca ï¿½l incluzi dupa ce instan?iezi $router ï¿½n index.php:
  *    require_once 'config/routes.php';
  *
  * IMPORTANT: Clasa Router are metoda addRoute($method, $path, $controller, $action)
@@ -13,7 +13,7 @@
  */
 
 if (!isset($router) || !is_object($router)) {
-	throw new RuntimeException('Router nu este ini?ializat înainte de includerea config/routes.php');
+	throw new RuntimeException('Router nu este ini?ializat ï¿½nainte de includerea config/routes.php');
 }
 
 // Autentificare
@@ -77,7 +77,7 @@ $router->addRoute('POST', '/drivers/edit', 'DriverController', 'edit');
 $router->addRoute('GET', '/drivers/view', 'DriverController', 'view');
 $router->addRoute('POST', '/drivers/delete', 'DriverController', 'delete');
 
-// Între?inere
+// ï¿½ntre?inere
 $router->addRoute('GET', '/maintenance', 'MaintenanceController', 'index');
 $router->addRoute('GET', '/maintenance/add', 'MaintenanceController', 'add');
 $router->addRoute('POST', '/maintenance/add', 'MaintenanceController', 'add');
@@ -151,6 +151,7 @@ $router->addRoute('POST', '/notifications/mark-read', 'NotificationController', 
 $router->addRoute('POST', '/notifications/mark-all-read', 'NotificationController', 'markAllAsRead');
 $router->addRoute('GET', '/notifications/unread-count', 'NotificationController', 'getUnreadCount');
 $router->addRoute('POST', '/notifications/generate-system', 'NotificationController', 'generateSystemNotifications');
+$router->addRoute('GET', '/notifications/generate-system', 'NotificationController', 'generateSystemNotifications');
 $router->addRoute('GET', '/notifications/settings', 'NotificationController', 'settings');
 $router->addRoute('POST', '/notifications/settings', 'NotificationController', 'settings');
 $router->addRoute('GET', '/api/notifications', 'ApiController', 'notifications');
@@ -160,4 +161,4 @@ $router->addRoute('GET', '/home', 'LandingController', 'index');
 $router->addRoute('GET', '/contact', 'LandingController', 'contact');
 $router->addRoute('POST', '/contact/submit', 'LandingController', 'submitContact');
 
-// Sfâr?it liste
+// Sfï¿½r?it liste

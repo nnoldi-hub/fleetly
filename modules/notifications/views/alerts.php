@@ -435,14 +435,20 @@ function generateSystemNotifications() {
         return;
     }
     
-    const formData = new FormData();
-    formData.append('ajax', '1');
-    
-    fetch('<?= ROUTE_BASE ?>notifications/generate-system', {
+    // Folosim GET cu parametru ajax pentru compatibilitate
+    fetch('<?= ROUTE_BASE ?>notifications/generate-system?ajax=1', {
         method: 'POST',
-        body: formData
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'ajax=1'
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('HTTP ' + response.status);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             alert('Succes! Au fost generate notificări pentru ' + data.created + ' evenimente.');
@@ -453,7 +459,7 @@ function generateSystemNotifications() {
     })
     .catch(error => {
         console.error('Eroare:', error);
-        alert('Eroare la generarea notificărilor. Verifică console pentru detalii.');
+        alert('Eroare la generarea notificărilor: ' + error.message + '. Verifică console pentru detalii.');
     });
 }
 </script>
