@@ -286,13 +286,39 @@ class NotificationController extends Controller {
             $user = $this->db->fetch("SELECT company_id, role_id FROM users WHERE id = ?", [$userId]);
             $companyId = $user['company_id'] ?? null;
 
+            // IMPORTANT: setăm contextul de tenant înainte de a atinge tabele de flotă (insurance/maintenance/vehicles)
+            if ($companyId) {
+                try { $this->db->setTenantDatabaseByCompanyId((int)$companyId); } catch (Throwable $e) { /* continuăm, Database va cădea pe core */ }
+            }
+
             // Verificăm asigurările care expiră (folosim metoda pe expiry_date care expune days_until_expiry)
-            $insuranceModel = new Insurance();
-            if (method_exists($insuranceModel, 'getExpiringInsurance')) {
-                $expiringInsurance = $insuranceModel->getExpiringInsurance(30);
-            } else {
-                // fallback pe metoda existentă
-                $expiringInsurance = $insuranceModel->getExpiring(30);
+            $expiringInsurance = [];
+            try {
+                $insuranceModel = new Insurance();
+                if (method_exists($insuranceModel, 'getExpiringInsurance')) {
+                    $expiringInsurance = $insuranceModel->getExpiringInsurance(30);
+                } else {
+                    // fallback pe metoda existentă
+                    $expiringInsurance = $insuranceModel->getExpiring(30);
+                }
+            } catch (Throwable $ie) {
+                // Fallback compatibilitate direct pe DB (diferențe de schemă/tabele)
+                try {
+                    $expiringInsurance = $this->db->fetchAll(
+                        "SELECT i.*, 
+                                v.registration_number AS license_plate,
+                                CONCAT(v.brand, ' ', v.model, ' (', v.registration_number, ')') AS vehicle_info,
+                                DATEDIFF(i.expiry_date, CURDATE()) AS days_until_expiry,
+                                i.insurance_type
+                         FROM insurance i
+                         LEFT JOIN vehicles v ON i.vehicle_id = v.id
+                         WHERE i.expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+                         ORDER BY i.expiry_date ASC",
+                        []
+                    );
+                } catch (Throwable $ie2) {
+                    throw $ie2; // lăsăm try/catch principal să raporteze
+                }
             }
 
             foreach ($expiringInsurance as $insurance) {
@@ -315,8 +341,34 @@ class NotificationController extends Controller {
             }
 
             // Verificăm mentenanța scadentă
-            $maintenanceModel = new Maintenance();
-            $dueMaintenance = $maintenanceModel->getDueMaintenance();
+            $dueMaintenance = [];
+            try {
+                $maintenanceModel = new Maintenance();
+                $dueMaintenance = $maintenanceModel->getDueMaintenance();
+            } catch (Throwable $me) {
+                // Fallback compatibilitate: folosim coloane din schema tenant (registration_number, brand, model, current_mileage, next_service_mileage)
+                try {
+                    $dueMaintenance = $this->db->fetchAll(
+                        "SELECT m.*, 
+                                v.registration_number AS license_plate,
+                                CONCAT(v.brand, ' ', v.model, ' (', v.registration_number, ')') AS vehicle_info,
+                                'mentenanță' AS maintenance_type
+                         FROM maintenance m
+                         LEFT JOIN vehicles v ON m.vehicle_id = v.id
+                         WHERE m.status IN ('scheduled','in_progress')
+                           AND (
+                                (m.next_service_date IS NOT NULL AND m.next_service_date <= DATE_ADD(CURDATE(), INTERVAL 14 DAY))
+                                OR
+                                (m.next_service_mileage IS NOT NULL AND v.current_mileage IS NOT NULL AND v.current_mileage >= (m.next_service_mileage - 2000))
+                           )
+                         ORDER BY COALESCE(m.next_service_date, '9999-12-31') ASC, m.next_service_mileage ASC",
+                        []
+                    );
+                } catch (Throwable $me2) {
+                    // Dacă și fallback-ul eșuează, raportăm eroarea originală
+                    throw $me;
+                }
+            }
 
             foreach ($dueMaintenance as $maintenance) {
                 Notification::createMaintenanceNotification(
