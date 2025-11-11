@@ -435,11 +435,12 @@ function generateSystemNotifications() {
         return;
     }
     
+    const formData = new FormData();
+    formData.append('ajax', '1');
+    
     fetch('<?= ROUTE_BASE ?>notifications/generate-system', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+        body: formData
     })
     .then(response => response.json())
     .then(data => {
@@ -452,7 +453,7 @@ function generateSystemNotifications() {
     })
     .catch(error => {
         console.error('Eroare:', error);
-        alert('Eroare la generarea notificărilor');
+        alert('Eroare la generarea notificărilor. Verifică console pentru detalii.');
     });
 }
 </script>
