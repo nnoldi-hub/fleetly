@@ -274,10 +274,22 @@ class Notification extends Model {
     private function getAdminBroadcastPreference($companyId) {
         // Căutăm un admin/manager al companiei și citim preferințele sale
         try {
-            $admin = $this->db->fetchOn('users', 
-                "SELECT id FROM users WHERE company_id = ? AND role IN ('admin','manager') AND status = 'active' LIMIT 1", 
-                [$companyId]
-            );
+            // Compatibilitate între două scheme: una simplă cu coloana `role` în users și schema RBAC cu `role_id` + tabela roles.
+            // Încercăm mai întâi join pe roles (schema nouă). Dacă eșuează, revenim la varianta simplă.
+            try {
+                $admin = $this->db->fetchOn('users',
+                    "SELECT u.id FROM users u INNER JOIN roles r ON u.role_id = r.id 
+                     WHERE u.company_id = ? AND r.slug IN ('admin','manager','fleet_manager','superadmin') AND u.status = 'active' 
+                     ORDER BY r.level ASC LIMIT 1",
+                    [$companyId]
+                );
+            } catch (Throwable $e) {
+                // Fallback pe schema veche (coloană role direct în users)
+                $admin = $this->db->fetchOn('users',
+                    "SELECT id FROM users WHERE company_id = ? AND role IN ('admin','manager') AND status = 'active' LIMIT 1",
+                    [$companyId]
+                );
+            }
             if ($admin) {
                 $key = 'notifications_prefs_user_' . $admin['id'];
                 $row = $this->db->fetchOn($this->table, "SELECT setting_value FROM system_settings WHERE setting_key = ?", [$key]);

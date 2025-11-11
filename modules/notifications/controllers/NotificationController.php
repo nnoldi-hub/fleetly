@@ -281,7 +281,9 @@ class NotificationController extends Controller {
 
             // Obținem company_id al utilizatorului curent pentru broadcast
             $userId = $_SESSION['user_id'] ?? 1;
-            $user = $this->db->fetch("SELECT company_id, role FROM users WHERE id = ?", [$userId]);
+            // Schema diferențiată: în varianta RBAC avansată nu există coloana `role`, ci `role_id` cu legătură la tabela `roles`.
+            // Luăm doar company_id (rolul nu este necesar aici pentru generare) pentru compatibilitate cu ambele scheme.
+            $user = $this->db->fetch("SELECT company_id, role_id FROM users WHERE id = ?", [$userId]);
             $companyId = $user['company_id'] ?? null;
 
             // Verificăm asigurările care expiră (folosim metoda pe expiry_date care expune days_until_expiry)

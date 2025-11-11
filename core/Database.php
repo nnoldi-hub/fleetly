@@ -257,6 +257,7 @@ class Database {
         $pdo->exec("CREATE TABLE IF NOT EXISTS notifications (
             id INT AUTO_INCREMENT PRIMARY KEY,
             user_id INT NULL,
+            company_id INT NULL,
             type ENUM('document_expiry', 'maintenance_due', 'inspection_due', 'license_expiry', 'mileage_alert', 'cost_alert', 'general') NOT NULL,
             priority ENUM('low', 'medium', 'high', 'critical') DEFAULT 'medium',
             vehicle_id INT NULL,
@@ -283,7 +284,8 @@ class Database {
             INDEX idx_vehicle_notifications (vehicle_id),
             INDEX idx_type_priority (type, priority),
             INDEX idx_notifications_user_unread (user_id, is_read),
-            INDEX idx_notifications_user_created (user_id, created_at)
+            INDEX idx_notifications_user_created (user_id, created_at),
+            INDEX idx_notifications_company (company_id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
         ");
         // Seed default vehicle types if empty
