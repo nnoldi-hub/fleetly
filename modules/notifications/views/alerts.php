@@ -463,7 +463,8 @@ function generateSystemNotifications() {
 
 function handleGenerateResponse(data) {
     if (data && data.success) {
-        alert('Succes! Au fost generate notificări pentru ' + (data.created ?? '?') + ' evenimente.');
+        var created = (data && typeof data.created !== 'undefined' && data.created !== null) ? data.created : '?';
+        alert('Succes! Au fost generate notificări pentru ' + created + ' evenimente.');
         location.reload();
     } else {
         alert('Eroare: ' + (data && data.message ? data.message : 'Generare eșuată'));
