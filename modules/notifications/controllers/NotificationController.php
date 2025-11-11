@@ -292,6 +292,8 @@ class NotificationController extends Controller {
             } else {
                 // Dacă nu avem company_id (ex. superadmin), folosim DB-ul curent ca "tenant" ca să instalăm schema flotă dacă lipsește
                 try { $this->db->setTenantDatabase(DatabaseConfig::getDbName()); } catch (Throwable $e) {}
+                // Fallback: dacă rulăm pe core și nu există încă tabele flotă, le creăm minim necesar
+                try { $this->db->ensureFleetTablesOnCoreIfMissing(); } catch (Throwable $e) {}
             }
 
             // Verificăm asigurările care expiră (folosim metoda pe expiry_date care expune days_until_expiry)

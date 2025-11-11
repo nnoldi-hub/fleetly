@@ -336,6 +336,112 @@ class Database {
         }
     }
 
+    // Fallback: dacă suntem pe modul multi-tenancy dar operăm pe baza core (ex. tenant DB nu există încă)
+    // și lipsesc tabele flotă (vehicles, insurance etc), le creăm aici în baza core pentru a evita 1146.
+    public function ensureFleetTablesOnCoreIfMissing() {
+        $corePdo = $this->core;
+        try {
+            $exists = $corePdo->query("SHOW TABLES LIKE 'vehicles'")->fetch();
+        } catch (Throwable $e) { $exists = false; }
+        if ($exists) { return; } // deja create
+        try {
+            // Replicăm subsetul minim necesar (vehicle_types + vehicles + insurance + maintenance) pentru generator notificări
+            $corePdo->exec("CREATE TABLE IF NOT EXISTS vehicle_types (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                category ENUM('vehicle', 'equipment') NOT NULL DEFAULT 'vehicle',
+                description TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                UNIQUE KEY unique_name (name)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+            $corePdo->exec("CREATE TABLE IF NOT EXISTS vehicles (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                registration_number VARCHAR(20) NOT NULL,
+                vin_number VARCHAR(50),
+                brand VARCHAR(50) NOT NULL,
+                model VARCHAR(50) NOT NULL,
+                year YEAR NOT NULL,
+                vehicle_type_id INT NOT NULL,
+                status ENUM('active', 'inactive', 'maintenance', 'deleted') DEFAULT 'active',
+                purchase_date DATE,
+                purchase_price DECIMAL(10,2),
+                current_mileage INT DEFAULT 0,
+                engine_capacity VARCHAR(20),
+                fuel_type ENUM('petrol', 'diesel', 'electric', 'hybrid', 'gas') DEFAULT 'diesel',
+                color VARCHAR(30),
+                notes TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (vehicle_type_id) REFERENCES vehicle_types(id),
+                UNIQUE KEY unique_registration (registration_number),
+                INDEX idx_status (status),
+                INDEX idx_brand_model (brand, model),
+                INDEX idx_vehicle_type (vehicle_type_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+            $corePdo->exec("CREATE TABLE IF NOT EXISTS insurance (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                vehicle_id INT NOT NULL,
+                insurance_type VARCHAR(50) NOT NULL,
+                policy_number VARCHAR(100),
+                insurance_company VARCHAR(100),
+                start_date DATE,
+                expiry_date DATE,
+                coverage_amount DECIMAL(12,2),
+                premium_amount DECIMAL(12,2),
+                deductible DECIMAL(12,2),
+                payment_frequency VARCHAR(50),
+                agent_name VARCHAR(100),
+                agent_phone VARCHAR(30),
+                agent_email VARCHAR(100),
+                coverage_details TEXT,
+                policy_file VARCHAR(255),
+                status ENUM('active','inactive','cancelled','expired') DEFAULT 'active',
+                notes TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE,
+                INDEX idx_expiry_date (expiry_date),
+                INDEX idx_status (status)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+
+            $corePdo->exec("CREATE TABLE IF NOT EXISTS maintenance (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                vehicle_id INT NOT NULL,
+                driver_id INT NULL,
+                maintenance_type ENUM('preventive', 'corrective', 'inspection', 'repair', 'service') NOT NULL,
+                description TEXT NOT NULL,
+                cost DECIMAL(10,2) NOT NULL DEFAULT 0,
+                currency VARCHAR(3) DEFAULT 'RON',
+                mileage_at_service INT,
+                service_date DATE NOT NULL,
+                next_service_date DATE,
+                next_service_mileage INT,
+                provider VARCHAR(100),
+                invoice_number VARCHAR(50),
+                work_order_number VARCHAR(50),
+                warranty_expiry_date DATE,
+                parts_replaced TEXT,
+                status ENUM('scheduled', 'in_progress', 'completed', 'cancelled') DEFAULT 'completed',
+                priority ENUM('low', 'medium', 'high', 'urgent') DEFAULT 'medium',
+                file_path VARCHAR(255),
+                notes TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE,
+                FOREIGN KEY (driver_id) REFERENCES drivers(id) ON DELETE SET NULL,
+                INDEX idx_vehicle_date (vehicle_id, service_date),
+                INDEX idx_next_service (next_service_date),
+                INDEX idx_maintenance_type (maintenance_type),
+                INDEX idx_status (status)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+        } catch (Throwable $e) {
+            // Dacă nu se poate crea, lăsăm generatorul să raporteze eroarea originală
+        }
+    }
+
     // Choose the proper PDO based on table location
     private function pdoForTable($table) {
         $t = strtolower($table);
