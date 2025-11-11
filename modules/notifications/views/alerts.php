@@ -440,23 +440,35 @@ function generateSystemNotifications() {
 
     // Încercare 1: rută prin router (index.php)
     fetch(primaryUrl)
-        .then(r => {
-            if (!r.ok) throw { type: 'primary', status: r.status };
-            return r.json();
+        .then(async r => {
+            if (r.ok) return r.json();
+            // extragem textul de eroare (poate fi HTML), apoi aruncăm pentru fallback
+            const t = await r.text();
+            throw { type: 'primary', status: r.status, body: t };
         })
         .then(data => handleGenerateResponse(data))
         .catch(err => {
-            // Dacă a picat ruta principală (404/500), încercăm fallback direct pe modul
+            // Dacă a picat ruta principală, încercăm fallback direct pe modul și expunem mesajul JSON chiar dacă status=500
             console.warn('Generator via router a eșuat, încerc fallback direct:', err);
             return fetch(fallbackUrl)
-                .then(r2 => {
-                    if (!r2.ok) throw new Error('HTTP ' + r2.status);
-                    return r2.json();
+                .then(async r2 => {
+                    const raw = await r2.text();
+                    try {
+                        const data2 = JSON.parse(raw);
+                        // Dacă vine JSON dar success=false, propagăm mesajul clar
+                        if (!data2.success) {
+                            throw new Error(data2.message || ('HTTP ' + r2.status));
+                        }
+                        return data2;
+                    } catch (e) {
+                        // Nu e JSON valid; includem primele caractere ca indiciu
+                        throw new Error('HTTP ' + r2.status + ' ' + raw.slice(0, 200));
+                    }
                 })
                 .then(data2 => handleGenerateResponse(data2))
                 .catch(err2 => {
                     console.error('Generator fallback a eșuat:', err2);
-                    alert('Eroare la generarea notificărilor (ambele rute au eșuat).');
+                    alert('Eroare la generarea notificărilor: ' + (err2.message || 'necunoscută'));
                 });
         });
 }
