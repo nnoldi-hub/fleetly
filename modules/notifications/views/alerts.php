@@ -435,13 +435,13 @@ function generateSystemNotifications() {
         return;
     }
     
-    // Folosim GET cu parametru ajax pentru compatibilitate
-    fetch('<?= ROUTE_BASE ?>notifications/generate-system?ajax=1', {
+    // Folosim ruta principală cu parametru action
+    fetch('<?= ROUTE_BASE ?>notifications?action=generate&ajax=1', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: 'ajax=1'
+        body: 'action=generate&ajax=1'
     })
     .then(response => {
         if (!response.ok) {

@@ -13,6 +13,16 @@ class NotificationController extends Controller {
     }
     
     public function index() {
+        // Verificăm dacă e cerere de generare notificări
+        if (isset($_GET['action']) && $_GET['action'] === 'generate') {
+            $this->generateSystemNotifications();
+            return;
+        }
+        if (isset($_POST['action']) && $_POST['action'] === 'generate') {
+            $this->generateSystemNotifications();
+            return;
+        }
+        
         $this->alerts();
     }
     
