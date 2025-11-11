@@ -435,26 +435,39 @@ function generateSystemNotifications() {
         return;
     }
     
-    // Folosim o rută GET dedicată (mai robustă pe shared hosting)
-    fetch('<?= ROUTE_BASE ?>notifications/generate?ajax=1')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('HTTP ' + response.status);
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.success) {
-            alert('Succes! Au fost generate notificări pentru ' + data.created + ' evenimente.');
-            location.reload();
-        } else {
-            alert('Eroare: ' + (data.message || 'Generare eșuată'));
-        }
-    })
-    .catch(error => {
-        console.error('Eroare:', error);
-        alert('Eroare la generarea notificărilor: ' + error.message);
-    });
+    const primaryUrl = '<?= ROUTE_BASE ?>notifications/generate?ajax=1';
+    const fallbackUrl = '<?= BASE_URL ?>modules/notifications/?action=generateSystemNotifications&ajax=1';
+
+    // Încercare 1: rută prin router (index.php)
+    fetch(primaryUrl)
+        .then(r => {
+            if (!r.ok) throw { type: 'primary', status: r.status };
+            return r.json();
+        })
+        .then(data => handleGenerateResponse(data))
+        .catch(err => {
+            // Dacă a picat ruta principală (404/500), încercăm fallback direct pe modul
+            console.warn('Generator via router a eșuat, încerc fallback direct:', err);
+            return fetch(fallbackUrl)
+                .then(r2 => {
+                    if (!r2.ok) throw new Error('HTTP ' + r2.status);
+                    return r2.json();
+                })
+                .then(data2 => handleGenerateResponse(data2))
+                .catch(err2 => {
+                    console.error('Generator fallback a eșuat:', err2);
+                    alert('Eroare la generarea notificărilor (ambele rute au eșuat).');
+                });
+        });
+}
+
+function handleGenerateResponse(data) {
+    if (data && data.success) {
+        alert('Succes! Au fost generate notificări pentru ' + (data.created ?? '?') + ' evenimente.');
+        location.reload();
+    } else {
+        alert('Eroare: ' + (data && data.message ? data.message : 'Generare eșuată'));
+    }
 }
 </script>
 

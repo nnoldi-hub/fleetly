@@ -3,6 +3,9 @@
 
 require_once __DIR__ . '/../../../core/Controller.php';
 require_once __DIR__ . '/../models/Notification.php';
+// Asigurăm încărcarea modelelor folosite de generator, chiar și când controllerul este invocat din modules/notifications/index.php
+@require_once __DIR__ . '/../../insurance/models/Insurance.php';
+@require_once __DIR__ . '/../../maintenance/models/Maintenance.php';
 
 class NotificationController extends Controller {
     private $notificationModel;
@@ -297,8 +300,7 @@ class NotificationController extends Controller {
                 $insurance['id'],
                 $insurance['license_plate'],
                 $insurance['insurance_type'],
-                $insurance['end_date'],
-                $priority,
+                (int)round($daysUntilExpiry),
                 $companyId
             );
         }
