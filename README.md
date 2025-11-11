@@ -247,6 +247,26 @@ A lightweight PHP MVC fleet management app with reports and notifications.
 - Script: `scripts/process_notifications.php`
 - Recommended: every 5 minutes
 
+### Automatic daily generation (document / insurance / maintenance)
+
+- Manual run (UI): pagina Notificări → „Generează Notificări”.
+- Automated run (cron / Task Scheduler): `scripts/cron_generate_notifications.php` (o dată pe zi, ex. 06:00) produce notificări noi conform preferințelor admin/manager (daysBefore + broadcast) pentru fiecare companie.
+
+Linux cron example:
+
+```
+0 6 * * * /usr/bin/php /var/www/fleet-management/scripts/cron_generate_notifications.php >> /var/log/fleetly-cron.log 2>&1
+```
+
+Windows Task Scheduler:
+1. Create Basic Task → Daily 06:00.
+2. Program/script: `C:\path\to\php.exe`
+3. Arguments: `-f C:\wamp64\www\fleet-management\scripts\cron_generate_notifications.php`
+4. Start in: `C:\wamp64\www\fleet-management`
+5. Enable "Run whether user is logged on or not".
+
+Logs: tabel `notification_logs` păstrează create / sent / skipped / error (cron_generation). Curățați periodic dacă devine foarte mare.
+
 5. Smoke tests
 - Notifications: `php scripts/test_notifications.php`
 - Reports: `php scripts/test_reports.php`
