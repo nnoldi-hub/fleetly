@@ -194,7 +194,10 @@ $router->addRoute('POST', '/notifications/dismiss', 'NotificationController', 'd
 $router->addRoute('POST', '/notifications/mark-read', 'NotificationController', 'markAsRead');
 $router->addRoute('POST', '/notifications/mark-all-read', 'NotificationController', 'markAllAsRead');
 $router->addRoute('GET', '/notifications/unread-count', 'NotificationController', 'getUnreadCount');
-$router->addRoute('POST', '/notifications/generate-system', 'NotificationController', 'generateSystemNotifications');
+$router->addRoute('POST', '/notifications/generate-system', 'NotificationController', 'generateSystemNotifications'); // legacy POST route
+// Nou: rută GET dedicată pentru generare (evită 404 la query action=generate pe unele hostinguri)
+$router->addRoute('GET', '/notifications/generate', 'NotificationController', 'generateSystemNotifications');
+$router->addRoute('GET', '/notifications/generate-system', 'NotificationController', 'generateSystemNotifications');
 $router->addRoute('GET', '/notifications/settings', 'NotificationController', 'settings');
 $router->addRoute('POST', '/notifications/settings', 'NotificationController', 'settings');
 

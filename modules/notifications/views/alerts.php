@@ -435,8 +435,8 @@ function generateSystemNotifications() {
         return;
     }
     
-    // Folosim GET simplu pentru compatibilitate maximă
-    fetch('<?= ROUTE_BASE ?>notifications?action=generate&ajax=1')
+    // Folosim o rută GET dedicată (mai robustă pe shared hosting)
+    fetch('<?= ROUTE_BASE ?>notifications/generate?ajax=1')
     .then(response => {
         if (!response.ok) {
             throw new Error('HTTP ' + response.status);

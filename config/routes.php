@@ -150,8 +150,10 @@ $router->addRoute('POST', '/notifications/dismiss', 'NotificationController', 'd
 $router->addRoute('POST', '/notifications/mark-read', 'NotificationController', 'markAsRead');
 $router->addRoute('POST', '/notifications/mark-all-read', 'NotificationController', 'markAllAsRead');
 $router->addRoute('GET', '/notifications/unread-count', 'NotificationController', 'getUnreadCount');
-$router->addRoute('POST', '/notifications/generate-system', 'NotificationController', 'generateSystemNotifications');
-$router->addRoute('GET', '/notifications/generate-system', 'NotificationController', 'generateSystemNotifications');
+$router->addRoute('POST', '/notifications/generate-system', 'NotificationController', 'generateSystemNotifications'); // legacy
+$router->addRoute('GET', '/notifications/generate-system', 'NotificationController', 'generateSystemNotifications'); // legacy
+// Nou: rută GET scurtă /notifications/generate (evită 404 pe query action)
+$router->addRoute('GET', '/notifications/generate', 'NotificationController', 'generateSystemNotifications');
 $router->addRoute('GET', '/notifications/settings', 'NotificationController', 'settings');
 $router->addRoute('POST', '/notifications/settings', 'NotificationController', 'settings');
 $router->addRoute('GET', '/api/notifications', 'ApiController', 'notifications');
