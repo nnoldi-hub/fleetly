@@ -435,14 +435,8 @@ function generateSystemNotifications() {
         return;
     }
     
-    // Folosim ruta principală cu parametru action
-    fetch('<?= ROUTE_BASE ?>notifications?action=generate&ajax=1', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: 'action=generate&ajax=1'
-    })
+    // Folosim GET simplu pentru compatibilitate maximă
+    fetch('<?= ROUTE_BASE ?>notifications?action=generate&ajax=1')
     .then(response => {
         if (!response.ok) {
             throw new Error('HTTP ' + response.status);
@@ -459,7 +453,7 @@ function generateSystemNotifications() {
     })
     .catch(error => {
         console.error('Eroare:', error);
-        alert('Eroare la generarea notificărilor: ' + error.message + '. Verifică console pentru detalii.');
+        alert('Eroare la generarea notificărilor: ' + error.message);
     });
 }
 </script>
