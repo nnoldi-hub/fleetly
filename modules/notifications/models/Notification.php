@@ -189,22 +189,40 @@ class Notification extends Model {
     }
     
     public function exists($data) {
-        // Verificăm dacă există deja o notificare similară în ultimele 24 ore
-        $sql = "SELECT COUNT(*) as count 
-                FROM notifications 
-                WHERE user_id = ? 
-                  AND type = ? 
-                  AND related_id = ? 
-                  AND related_type = ? 
-                  AND created_at > DATE_SUB(NOW(), INTERVAL 24 HOUR)";
-        
-        $params = [
-            $data['user_id'],
-            $data['type'],
-            $data['related_id'] ?? null,
-            $data['related_type'] ?? null
-        ];
-        
+        // Verificăm duplicate în ultimele 24h fie la nivel de user, fie la nivel de companie (broadcast)
+        if (!empty($data['user_id'])) {
+            $sql = "SELECT COUNT(*) as count 
+                    FROM notifications 
+                    WHERE user_id = ? 
+                      AND type = ? 
+                      AND related_id = ? 
+                      AND related_type = ? 
+                      AND created_at > DATE_SUB(NOW(), INTERVAL 24 HOUR)";
+            $params = [
+                $data['user_id'],
+                $data['type'],
+                $data['related_id'] ?? null,
+                $data['related_type'] ?? null
+            ];
+        } elseif (!empty($data['company_id'])) {
+            $sql = "SELECT COUNT(*) as count 
+                    FROM notifications 
+                    WHERE company_id = ? 
+                      AND type = ? 
+                      AND related_id = ? 
+                      AND related_type = ? 
+                      AND created_at > DATE_SUB(NOW(), INTERVAL 24 HOUR)";
+            $params = [
+                $data['company_id'],
+                $data['type'],
+                $data['related_id'] ?? null,
+                $data['related_type'] ?? null
+            ];
+        } else {
+            // Dacă nu avem nici user, nici company (nu ar trebui), nu blocăm crearea
+            return false;
+        }
+
         $result = $this->db->fetchOn($this->table, $sql, $params);
         return ($result['count'] ?? 0) > 0;
     }
@@ -315,8 +333,9 @@ class Notification extends Model {
         elseif ($daysUntilExpiry <= 14) $priority = 'medium';
         else $priority = 'low';
         
-        // Verificăm preferințele admin pentru broadcast
-        $adminPrefs = $notification->getAdminBroadcastPreference($companyId);
+    // Verificăm preferințele admin pentru broadcast și identificăm utilizatorul curent
+    $adminPrefs = $notification->getAdminBroadcastPreference($companyId);
+    $actorId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 1;
         
         $data = [
             'type' => 'insurance_expiry',
@@ -328,11 +347,11 @@ class Notification extends Model {
             'action_url' => "/modules/insurance/views/view.php?id=$insuranceId"
         ];
         
-        // Dacă broadcast e activ, setăm company_id; altfel, user_id = 1 (admin)
+        // Dacă broadcast e activ, setăm company_id; altfel, user_id = utilizatorul curent
         if ($adminPrefs['broadcastToCompany'] && $companyId) {
             $data['company_id'] = $companyId;
         } else {
-            $data['user_id'] = 1; // Admin user implicit
+            $data['user_id'] = $actorId;
         }
         
         if (!$notification->exists($data)) {
@@ -345,11 +364,12 @@ class Notification extends Model {
     public static function createMaintenanceNotification($vehicleId, $vehicleLicensePlate, $maintenanceType, $companyId = null) {
         $notification = new self();
         
-        // Verificăm dacă admin-ul companiei a activat broadcast
-        $broadcastPrefs = $companyId ? $notification->getAdminBroadcastPreference($companyId) : ['broadcastToCompany' => false];
+    // Verificăm dacă admin-ul companiei a activat broadcast și utilizatorul curent
+    $broadcastPrefs = $companyId ? $notification->getAdminBroadcastPreference($companyId) : ['broadcastToCompany' => false];
+    $actorId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 1;
         
         $data = [
-            'user_id' => $broadcastPrefs['broadcastToCompany'] ? null : 1,
+            'user_id' => $broadcastPrefs['broadcastToCompany'] ? null : $actorId,
             'company_id' => $broadcastPrefs['broadcastToCompany'] ? $companyId : null,
             'type' => 'maintenance_due',
             'title' => 'Mentenanță scadentă',
@@ -375,11 +395,12 @@ class Notification extends Model {
         elseif ($daysUntilExpiry <= 14) $priority = 'medium';
         else $priority = 'low';
         
-        // Verificăm dacă admin-ul companiei a activat broadcast
-        $broadcastPrefs = $companyId ? $notification->getAdminBroadcastPreference($companyId) : ['broadcastToCompany' => false];
+    // Verificăm dacă admin-ul companiei a activat broadcast și utilizatorul curent
+    $broadcastPrefs = $companyId ? $notification->getAdminBroadcastPreference($companyId) : ['broadcastToCompany' => false];
+    $actorId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 1;
         
         $data = [
-            'user_id' => $broadcastPrefs['broadcastToCompany'] ? null : 1,
+            'user_id' => $broadcastPrefs['broadcastToCompany'] ? null : $actorId,
             'company_id' => $broadcastPrefs['broadcastToCompany'] ? $companyId : null,
             'type' => 'document_expiry',
             'title' => 'Document în expirare',
