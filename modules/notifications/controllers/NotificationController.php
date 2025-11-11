@@ -290,10 +290,8 @@ class NotificationController extends Controller {
             if ($companyId) {
                 try { $this->db->setTenantDatabaseByCompanyId((int)$companyId); } catch (Throwable $e) { /* fallback pe core */ }
             } else {
-                // În absența company_id folosim mod SINGLE dacă este setat în config pentru a crea tabelele lipsă.
-                if (method_exists('DatabaseConfig','getTenancyMode') && DatabaseConfig::getTenancyMode()==='single') {
-                    try { $this->db->setTenantDatabase(DatabaseConfig::getDbName()); } catch (Throwable $e) {}
-                }
+                // Dacă nu avem company_id (ex. superadmin), folosim DB-ul curent ca "tenant" ca să instalăm schema flotă dacă lipsește
+                try { $this->db->setTenantDatabase(DatabaseConfig::getDbName()); } catch (Throwable $e) {}
             }
 
             // Verificăm asigurările care expiră (folosim metoda pe expiry_date care expune days_until_expiry)
@@ -309,9 +307,9 @@ class NotificationController extends Controller {
             } catch (Throwable $ie) {
                 // Fallback compatibilitate direct pe DB (diferențe de schemă/tabele)
                 // dacă tabela insurance nu există, o creăm rapid (poate fi prima rulare tenant)
-                try { $this->db->query("SELECT 1 FROM insurance LIMIT 1"); } catch (Throwable $tMissing) {
+                try { $this->db->queryOn('insurance', "SELECT 1 FROM insurance LIMIT 1"); } catch (Throwable $tMissing) {
                     try {
-                        $this->db->query("CREATE TABLE IF NOT EXISTS insurance (
+                        $this->db->queryOn('insurance', "CREATE TABLE IF NOT EXISTS insurance (
                             id INT AUTO_INCREMENT PRIMARY KEY,
                             vehicle_id INT NOT NULL,
                             insurance_type VARCHAR(50) NOT NULL,
@@ -339,7 +337,7 @@ class NotificationController extends Controller {
                         throw $createFail; // dacă nu putem crea, raportăm
                     }
                 }
-                $expiringInsurance = $this->db->fetchAll(
+                $expiringInsurance = $this->db->fetchAllOn('insurance',
                     "SELECT i.*, 
                             v.registration_number AS license_plate,
                             CONCAT(v.brand, ' ', v.model, ' (', v.registration_number, ')') AS vehicle_info,
@@ -380,7 +378,7 @@ class NotificationController extends Controller {
             } catch (Throwable $me) {
                 // Fallback compatibilitate: folosim coloane din schema tenant (registration_number, brand, model, current_mileage, next_service_mileage)
                 try {
-                    $dueMaintenance = $this->db->fetchAll(
+                                        $dueMaintenance = $this->db->fetchAllOn('maintenance',
                         "SELECT m.*, 
                                 v.registration_number AS license_plate,
                                 CONCAT(v.brand, ' ', v.model, ' (', v.registration_number, ')') AS vehicle_info,
