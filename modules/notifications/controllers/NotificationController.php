@@ -288,7 +288,12 @@ class NotificationController extends Controller {
 
             // IMPORTANT: setăm contextul de tenant înainte de a atinge tabele de flotă (insurance/maintenance/vehicles)
             if ($companyId) {
-                try { $this->db->setTenantDatabaseByCompanyId((int)$companyId); } catch (Throwable $e) { /* continuăm, Database va cădea pe core */ }
+                try { $this->db->setTenantDatabaseByCompanyId((int)$companyId); } catch (Throwable $e) { /* fallback pe core */ }
+            } else {
+                // În absența company_id folosim mod SINGLE dacă este setat în config pentru a crea tabelele lipsă.
+                if (method_exists('DatabaseConfig','getTenancyMode') && DatabaseConfig::getTenancyMode()==='single') {
+                    try { $this->db->setTenantDatabase(DatabaseConfig::getDbName()); } catch (Throwable $e) {}
+                }
             }
 
             // Verificăm asigurările care expiră (folosim metoda pe expiry_date care expune days_until_expiry)
@@ -303,22 +308,49 @@ class NotificationController extends Controller {
                 }
             } catch (Throwable $ie) {
                 // Fallback compatibilitate direct pe DB (diferențe de schemă/tabele)
-                try {
-                    $expiringInsurance = $this->db->fetchAll(
-                        "SELECT i.*, 
-                                v.registration_number AS license_plate,
-                                CONCAT(v.brand, ' ', v.model, ' (', v.registration_number, ')') AS vehicle_info,
-                                DATEDIFF(i.expiry_date, CURDATE()) AS days_until_expiry,
-                                i.insurance_type
-                         FROM insurance i
-                         LEFT JOIN vehicles v ON i.vehicle_id = v.id
-                         WHERE i.expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
-                         ORDER BY i.expiry_date ASC",
-                        []
-                    );
-                } catch (Throwable $ie2) {
-                    throw $ie2; // lăsăm try/catch principal să raporteze
+                // dacă tabela insurance nu există, o creăm rapid (poate fi prima rulare tenant)
+                try { $this->db->query("SELECT 1 FROM insurance LIMIT 1"); } catch (Throwable $tMissing) {
+                    try {
+                        $this->db->query("CREATE TABLE IF NOT EXISTS insurance (
+                            id INT AUTO_INCREMENT PRIMARY KEY,
+                            vehicle_id INT NOT NULL,
+                            insurance_type VARCHAR(50) NOT NULL,
+                            policy_number VARCHAR(100),
+                            insurance_company VARCHAR(100),
+                            start_date DATE,
+                            expiry_date DATE,
+                            coverage_amount DECIMAL(12,2),
+                            premium_amount DECIMAL(12,2),
+                            deductible DECIMAL(12,2),
+                            payment_frequency VARCHAR(50),
+                            agent_name VARCHAR(100),
+                            agent_phone VARCHAR(30),
+                            agent_email VARCHAR(100),
+                            coverage_details TEXT,
+                            policy_file VARCHAR(255),
+                            status ENUM('active','inactive','cancelled','expired') DEFAULT 'active',
+                            notes TEXT,
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                            INDEX idx_expiry_date (expiry_date),
+                            INDEX idx_status (status)
+                        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+                    } catch (Throwable $createFail) {
+                        throw $createFail; // dacă nu putem crea, raportăm
+                    }
                 }
+                $expiringInsurance = $this->db->fetchAll(
+                    "SELECT i.*, 
+                            v.registration_number AS license_plate,
+                            CONCAT(v.brand, ' ', v.model, ' (', v.registration_number, ')') AS vehicle_info,
+                            DATEDIFF(i.expiry_date, CURDATE()) AS days_until_expiry,
+                            i.insurance_type
+                     FROM insurance i
+                     LEFT JOIN vehicles v ON i.vehicle_id = v.id
+                     WHERE i.expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+                     ORDER BY i.expiry_date ASC",
+                    []
+                );
             }
 
             foreach ($expiringInsurance as $insurance) {
