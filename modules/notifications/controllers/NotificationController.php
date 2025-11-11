@@ -296,15 +296,29 @@ class NotificationController extends Controller {
                 try { $this->db->ensureFleetTablesOnCoreIfMissing(); } catch (Throwable $e) {}
             }
 
+            // Zile înainte de expirare din preferințe (fallback 30)
+            $daysBefore = 30; $daysBeforeInt = 30;
+            try {
+                $prefsKey = 'notifications_prefs_user_' . $userId;
+                $prefsRow = $this->db->fetch("SELECT setting_value FROM system_settings WHERE setting_key = ?", [$prefsKey]);
+                if ($prefsRow && !empty($prefsRow['setting_value'])) {
+                    $prefs = json_decode($prefsRow['setting_value'], true);
+                    if (isset($prefs['daysBefore'])) {
+                        $daysBefore = max(0, (int)$prefs['daysBefore']);
+                        $daysBeforeInt = $daysBefore;
+                    }
+                }
+            } catch (Throwable $pe) { /* folosim fallback-ul 30 */ }
+
             // Verificăm asigurările care expiră (folosim metoda pe expiry_date care expune days_until_expiry)
             $expiringInsurance = [];
             try {
                 $insuranceModel = new Insurance();
                 if (method_exists($insuranceModel, 'getExpiringInsurance')) {
-                    $expiringInsurance = $insuranceModel->getExpiringInsurance(30);
+                    $expiringInsurance = $insuranceModel->getExpiringInsurance($daysBeforeInt);
                 } else {
                     // fallback pe metoda existentă
-                    $expiringInsurance = $insuranceModel->getExpiring(30);
+                    $expiringInsurance = $insuranceModel->getExpiring($daysBeforeInt);
                 }
             } catch (Throwable $ie) {
                 // Fallback compatibilitate direct pe DB (diferențe de schemă/tabele)
@@ -347,7 +361,7 @@ class NotificationController extends Controller {
                             i.insurance_type
                      FROM insurance i
                      LEFT JOIN vehicles v ON i.vehicle_id = v.id
-                     WHERE i.expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+                     WHERE i.expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL {$daysBeforeInt} DAY)
                      ORDER BY i.expiry_date ASC",
                     []
                 );
@@ -411,8 +425,42 @@ class NotificationController extends Controller {
                 );
             }
 
+            // Verificăm documentele care expiră în fereastra definită
+            $expiringDocuments = [];
+            try {
+                $expiringDocuments = $this->db->fetchAllOn('documents',
+                    "SELECT d.*, 
+                            v.registration_number AS license_plate,
+                            CONCAT(v.brand, ' ', v.model, ' (', v.registration_number, ')') AS vehicle_info,
+                            DATEDIFF(d.expiry_date, CURDATE()) AS days_until_expiry,
+                            d.document_type
+                     FROM documents d
+                     LEFT JOIN vehicles v ON d.vehicle_id = v.id
+                     WHERE d.status = 'active'
+                       AND d.expiry_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL {$daysBeforeInt} DAY)
+                     ORDER BY d.expiry_date ASC",
+                    []
+                );
+            } catch (Throwable $de) { /* dacă lipsește tabela, continuăm fără docs */ }
+
+            foreach ($expiringDocuments as $doc) {
+                $daysUntilExpiry = isset($doc['days_until_expiry'])
+                    ? (int)$doc['days_until_expiry']
+                    : (isset($doc['expiry_date']) ? (int)floor((strtotime($doc['expiry_date']) - time()) / (24 * 3600)) : $daysBeforeInt);
+
+                Notification::createDocumentExpiryNotification(
+                    $doc['id'],
+                    $doc['license_plate'] ?? ($doc['vehicle_info'] ?? 'Vehicul'),
+                    $doc['document_type'] ?? 'document',
+                    $daysUntilExpiry,
+                    $companyId
+                );
+            }
+
             // Contorizăm notificările create (broadcast creează mai multe înregistrări)
-            $created = (is_array($expiringInsurance) ? count($expiringInsurance) : 0) + (is_array($dueMaintenance) ? count($dueMaintenance) : 0);
+            $created = (is_array($expiringInsurance) ? count($expiringInsurance) : 0)
+                     + (is_array($dueMaintenance) ? count($dueMaintenance) : 0)
+                     + (is_array($expiringDocuments) ? count($expiringDocuments) : 0);
 
             if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
                 $this->json(['success' => true, 'message' => "Au fost generate notificări pentru $created evenimente", 'created' => $created]);
