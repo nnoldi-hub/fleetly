@@ -353,7 +353,7 @@ function markAllAsRead() {
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesare...';
     
-    fetch('<?= BASE_URL ?>notifications/mark-all-read', {
+    fetch('<?= rtrim(BASE_URL, "/") ?>/index.php/notifications/mark-all-read', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -455,7 +455,7 @@ function generateSystemNotifications() {
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generare...';
     
-    fetch('<?= BASE_URL ?>notifications/generate-system', {
+    fetch('<?= rtrim(BASE_URL, "/") ?>/index.php/notifications/generate-system', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
