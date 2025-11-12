@@ -9,55 +9,66 @@
 
 Conectează-te la **phpMyAdmin** pe Hostico și identifică:
 
-✅ **Baza CORE (principală):** `fleet_management`
+✅ **Baza CORE (principală):** `cpses_XXXXX_fleet` sau similar (numele poate varia pe Hostico)
 ✅ **Baze TENANT (companii):** 
-   - `fleet_management_company_1`
-   - `fleet_management_company_2`
+   - `cpses_XXXXX_fleet_company1` (sau company_1)
+   - `cpses_XXXXX_fleet_company2` (sau company_2)
    - etc.
 
+**IMPORTANT:** Pe Hostico, toate bazele de date au un **prefix** (ex: `cpses_wcdpw7nrfw_`). 
+Numele EXACT îl vezi în lista din stânga în phpMyAdmin.
+
 **Cum verifici:** Click pe baza de date în stânga → Vezi tabelele:
-- CORE are: `users`, `companies`, `system_settings`
-- TENANT are: `vehicles`, `documents`, `insurance`, `maintenance`, `notifications`
+- **CORE** are: `users`, `companies`, `system_settings`
+- **TENANT** are: `vehicles`, `documents`, `insurance`, `maintenance`, `notifications`
 
 ---
 
 ## ⚡ DEPLOYMENT
 
-### PASUL 1: Actualizează Baza CORE (fleet_management)
+### PASUL 1: Actualizează Baza CORE (baza principală)
 
 1. **Selectează baza de date CORE:**
-   - Click pe `fleet_management` în phpMyAdmin (stânga)
+   - Click pe baza ta PRINCIPALĂ în phpMyAdmin (stânga)
+   - Ex: `cpses_wcdpw7nrfw_fleet` sau `cpses_XXXXX_fleet`
+   - Aceasta este baza care conține tabelele `users`, `companies`
 
 2. **Deschide tab-ul SQL:**
-   - Click pe butonul **SQL** (sus)
+   - Click pe butonul **SQL** (sus în meniu)
 
 3. **Copiază și rulează:**
    - Deschide fișierul: `sql/migrations/hostico_deploy_core.sql`
-   - Copiază ÎNTREGUL conținut
-   - Paste în phpMyAdmin
+   - Copiază ÎNTREGUL conținut (FĂRĂ linia `USE fleet_management;` - este comentată)
+   - Paste în phpMyAdmin în zona SQL
    - Click **Go** (Execute)
 
-4. **Verifică rezultatul:**
+4. **IMPORTANT:** Nu include comanda `USE database_name` - phpMyAdmin rulează SQL-ul pe baza selectată!
+
+5. **Verifică rezultatul:**
+   - Scroll în jos în phpMyAdmin după execute
+   - Ar trebui să vezi mesaje de succes: "Table created" sau "X rows inserted"
+   
+   Sau rulează query de verificare (tab SQL nou):
    ```sql
    SHOW TABLES LIKE 'notification%';
    ```
    
-   **Trebuie să vezi:**
+   **Trebuie să vezi 4 tabele noi:**
    - ✅ notification_preferences
    - ✅ notification_queue
    - ✅ notification_templates
    - ✅ notification_rate_limits
 
-5. **Verifică template-urile default:**
+6. **Verifică template-urile default:**
    ```sql
    SELECT slug, name FROM notification_templates WHERE company_id IS NULL;
    ```
    
-   **Trebuie să vezi 4 template-uri:**
-   - ✅ document_expiry
-   - ✅ insurance_expiry
-   - ✅ maintenance_due
-   - ✅ system_alert
+   **Trebuie să vezi 4 template-uri globale:**
+   - ✅ document_expiry - Expirare Document
+   - ✅ insurance_expiry - Expirare Asigurare
+   - ✅ maintenance_due - Mentenanta Scadenta
+   - ✅ system_alert - Alerta Sistem
 
 ---
 
@@ -65,10 +76,12 @@ Conectează-te la **phpMyAdmin** pe Hostico și identifică:
 
 **IMPORTANT:** Repetă pașii de mai jos pentru FIECARE bază de date tenant!
 
-#### 2.1. Pentru fleet_management_company_1:
+#### 2.1. Pentru prima companie (tenant database):
 
 1. **Selectează baza de date TENANT:**
-   - Click pe `fleet_management_company_1` în phpMyAdmin
+   - Click pe baza TENANT în phpMyAdmin (stânga)
+   - Ex: `cpses_XXXXX_fleet_company1` sau similar
+   - Aceasta este baza care conține tabelele `vehicles`, `notifications`
 
 2. **Deschide tab-ul SQL**
 
@@ -77,8 +90,13 @@ Conectează-te la **phpMyAdmin** pe Hostico și identifică:
    - Copiază ÎNTREGUL conținut
    - Paste în phpMyAdmin
    - Click **Go**
+   
+4. **IMPORTANT:** Script-ul folosește `DATABASE()` dinamic - nu trebuie să modifici nimic!
 
-4. **Verifică rezultatul:**
+5. **Verifică rezultatul:**
+   - Scroll în jos - ar trebui să vezi mesaje: "Column added" sau "Column already exists"
+   
+   Verifică manual (tab SQL nou):
    ```sql
    SHOW COLUMNS FROM notifications;
    ```
@@ -89,16 +107,16 @@ Conectează-te la **phpMyAdmin** pe Hostico și identifică:
    - ✅ sent_at (DATETIME)
    - ✅ metadata (JSON)
 
-5. **Verifică tabele auxiliare:**
+6. **Verifică tabele auxiliare (dacă există):**
    ```sql
    SHOW COLUMNS FROM documents LIKE '%expiry_status%';
    SHOW COLUMNS FROM insurance LIKE '%expiry_status%';
    SHOW COLUMNS FROM maintenance LIKE '%due_status%';
    ```
 
-#### 2.2. Pentru fleet_management_company_2:
+#### 2.2. Pentru a doua companie:
 
-**Repetă exact aceiași pași ca la 2.1**, dar selectează `fleet_management_company_2`
+**Repetă exact aceiași pași ca la 2.1**, dar selectează a DOUA bază TENANT (ex: `cpses_XXXXX_fleet_company2`)
 
 #### 2.3. Pentru alte companii:
 

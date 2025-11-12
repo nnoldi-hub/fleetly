@@ -3,9 +3,11 @@
 -- Notification System V2 - Core Tables
 -- Database: fleet_management (CORE)
 -- ============================================
--- Run this on the MAIN/CORE database (fleet_management)
+-- IMPORTANT: Select your CORE database in phpMyAdmin LEFT panel BEFORE running this!
+-- Database name on Hostico is usually: cpses_XXXXX_fleet (or similar with prefix)
+-- DO NOT include USE statement - phpMyAdmin handles this automatically
 
-USE fleet_management;
+-- USE fleet_management;  -- COMMENTED OUT for Hostico compatibility
 
 -- ============================================
 -- 1. notification_preferences (User Settings)
