@@ -344,27 +344,39 @@ function markAsRead(notificationId) {
 
 // Marchează toate notificările ca citite
 function markAllAsRead() {
-    if (confirm('Sigur doriți să marcați toate notificările ca citite?')) {
-    fetch('<?= ROUTE_BASE ?>notifications/mark-all-read', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'ajax=1'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Eroare: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Eroare:', error);
-            alert('A apărut o eroare la marcarea notificărilor.');
-        });
+    if (!confirm('Sigur doriți să marcați toate notificările ca citite?')) {
+        return;
     }
+    
+    const btn = event.target;
+    const originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesare...';
+    
+    fetch('<?= BASE_URL ?>notifications/mark-all-read', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Toate notificările au fost marcate ca citite!');
+            location.reload();
+        } else {
+            alert('Eroare: ' + (data.message || 'Operație eșuată'));
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+    })
+    .catch(error => {
+        console.error('Eroare:', error);
+        alert('A apărut o eroare la marcarea notificărilor.');
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+    });
 }
 
 // Șterge o notificare
@@ -438,52 +450,35 @@ function generateSystemNotifications() {
         return;
     }
     
-    const primaryUrl = '<?= ROUTE_BASE ?>notifications/generate?ajax=1';
-    const fallbackUrl = '<?= BASE_URL ?>modules/notifications/?action=generateSystemNotifications&ajax=1';
-
-    // Încercare 1: rută prin router (index.php)
-    fetch(primaryUrl)
-        .then(async r => {
-            if (r.ok) return r.json();
-            // extragem textul de eroare (poate fi HTML), apoi aruncăm pentru fallback
-            const t = await r.text();
-            throw { type: 'primary', status: r.status, body: t };
-        })
-        .then(data => handleGenerateResponse(data))
-        .catch(err => {
-            // Dacă a picat ruta principală, încercăm fallback direct pe modul și expunem mesajul JSON chiar dacă status=500
-            console.warn('Generator via router a eșuat, încerc fallback direct:', err);
-            return fetch(fallbackUrl)
-                .then(async r2 => {
-                    const raw = await r2.text();
-                    try {
-                        const data2 = JSON.parse(raw);
-                        // Dacă vine JSON dar success=false, propagăm mesajul clar
-                        if (!data2.success) {
-                            throw new Error(data2.message || ('HTTP ' + r2.status));
-                        }
-                        return data2;
-                    } catch (e) {
-                        // Nu e JSON valid; includem primele caractere ca indiciu
-                        throw new Error('HTTP ' + r2.status + ' ' + raw.slice(0, 200));
-                    }
-                })
-                .then(data2 => handleGenerateResponse(data2))
-                .catch(err2 => {
-                    console.error('Generator fallback a eșuat:', err2);
-                    alert('Eroare la generarea notificărilor: ' + (err2.message || 'necunoscută'));
-                });
-        });
-}
-
-function handleGenerateResponse(data) {
-    if (data && data.success) {
-        var created = (data && typeof data.created !== 'undefined' && data.created !== null) ? data.created : '?';
-        alert('Succes! Au fost generate notificări pentru ' + created + ' evenimente.');
-        location.reload();
-    } else {
-        alert('Eroare: ' + (data && data.message ? data.message : 'Generare eșuată'));
-    }
+    const btn = event.target;
+    const originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generare...';
+    
+    fetch('<?= BASE_URL ?>notifications/generate-system', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Succes! Au fost generate ' + (data.created || 0) + ' notificări.');
+            location.reload();
+        } else {
+            alert('Eroare: ' + (data.message || 'Generare eșuată'));
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+    })
+    .catch(error => {
+        console.error('Eroare:', error);
+        alert('A apărut o eroare la generarea notificărilor.');
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+    });
 }
 </script>
 
