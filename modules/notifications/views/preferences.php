@@ -1,54 +1,7 @@
 <?php
 // modules/notifications/views/preferences.php
 // UI pentru configurarea preferințelor personale de notificări (V2)
-
-require_once __DIR__ . '/../models/NotificationPreference.php';
-
-$auth = Auth::getInstance();
-$currentUser = $auth->user();
-$userId = $currentUser->id ?? 0;
-$companyId = $currentUser->company_id ?? 0;
-
-// Load preferințe existente
-$prefsModel = new NotificationPreference();
-$prefs = $prefsModel->getOrDefault($userId, $companyId);
-
-// Timezones suportate
-$timezones = [
-    'Europe/Bucharest' => 'București (GMT+2/+3)',
-    'Europe/London' => 'Londra (GMT+0/+1)',
-    'Europe/Paris' => 'Paris (GMT+1/+2)',
-    'America/New_York' => 'New York (GMT-5/-4)',
-    'America/Los_Angeles' => 'Los Angeles (GMT-8/-7)',
-    'Asia/Dubai' => 'Dubai (GMT+4)',
-    'Asia/Tokyo' => 'Tokyo (GMT+9)'
-];
-
-// Notification types disponibile
-$notificationTypes = [
-    'document_expiry' => ['label' => 'Expirare Documente', 'icon' => 'fa-file-alt'],
-    'insurance_expiry' => ['label' => 'Expirare Asigurări', 'icon' => 'fa-shield-alt'],
-    'maintenance_due' => ['label' => 'Mentenanță Scadentă', 'icon' => 'fa-wrench'],
-    'system_alert' => ['label' => 'Alerte Sistem', 'icon' => 'fa-exclamation-triangle'],
-    'fuel_expense' => ['label' => 'Cheltuieli Combustibil', 'icon' => 'fa-gas-pump'],
-    'driver_license' => ['label' => 'Permise Conducere', 'icon' => 'fa-id-card']
-];
-
-// Decode enabled_types JSON
-$enabledTypes = [];
-if (!empty($prefs['enabled_types'])) {
-    $decoded = is_string($prefs['enabled_types']) ? json_decode($prefs['enabled_types'], true) : $prefs['enabled_types'];
-    $enabledTypes = is_array($decoded) ? $decoded : [];
-}
-
-// Decode quiet_hours JSON
-$quietHours = ['start' => '22:00', 'end' => '08:00'];
-if (!empty($prefs['quiet_hours'])) {
-    $decoded = is_string($prefs['quiet_hours']) ? json_decode($prefs['quiet_hours'], true) : $prefs['quiet_hours'];
-    if (is_array($decoded)) {
-        $quietHours = array_merge($quietHours, $decoded);
-    }
-}
+// Datele sunt preluate din controller prin extract($data)
 ?>
 
 <div class="container-fluid py-4">
