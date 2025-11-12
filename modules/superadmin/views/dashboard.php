@@ -64,6 +64,18 @@
       <div class="card border-0 shadow-sm h-100">
         <div class="card-body">
           <div class="d-flex align-items-center mb-2">
+            <div class="me-2 text-info"><i class="fas fa-chart-line"></i></div>
+            <h5 class="mb-0">Notifications Analytics</h5>
+          </div>
+          <p class="text-muted small mb-3">Cross-tenant dashboard with KPIs, charts, and company comparison.</p>
+          <a class="btn btn-outline-info" href="<?= ROUTE_BASE ?>superadmin/notifications/dashboard"><i class="fas fa-analytics me-1"></i> View Dashboard</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-2">
             <div class="me-2 text-primary"><i class="fas fa-sitemap"></i></div>
             <h5 class="mb-0">Gestionează flota</h5>
           </div>

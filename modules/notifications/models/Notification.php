@@ -30,85 +30,162 @@ class Notification extends Model {
     }
     
     private function createSingle($data) {
-        $sql = "INSERT INTO notifications (user_id, company_id, type, title, message, priority, related_id, related_type, action_url, created_at) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+        // V2: Integrare cu NotificationTemplate + NotificationQueue
+        require_once __DIR__ . '/NotificationTemplate.php';
+        require_once __DIR__ . '/NotificationPreference.php';
+        require_once __DIR__ . '/NotificationQueue.php';
+        
+        $userId = (int)($data['user_id'] ?? 0);
+        $companyId = (int)($data['company_id'] ?? 0);
+        $type = $data['type'] ?? 'system_alert';
+        
+        // Step 1: Render template (dacă există)
+        $templateModel = new NotificationTemplate();
+        $templateVars = $data['template_vars'] ?? [];
+        
+        // Fallback: dacă nu sunt template_vars, folosim titlu/mesaj direct din $data
+        if (empty($templateVars) && isset($data['title']) && isset($data['message'])) {
+            $rendered = [
+                'subject' => $data['title'],
+                'body' => $data['message'],
+                'priority' => $data['priority'] ?? 'medium',
+                'template_id' => null
+            ];
+        } else {
+            // Render din template
+            $rendered = $templateModel->render($type, $templateVars, 'in_app', $companyId);
+            
+            // Dacă template nu există, fallback la date din $data
+            if (!$rendered) {
+                $rendered = [
+                    'subject' => $data['title'] ?? 'Notificare',
+                    'body' => $data['message'] ?? '',
+                    'priority' => $data['priority'] ?? 'medium',
+                    'template_id' => null
+                ];
+            }
+        }
+        
+        // Step 2: INSERT notification în DB
+        $sql = "INSERT INTO notifications (user_id, company_id, type, title, message, priority, related_id, related_type, action_url, template_id, rendered_at, created_at) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
         
         $params = [
-            $data['user_id'] ?? null,
-            $data['company_id'] ?? null,
-            $data['type'],
-            $data['title'],
-            $data['message'],
-            $data['priority'] ?? 'medium',
+            $userId,
+            $companyId,
+            $type,
+            $rendered['subject'],
+            $rendered['body'],
+            $rendered['priority'],
             $data['related_id'] ?? null,
             $data['related_type'] ?? null,
-            $data['action_url'] ?? null
+            $data['action_url'] ?? null,
+            $rendered['template_id']
         ];
         
         $this->db->queryOn($this->table, $sql, $params);
-        $id = $this->db->lastInsertIdOn($this->table);
+        $notificationId = $this->db->lastInsertIdOn($this->table);
+        
         // Log creare
-        NotificationLog::log($data['type'] ?? 'unknown', 'created', [
-            'user_id' => $data['user_id'] ?? null,
-            'company_id' => $data['company_id'] ?? null,
-            'related_id' => $data['related_id'] ?? null,
-            'related_type' => $data['related_type'] ?? null,
-            'priority' => $data['priority'] ?? 'medium'
-        ], $id);
-
-        // Încercare trimitere imediată pe email/SMS conform preferințelor utilizatorului (non-blocking)
-        try {
-            require_once __DIR__ . '/../services/Notifier.php';
-            $notifier = new Notifier();
-
-            $userId = (int)($data['user_id'] ?? 0);
-            if ($userId > 0) {
-                // Preferințe
-                $prefsKey = 'notifications_prefs_user_' . $userId;
-                $prefsRow = $this->db->fetchOn($this->table, "SELECT setting_value FROM system_settings WHERE setting_key = ?", [$prefsKey]);
-                $prefs = ['methods' => ['in_app'=>1,'email'=>0,'sms'=>0]];
-                if ($prefsRow && !empty($prefsRow['setting_value'])) {
-                    $dec = json_decode($prefsRow['setting_value'], true);
-                    if (is_array($dec)) { $prefs = array_replace_recursive($prefs, $dec); }
+        NotificationLog::log($type, 'created', [
+            'user_id' => $userId,
+            'company_id' => $companyId,
+            'notification_id' => $notificationId,
+            'template_id' => $rendered['template_id'],
+            'priority' => $rendered['priority']
+        ], $notificationId);
+        
+        // Step 3: Get user preferences (pentru Queue)
+        if ($userId > 0) {
+            try {
+                $prefsModel = new NotificationPreference();
+                $userPrefs = $prefsModel->getOrDefault($userId, $companyId);
+                
+                // Get user data pentru contact info
+                $user = $this->db->fetchOn($this->table, "SELECT email, phone FROM users WHERE id = ?", [$userId]);
+                if (!$user) {
+                    $user = ['email' => null, 'phone' => null];
                 }
-
-                $sentAny = false;
-                $subject = ($data['title'] ?? 'Notificare') . ' - ' . (defined('APP_NAME') ? APP_NAME : 'Fleet Management');
-                $body = ($data['message'] ?? '');
-                if (!empty($data['action_url'])) { $body .= "\n\nVezi detalii: " . rtrim(BASE_URL, '/') . $data['action_url']; }
-
-                if (!empty($prefs['methods']['email'])) {
-                    $user = $this->db->fetchOn($this->table, "SELECT email FROM users WHERE id = ?", [$userId]);
-                    $emailTo = $user['email'] ?? '';
-                    if ($emailTo) {
-                        [$ok, $err] = $notifier->sendEmail($emailTo, $subject, $body);
-                        if ($ok) { $sentAny = true; }
+                
+                // Determine scheduled_at pe bază de frequency
+                $scheduledAt = null; // immediate
+                if ($userPrefs['frequency'] === 'daily') {
+                    $scheduledAt = date('Y-m-d 06:00:00', strtotime('tomorrow'));
+                } elseif ($userPrefs['frequency'] === 'weekly') {
+                    $scheduledAt = date('Y-m-d 09:00:00', strtotime('next monday'));
+                }
+                
+                // Step 4: Enqueue pentru fiecare canal activ
+                $queueModel = new NotificationQueue();
+                $channels = [];
+                
+                // Email
+                if ($userPrefs['email_enabled']) {
+                    $emailRendered = $templateModel->render($type, $templateVars, 'email', $companyId);
+                    if (!$emailRendered && isset($rendered['subject'])) {
+                        $emailRendered = ['subject' => $rendered['subject'], 'body' => $rendered['body']];
                     }
+                    
+                    $queueModel->enqueue($notificationId, $userId, $companyId, 'email', [
+                        'recipient_email' => $userPrefs['email'] ?? $user['email'],
+                        'subject' => $emailRendered['subject'] ?? $rendered['subject'],
+                        'message' => $emailRendered['body'] ?? $rendered['body'],
+                        'scheduled_at' => $scheduledAt
+                    ]);
+                    $channels[] = 'email';
                 }
-
-                if (!empty($prefs['methods']['sms'])) {
-                    $userPhoneRow = $this->db->fetchOn($this->table, "SELECT setting_value FROM system_settings WHERE setting_key = ?", ['user_'.$userId.'_sms_to']);
-                    $smsSettingsRow = $this->db->fetchOn($this->table, "SELECT setting_value FROM system_settings WHERE setting_key = 'sms_settings'");
-                    $smsSettings = $smsSettingsRow && $smsSettingsRow['setting_value'] ? json_decode($smsSettingsRow['setting_value'], true) : [];
-                    $toPhone = '';
-                    if ($userPhoneRow && !empty($userPhoneRow['setting_value'])) { $toPhone = trim($userPhoneRow['setting_value']); }
-                    elseif (!empty($smsSettings['sms_default_to'])) { $toPhone = trim($smsSettings['sms_default_to']); }
-                    if ($toPhone) {
-                        [$ok, $err] = $notifier->sendSms($toPhone, $data['message'] ?? 'Notificare');
-                        if ($ok) { $sentAny = true; }
-                    }
+                
+                // SMS
+                if ($userPrefs['sms_enabled']) {
+                    $smsRendered = $templateModel->render($type, $templateVars, 'sms', $companyId);
+                    $smsMessage = $smsRendered['body'] ?? mb_substr($rendered['body'], 0, 160);
+                    
+                    $queueModel->enqueue($notificationId, $userId, $companyId, 'sms', [
+                        'recipient_phone' => $userPrefs['phone'] ?? $user['phone'],
+                        'message' => $smsMessage,
+                        'scheduled_at' => $scheduledAt
+                    ]);
+                    $channels[] = 'sms';
                 }
-
-                if ($sentAny) {
-                    $this->db->queryOn($this->table, "UPDATE notifications SET status='sent', sent_at = NOW() WHERE id = ?", [$id]);
-                    NotificationLog::log($data['type'] ?? 'unknown', 'sent', ['notification_id' => $id], $id);
+                
+                // Push (dacă activat)
+                if ($userPrefs['push_enabled'] && !empty($userPrefs['push_token'])) {
+                    $pushRendered = $templateModel->render($type, $templateVars, 'push', $companyId);
+                    
+                    $queueModel->enqueue($notificationId, $userId, $companyId, 'push', [
+                        'recipient_push_token' => $userPrefs['push_token'],
+                        'subject' => $pushRendered['subject'] ?? $rendered['subject'],
+                        'message' => $pushRendered['body'] ?? $rendered['body'],
+                        'scheduled_at' => $scheduledAt
+                    ]);
+                    $channels[] = 'push';
                 }
+                
+                // In-app (default, deja în tabela notifications)
+                if ($userPrefs['in_app_enabled']) {
+                    $channels[] = 'in_app';
+                }
+                
+                // Log canale enqueued
+                if (!empty($channels)) {
+                    NotificationLog::log($type, 'enqueued', [
+                        'notification_id' => $notificationId,
+                        'channels' => $channels,
+                        'frequency' => $userPrefs['frequency'],
+                        'scheduled_at' => $scheduledAt
+                    ], $notificationId);
+                }
+                
+            } catch (Throwable $e) {
+                // Non-blocking: dacă queue eșuează, notificarea in-app rămâne în DB
+                NotificationLog::log($type, 'queue_error', [
+                    'notification_id' => $notificationId,
+                    'error' => $e->getMessage()
+                ], $notificationId, $e->getMessage());
             }
-        } catch (Throwable $e) {
-            // Ignorăm erorile pentru a nu bloca fluxul aplicației
         }
-
-        return $id;
+        
+        return $notificationId;
     }
     
     public function getAllWithDetails($conditions = [], $offset = 0, $limit = 25) {

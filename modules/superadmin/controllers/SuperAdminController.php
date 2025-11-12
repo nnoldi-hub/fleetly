@@ -281,4 +281,186 @@ class SuperAdminController extends Controller {
         $_SESSION['success'] = 'Ai ieșit din modul de intervenție.';
         $this->redirect('/superadmin/companies');
     }
+    
+    /**
+     * V2: Notifications Analytics Dashboard
+     */
+    public function notificationsDashboard() {
+        if (!Auth::getInstance()->isSuperAdmin()) {
+            http_response_code(403);
+            die('Acces interzis - SuperAdmin only');
+        }
+        
+        $this->render('notifications_dashboard', [
+            'pageTitle' => 'SuperAdmin - Notifications Analytics'
+        ]);
+    }
+    
+    /**
+     * V2: Export notifications report
+     */
+    public function notificationsExport() {
+        if (!Auth::getInstance()->isSuperAdmin()) {
+            http_response_code(403);
+            die('Acces interzis');
+        }
+        
+        $type = $_GET['type'] ?? 'general';
+        $dateFrom = $_GET['date_from'] ?? date('Y-m-d', strtotime('-30 days'));
+        $dateTo = $_GET['date_to'] ?? date('Y-m-d');
+        
+        $db = Database::getInstance();
+        
+        // Generate CSV report based on type
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="notifications_report_' . date('Y-m-d') . '.csv"');
+        
+        $output = fopen('php://output', 'w');
+        
+        if ($type === 'company') {
+            // Company comparison report
+            fputcsv($output, ['Company', 'Total Notifications', 'Sent', 'Failed', 'Pending', 'Delivery Rate (%)']);
+            
+            $data = $db->fetchAll("
+                SELECT 
+                    c.name,
+                    COUNT(n.id) as total,
+                    SUM(CASE WHEN n.status = 'sent' THEN 1 ELSE 0 END) as sent,
+                    SUM(CASE WHEN n.status = 'failed' THEN 1 ELSE 0 END) as failed,
+                    SUM(CASE WHEN n.status = 'pending' THEN 1 ELSE 0 END) as pending,
+                    ROUND(SUM(CASE WHEN n.status = 'sent' THEN 1 ELSE 0 END) * 100.0 / COUNT(n.id), 2) as delivery_rate
+                FROM companies c
+                LEFT JOIN notifications n ON n.company_id = c.id 
+                    AND n.created_at BETWEEN ? AND ?
+                WHERE c.status = 'active'
+                GROUP BY c.id, c.name
+                ORDER BY total DESC
+            ", [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59']);
+            
+            foreach ($data as $row) {
+                fputcsv($output, [
+                    $row['name'],
+                    $row['total'],
+                    $row['sent'],
+                    $row['failed'],
+                    $row['pending'],
+                    $row['delivery_rate']
+                ]);
+            }
+            
+        } else {
+            // General report
+            fputcsv($output, ['Date', 'Company', 'Type', 'Channel', 'Status', 'User', 'Created At']);
+            
+            $data = $db->fetchAll("
+                SELECT 
+                    DATE(n.created_at) as date,
+                    c.name as company,
+                    n.type,
+                    COALESCE(nq.channel, 'in_app') as channel,
+                    n.status,
+                    u.username,
+                    n.created_at
+                FROM notifications n
+                LEFT JOIN companies c ON c.id = n.company_id
+                LEFT JOIN users u ON u.id = n.user_id
+                LEFT JOIN notification_queue nq ON nq.notification_id = n.id
+                WHERE n.created_at BETWEEN ? AND ?
+                ORDER BY n.created_at DESC
+                LIMIT 10000
+            ", [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59']);
+            
+            foreach ($data as $row) {
+                fputcsv($output, [
+                    $row['date'],
+                    $row['company'],
+                    $row['type'],
+                    $row['channel'],
+                    $row['status'],
+                    $row['username'],
+                    $row['created_at']
+                ]);
+            }
+        }
+        
+        fclose($output);
+        exit;
+    }
+    
+    /**
+     * V2: Template Manager (CRUD for global templates)
+     */
+    public function notificationTemplates() {
+        if (!Auth::getInstance()->isSuperAdmin()) {
+            http_response_code(403);
+            die('Acces interzis');
+        }
+        
+        require_once __DIR__ . '/../../notifications/models/NotificationTemplate.php';
+        
+        $templateModel = new NotificationTemplate();
+        $db = Database::getInstance();
+        
+        // Handle POST actions (create/update/delete)
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $action = $_POST['action'] ?? '';
+            
+            try {
+                if ($action === 'create' || $action === 'update') {
+                    $data = [
+                        'slug' => $_POST['slug'] ?? '',
+                        'name' => $_POST['name'] ?? '',
+                        'email_subject' => $_POST['email_subject'] ?? '',
+                        'email_body' => $_POST['email_body'] ?? '',
+                        'sms_body' => $_POST['sms_body'] ?? '',
+                        'push_title' => $_POST['push_title'] ?? '',
+                        'push_body' => $_POST['push_body'] ?? '',
+                        'in_app_title' => $_POST['in_app_title'] ?? '',
+                        'in_app_message' => $_POST['in_app_message'] ?? '',
+                        'available_variables' => $_POST['available_variables'] ?? [],
+                        'default_priority' => $_POST['default_priority'] ?? 'medium',
+                        'enabled' => isset($_POST['enabled']) ? 1 : 0
+                    ];
+                    
+                    if ($action === 'create') {
+                        $templateModel->create($data);
+                        $_SESSION['success_message'] = 'Template created successfully!';
+                    } else {
+                        $id = (int)$_POST['id'];
+                        $templateModel->update($id, $data);
+                        $_SESSION['success_message'] = 'Template updated successfully!';
+                    }
+                } elseif ($action === 'delete') {
+                    $id = (int)$_POST['id'];
+                    $templateModel->delete($id);
+                    $_SESSION['success_message'] = 'Template deleted successfully!';
+                }
+            } catch (Throwable $e) {
+                $_SESSION['error_message'] = 'Error: ' . $e->getMessage();
+            }
+            
+            header('Location: ' . ROUTE_BASE . 'superadmin/notifications/templates');
+            exit;
+        }
+        
+        // Get all global templates
+        $templates = $db->fetchAll("
+            SELECT 
+                id,
+                slug,
+                name,
+                enabled,
+                default_priority,
+                created_at,
+                (SELECT COUNT(*) FROM notifications WHERE template_id = notification_templates.id) as usage_count
+            FROM notification_templates
+            WHERE company_id IS NULL
+            ORDER BY slug ASC
+        ");
+        
+        $this->render('notification_templates', [
+            'pageTitle' => 'SuperAdmin - Notification Templates',
+            'templates' => $templates
+        ]);
+    }
 }

@@ -30,8 +30,11 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshAlerts()">
                             <i class="fas fa-sync-alt"></i> Actualizează
                         </button>
+                        <a href="<?= ROUTE_BASE ?>notifications/preferences" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-user-cog"></i> Preferințe
+                        </a>
                         <a href="<?= ROUTE_BASE ?>notifications/settings" class="btn btn-sm btn-outline-dark">
-                            <i class="fas fa-sliders-h"></i> Setări
+                            <i class="fas fa-sliders-h"></i> Setări Admin
                         </a>
                     </div>
                 </div>

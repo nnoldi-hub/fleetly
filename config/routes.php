@@ -123,6 +123,12 @@ $router->addRoute('POST', '/superadmin/companies/change-status', 'SuperAdminCont
 $router->addRoute('POST', '/superadmin/companies/reset-admin', 'SuperAdminController', 'resetAdmin');
 $router->addRoute('GET', '/superadmin/act-as', 'SuperAdminController', 'actAs');
 $router->addRoute('GET', '/superadmin/stop-acting', 'SuperAdminController', 'stopActing');
+// V2: Notifications Analytics
+$router->addRoute('GET', '/superadmin/notifications', 'SuperAdminController', 'notificationsDashboard');
+$router->addRoute('GET', '/superadmin/notifications/dashboard', 'SuperAdminController', 'notificationsDashboard');
+$router->addRoute('GET', '/superadmin/notifications/export', 'SuperAdminController', 'notificationsExport');
+$router->addRoute('GET', '/superadmin/notifications/templates', 'SuperAdminController', 'notificationTemplates');
+$router->addRoute('POST', '/superadmin/notifications/templates', 'SuperAdminController', 'notificationTemplates');
 
 // Utilizatori (profil & management)
 $router->addRoute('GET', '/profile', 'UserController', 'profile');
@@ -146,6 +152,7 @@ $router->addRoute('POST', '/import/upload-drivers', 'ImportController', 'uploadD
 
 // Notificari & API
 $router->addRoute('GET', '/notifications', 'NotificationController', 'index');
+$router->addRoute('GET', '/notifications/alerts', 'NotificationController', 'alerts');
 $router->addRoute('POST', '/notifications/dismiss', 'NotificationController', 'dismiss');
 $router->addRoute('POST', '/notifications/mark-read', 'NotificationController', 'markAsRead');
 $router->addRoute('POST', '/notifications/mark-all-read', 'NotificationController', 'markAllAsRead');
@@ -156,6 +163,10 @@ $router->addRoute('GET', '/notifications/generate-system', 'NotificationControll
 $router->addRoute('GET', '/notifications/generate', 'NotificationController', 'generateSystemNotifications');
 $router->addRoute('GET', '/notifications/settings', 'NotificationController', 'settings');
 $router->addRoute('POST', '/notifications/settings', 'NotificationController', 'settings');
+// V2: User preferences
+$router->addRoute('GET', '/notifications/preferences', 'NotificationController', 'preferences');
+$router->addRoute('POST', '/notifications/savePreferences', 'NotificationController', 'savePreferences');
+$router->addRoute('POST', '/notifications/sendTest', 'NotificationController', 'sendTest');
 $router->addRoute('GET', '/api/notifications', 'ApiController', 'notifications');
 
 // Public landing pages (daca exista controllerele)

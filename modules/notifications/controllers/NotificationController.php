@@ -716,5 +716,150 @@ class NotificationController extends Controller {
         }
     }
     // sendTestEmail / sendTestSms migrate spre Notifier; păstrăm doar helperul de setări mai sus.
+    
+    /**
+     * V2: Display user notification preferences UI
+     */
+    public function preferences() {
+        $this->render('preferences', []);
+    }
+    
+    /**
+     * V2: Save user notification preferences (POST handler)
+     */
+    public function savePreferences() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . ROUTE_BASE . 'notifications/preferences');
+            exit;
+        }
+        
+        try {
+            require_once __DIR__ . '/../models/NotificationPreference.php';
+            
+            $auth = Auth::getInstance();
+            $currentUser = $auth->user();
+            $userId = $currentUser->id ?? 0;
+            $companyId = $currentUser->company_id ?? 0;
+            
+            if ($userId === 0) {
+                throw new Exception('User ID invalid');
+            }
+            
+            // Collect form data
+            $data = [
+                'in_app_enabled' => isset($_POST['in_app_enabled']) ? 1 : 0,
+                'email_enabled' => isset($_POST['email_enabled']) ? 1 : 0,
+                'sms_enabled' => isset($_POST['sms_enabled']) ? 1 : 0,
+                'push_enabled' => isset($_POST['push_enabled']) ? 1 : 0,
+                'enabled_types' => $_POST['enabled_types'] ?? [],
+                'min_priority' => $_POST['min_priority'] ?? 'low',
+                'frequency' => $_POST['frequency'] ?? 'immediate',
+                'days_before_expiry' => (int)($_POST['days_before_expiry'] ?? 30),
+                'timezone' => $_POST['timezone'] ?? 'Europe/Bucharest',
+                'quiet_hours' => $_POST['quiet_hours'] ?? ['start' => '22:00', 'end' => '08:00']
+            ];
+            
+            // Email/phone overrides (optional)
+            if (!empty($_POST['email'])) {
+                $data['email'] = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ?: null;
+            }
+            if (!empty($_POST['phone'])) {
+                $data['phone'] = preg_replace('/[^0-9+]/', '', $_POST['phone']);
+            }
+            
+            // Validation
+            if ($data['days_before_expiry'] < 7 || $data['days_before_expiry'] > 90) {
+                throw new Exception('Zile înainte de expirare trebuie să fie între 7 și 90');
+            }
+            
+            if (empty($data['enabled_types']) || !is_array($data['enabled_types'])) {
+                throw new Exception('Selectați cel puțin un tip de notificare');
+            }
+            
+            // Save to database
+            $prefsModel = new NotificationPreference();
+            $result = $prefsModel->createOrUpdate($userId, $companyId, $data);
+            
+            if ($result) {
+                // Log action
+                NotificationLog::log('preferences_update', 'success', [
+                    'user_id' => $userId,
+                    'company_id' => $companyId,
+                    'channels' => array_filter([
+                        $data['email_enabled'] ? 'email' : null,
+                        $data['sms_enabled'] ? 'sms' : null,
+                        $data['push_enabled'] ? 'push' : null,
+                        $data['in_app_enabled'] ? 'in_app' : null
+                    ]),
+                    'frequency' => $data['frequency']
+                ]);
+                
+                $_SESSION['success_message'] = 'Preferințele au fost salvate cu succes!';
+            } else {
+                throw new Exception('Eroare la salvarea preferințelor');
+            }
+            
+        } catch (Throwable $e) {
+            NotificationLog::log('preferences_update', 'error', [
+                'user_id' => $userId ?? 0,
+                'error' => $e->getMessage()
+            ], null, $e->getMessage());
+            
+            $_SESSION['error_message'] = 'Eroare: ' . $e->getMessage();
+        }
+        
+        header('Location: ' . ROUTE_BASE . 'notifications/preferences');
+        exit;
+    }
+    
+    /**
+     * V2: Send test notification to user (AJAX endpoint)
+     */
+    public function sendTest() {
+        header('Content-Type: application/json');
+        
+        try {
+            require_once __DIR__ . '/../models/NotificationPreference.php';
+            
+            $auth = Auth::getInstance();
+            $currentUser = $auth->user();
+            $userId = $currentUser->id ?? 0;
+            $companyId = $currentUser->company_id ?? 0;
+            
+            if ($userId === 0) {
+                throw new Exception('User not authenticated');
+            }
+            
+            // Create test notification
+            $testData = [
+                'user_id' => $userId,
+                'company_id' => $companyId,
+                'type' => 'system_alert',
+                'title' => 'Notificare Test',
+                'message' => 'Aceasta este o notificare test trimisă la ' . date('Y-m-d H:i:s') . '. Dacă ați primit-o, configurarea funcționează corect!',
+                'priority' => 'low',
+                'action_url' => '/notifications/preferences'
+            ];
+            
+            $notificationId = $this->notificationModel->create($testData);
+            
+            if ($notificationId) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Notificare test trimisă cu succes',
+                    'notification_id' => $notificationId
+                ]);
+            } else {
+                throw new Exception('Failed to create test notification');
+            }
+            
+        } catch (Throwable $e) {
+            echo json_encode([
+                'success' => false,
+                'error' => $e->getMessage()
+            ]);
+        }
+        exit;
+    }
 }
 ?>
