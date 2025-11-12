@@ -198,15 +198,19 @@ class NotificationController extends Controller {
             return;
         }
         
+        // Detect AJAX request
+        $isAjax = isset($_POST['ajax']) || isset($_GET['ajax']) || 
+                  (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
+        
         if ($this->notificationModel->markAsRead($id)) {
-            if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+            if ($isAjax) {
                 $this->json(['success' => true, 'message' => 'Notificarea a fost marcată ca citită']);
             } else {
                 $_SESSION['success'] = 'Notificarea a fost marcată ca citită!';
                 $this->redirect('/notifications');
             }
         } else {
-            if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+            if ($isAjax) {
                 $this->json(['success' => false, 'message' => 'Eroare la marcarea notificării'], 500);
             } else {
                 $_SESSION['errors'] = ['Eroare la marcarea notificării'];
@@ -218,15 +222,19 @@ class NotificationController extends Controller {
     public function markAllAsRead() {
         $userId = $_SESSION['user_id'] ?? 1;
         
+        // Detect AJAX request
+        $isAjax = isset($_POST['ajax']) || isset($_GET['ajax']) || 
+                  (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
+        
         if ($this->notificationModel->markAllAsRead($userId)) {
-            if (isset($_POST['ajax'])) {
+            if ($isAjax) {
                 $this->json(['success' => true, 'message' => 'Toate notificările au fost marcate ca citite']);
             } else {
                 $_SESSION['success'] = 'Toate notificările au fost marcate ca citite!';
                 $this->redirect('/notifications');
             }
         } else {
-            if (isset($_POST['ajax'])) {
+            if ($isAjax) {
                 $this->json(['success' => false, 'message' => 'Eroare la marcarea notificărilor'], 500);
             } else {
                 $_SESSION['errors'] = ['Eroare la marcarea notificărilor'];
@@ -250,15 +258,19 @@ class NotificationController extends Controller {
             return;
         }
         
+        // Detect AJAX request
+        $isAjax = isset($_POST['ajax']) || isset($_GET['ajax']) || 
+                  (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
+        
         if ($this->notificationModel->delete($id)) {
-            if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+            if ($isAjax) {
                 $this->json(['success' => true, 'message' => 'Notificarea a fost ștearsă']);
             } else {
                 $_SESSION['success'] = 'Notificarea a fost ștearsă!';
                 $this->redirect('/notifications');
             }
         } else {
-            if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+            if ($isAjax) {
                 $this->json(['success' => false, 'message' => 'Eroare la ștergerea notificării'], 500);
             } else {
                 $_SESSION['errors'] = ['Eroare la ștergerea notificării'];
@@ -462,14 +474,22 @@ class NotificationController extends Controller {
                      + (is_array($dueMaintenance) ? count($dueMaintenance) : 0)
                      + (is_array($expiringDocuments) ? count($expiringDocuments) : 0);
 
-            if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+            // Detect AJAX request
+            $isAjax = isset($_POST['ajax']) || isset($_GET['ajax']) || 
+                      (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
+
+            if ($isAjax) {
                 $this->json(['success' => true, 'message' => "Au fost generate notificări pentru $created evenimente", 'created' => $created]);
             } else {
                 $_SESSION['success'] = "Au fost generate notificări automate pentru $created evenimente!";
                 $this->redirect('/notifications');
             }
         } catch (Throwable $e) {
-            if (isset($_POST['ajax']) || isset($_GET['ajax'])) {
+            // Detect AJAX request
+            $isAjax = isset($_POST['ajax']) || isset($_GET['ajax']) || 
+                      (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
+            
+            if ($isAjax) {
                 $this->json(['success' => false, 'message' => 'Eroare la generare: ' . $e->getMessage()], 500);
             } else {
                 $_SESSION['errors'] = ['Eroare la generare: ' . $e->getMessage()];
