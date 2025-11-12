@@ -200,6 +200,10 @@ $router->addRoute('GET', '/notifications/generate', 'NotificationController', 'g
 $router->addRoute('GET', '/notifications/generate-system', 'NotificationController', 'generateSystemNotifications');
 $router->addRoute('GET', '/notifications/settings', 'NotificationController', 'settings');
 $router->addRoute('POST', '/notifications/settings', 'NotificationController', 'settings');
+// V2: User preferences
+$router->addRoute('GET', '/notifications/preferences', 'NotificationController', 'preferences');
+$router->addRoute('POST', '/notifications/savePreferences', 'NotificationController', 'savePreferences');
+$router->addRoute('POST', '/notifications/sendTest', 'NotificationController', 'sendTest');
 
 // Rute utilizator
 $router->addRoute('GET', '/profile', 'UserController', 'profile');
