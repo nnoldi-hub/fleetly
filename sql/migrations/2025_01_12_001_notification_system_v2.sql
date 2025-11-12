@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS notification_preferences (
     in_app_enabled TINYINT(1) DEFAULT 1,
     
     -- Tipuri de notificări activate (JSON array)
-    enabled_types JSON DEFAULT '["document_expiry","insurance_expiry","maintenance_due"]',
+    enabled_types JSON NULL,
     
     -- Frecvență trimitere
     frequency ENUM('immediate', 'daily', 'weekly') DEFAULT 'immediate',
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS notification_preferences (
     days_before_expiry INT DEFAULT 30,
     
     -- Quiet hours (JSON: {"start":"22:00", "end":"08:00"})
-    quiet_hours JSON DEFAULT NULL,
+    quiet_hours JSON NULL,
     
     -- Timezone pentru schedulare
     timezone VARCHAR(50) DEFAULT 'Europe/Bucharest',
@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS notification_templates (
     in_app_message TEXT NULL,
     
     -- Variabile disponibile (JSON array)
-    available_variables JSON DEFAULT '[]' COMMENT 'Ex: ["vehicle_plate", "days_until_expiry"]',
+    available_variables JSON NULL COMMENT 'Ex: ["vehicle_plate", "days_until_expiry"]',
     
     -- Default priority pentru notificări create cu acest template
     default_priority ENUM('low', 'medium', 'high') DEFAULT 'medium',
