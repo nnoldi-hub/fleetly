@@ -19,13 +19,9 @@ class ServiceController extends Controller {
     
     public function __construct() {
         parent::__construct();
+        Auth::getInstance()->requireAuth();
         $this->serviceModel = new Service();
         $this->auth = Auth::getInstance();
-        
-        // Verificare autentificare
-        if (!$this->auth->isLoggedIn()) {
-            $this->redirect('/auth/login');
-        }
     }
     
     protected function getModuleName() {

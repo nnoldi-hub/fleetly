@@ -21,13 +21,10 @@ class WorkOrderController extends Controller {
     
     public function __construct() {
         parent::__construct();
+        Auth::getInstance()->requireAuth();
         $this->workOrderModel = new WorkOrder();
         $this->serviceModel = new Service();
         $this->auth = Auth::getInstance();
-        
-        if (!$this->auth->isLoggedIn()) {
-            $this->redirect('/auth/login');
-        }
     }
     
     protected function getModuleName() {
