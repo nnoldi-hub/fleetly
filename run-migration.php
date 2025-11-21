@@ -82,9 +82,10 @@ echo "<h1>🔄 Executare Migrare SQL...</h1>";
 echo "<pre>";
 
 try {
-    // Încarcă configurația
+    // Încarcă configurația în ordinea corectă
     require_once 'config/database.php';
     require_once 'core/Database.php';
+    require_once 'core/Model.php';
     require_once 'core/Company.php';
     
     $tenancyMode = DatabaseConfig::getTenancyMode();
