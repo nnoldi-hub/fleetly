@@ -91,14 +91,15 @@ try {
     $tenancyMode = DatabaseConfig::getTenancyMode();
     echo "📋 Tenancy Mode: <strong>$tenancyMode</strong>\n\n";
     
-    // Citește fișierul SQL
-    $sqlFile = 'sql/migrations/service_module_schema.sql';
+    // Citește fișierul SQL (folosește versiunea fără DELIMITER pentru compatibilitate PDO)
+    $sqlFile = 'sql/migrations/service_module_schema_no_triggers.sql';
     if (!file_exists($sqlFile)) {
         throw new Exception("Fișierul SQL nu a fost găsit: $sqlFile");
     }
     
     $sql = file_get_contents($sqlFile);
     echo "✓ Fișier SQL încărcat (" . number_format(strlen($sql)) . " bytes)\n\n";
+    echo "ℹ️ Notă: Triggerele automate vor fi adăugate manual după migrare (opțional)\n\n";
     
     // Determină bazele de date țintă
     $databases = [];
