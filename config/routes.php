@@ -174,4 +174,35 @@ $router->addRoute('GET', '/home', 'LandingController', 'index');
 $router->addRoute('GET', '/contact', 'LandingController', 'contact');
 $router->addRoute('POST', '/contact/submit', 'LandingController', 'submitContact');
 
+// ===== MODUL SERVICE =====
+// Gestionare Servicii (externe și interne)
+$router->addRoute('GET', '/service/services', 'ServiceController', 'index');
+$router->addRoute('GET', '/service/services/add', 'ServiceController', 'add');
+$router->addRoute('POST', '/service/services/add', 'ServiceController', 'add');
+$router->addRoute('GET', '/service/services/view', 'ServiceController', 'view');
+$router->addRoute('GET', '/service/services/edit', 'ServiceController', 'edit');
+$router->addRoute('POST', '/service/services/edit', 'ServiceController', 'edit');
+$router->addRoute('POST', '/service/services/delete', 'ServiceController', 'delete');
+$router->addRoute('POST', '/service/services/activate', 'ServiceController', 'activate');
+$router->addRoute('GET', '/service/services/internal-setup', 'ServiceController', 'internalSetup');
+$router->addRoute('POST', '/service/services/internal-setup', 'ServiceController', 'internalSetup');
+$router->addRoute('GET', '/api/services', 'ServiceController', 'apiGetServices');
+
+// Atelier (Service Intern - Work Orders)
+$router->addRoute('GET', '/service/workshop', 'WorkOrderController', 'index');
+$router->addRoute('GET', '/service/workshop/add', 'WorkOrderController', 'add');
+$router->addRoute('POST', '/service/workshop/add', 'WorkOrderController', 'add');
+$router->addRoute('GET', '/service/workshop/view', 'WorkOrderController', 'view');
+$router->addRoute('GET', '/service/workshop/edit', 'WorkOrderController', 'edit');
+$router->addRoute('POST', '/service/workshop/edit', 'WorkOrderController', 'edit');
+$router->addRoute('GET', '/service/workshop/vehicles', 'WorkOrderController', 'vehiclesInService');
+
+// AJAX endpoints pentru atelier
+$router->addRoute('POST', '/service/workshop/update-status', 'WorkOrderController', 'updateStatus');
+$router->addRoute('POST', '/service/workshop/assign-mechanic', 'WorkOrderController', 'assignMechanic');
+$router->addRoute('POST', '/service/workshop/add-part', 'WorkOrderController', 'addPart');
+$router->addRoute('POST', '/service/workshop/start-labor', 'WorkOrderController', 'startLabor');
+$router->addRoute('POST', '/service/workshop/end-labor', 'WorkOrderController', 'endLabor');
+$router->addRoute('POST', '/service/workshop/update-checklist', 'WorkOrderController', 'updateChecklist');
+
 // Sf�r?it liste
