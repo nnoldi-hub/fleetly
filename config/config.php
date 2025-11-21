@@ -13,7 +13,8 @@ $env = getenv('FM_ENV') ?: 'local';
 
 // Hostico example domain/path (ADAPTEAZA la domeniul tau real):
 // ex: https://fleetly.hostico.ro/  sau https://client.tau.ro/fleet/
-if ($env === 'prod') {
+// Auto-detect production by domain name
+if ($env === 'prod' || (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'fleetly.ro') !== false)) {
 	define('BASE_URL', 'https://fleetly.ro/');
 } else {
 	define('BASE_URL', 'http://localhost/fleet-management/');
