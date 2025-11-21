@@ -112,7 +112,7 @@ try {
     } else {
         // Mod multi-tenant - detectează toate bazele tenant
         $pdo = DatabaseConfig::getConnection();
-        $stmt = $pdo->query("SELECT id, db_name, name, status FROM companies WHERE status = 'active' ORDER BY id");
+        $stmt = $pdo->query("SELECT id, database_name, name, status FROM companies WHERE status = 'active' ORDER BY id");
         $companies = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
         if (empty($companies)) {
@@ -121,9 +121,9 @@ try {
         
         echo "🏢 Găsite " . count($companies) . " companii active:\n";
         foreach ($companies as $company) {
-            echo "   - {$company['name']} (DB: {$company['db_name']})\n";
+            echo "   - {$company['name']} (DB: {$company['database_name']})\n";
             $databases[] = [
-                'name' => $company['db_name'],
+                'name' => $company['database_name'],
                 'label' => $company['name'],
                 'id' => $company['id']
             ];
