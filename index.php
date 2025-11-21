@@ -228,6 +228,27 @@ $router->addRoute('POST', '/import/upload-vehicles', 'ImportController', 'upload
 $router->addRoute('POST', '/import/upload-documents', 'ImportController', 'uploadDocuments');
 $router->addRoute('POST', '/import/upload-drivers', 'ImportController', 'uploadDrivers');
 
+// Rute Service Module
+$router->addRoute('GET', '/service/services', 'ServiceController', 'index');
+$router->addRoute('GET', '/service/services/add', 'ServiceController', 'add');
+$router->addRoute('POST', '/service/services/add', 'ServiceController', 'add');
+$router->addRoute('GET', '/service/services/edit', 'ServiceController', 'edit');
+$router->addRoute('POST', '/service/services/edit', 'ServiceController', 'edit');
+$router->addRoute('GET', '/service/services/view', 'ServiceController', 'view');
+$router->addRoute('POST', '/service/services/delete', 'ServiceController', 'delete');
+$router->addRoute('GET', '/service/services/internal-setup', 'ServiceController', 'internalSetup');
+$router->addRoute('POST', '/service/services/internal-setup', 'ServiceController', 'internalSetup');
+// Rute Workshop (Atelier)
+$router->addRoute('GET', '/service/workshop', 'WorkOrderController', 'dashboard');
+$router->addRoute('GET', '/service/workshop/add', 'WorkOrderController', 'add');
+$router->addRoute('POST', '/service/workshop/add', 'WorkOrderController', 'add');
+$router->addRoute('GET', '/service/workshop/edit', 'WorkOrderController', 'edit');
+$router->addRoute('POST', '/service/workshop/edit', 'WorkOrderController', 'edit');
+$router->addRoute('GET', '/service/workshop/view', 'WorkOrderController', 'view');
+$router->addRoute('POST', '/service/workshop/delete', 'WorkOrderController', 'delete');
+$router->addRoute('POST', '/service/workshop/update-status', 'WorkOrderController', 'updateStatus');
+$router->addRoute('GET', '/service/workshop/vehicles', 'WorkOrderController', 'vehiclesInService');
+
 // Obține calea curentă
 
 // Normalizează calea pentru rutare corectă (suport și pentru subdirector ex: /fleet-management)
