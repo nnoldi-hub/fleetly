@@ -84,10 +84,11 @@ echo "<pre>";
 try {
     // Încarcă configurația
     require_once 'config/database.php';
+    require_once 'core/Database.php';
+    require_once 'core/Company.php';
     
-    // Conectare la baza de date
-    $pdo = DatabaseConfig::getConnection();
-    echo "✓ Conexiune la baza de date stabilită\n\n";
+    $tenancyMode = DatabaseConfig::getTenancyMode();
+    echo "📋 Tenancy Mode: <strong>$tenancyMode</strong>\n\n";
     
     // Citește fișierul SQL
     $sqlFile = 'sql/migrations/service_module_schema.sql';
@@ -98,11 +99,43 @@ try {
     $sql = file_get_contents($sqlFile);
     echo "✓ Fișier SQL încărcat (" . number_format(strlen($sql)) . " bytes)\n\n";
     
+    // Determină bazele de date țintă
+    $databases = [];
+    
+    if ($tenancyMode === 'single') {
+        // Mod single tenant - o singură bază de date
+        $databases[] = [
+            'name' => DatabaseConfig::getDbName(),
+            'label' => 'Main Database'
+        ];
+    } else {
+        // Mod multi-tenant - detectează toate bazele tenant
+        $pdo = DatabaseConfig::getConnection();
+        $stmt = $pdo->query("SELECT id, db_name, name, status FROM companies WHERE status = 'active' ORDER BY id");
+        $companies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        if (empty($companies)) {
+            throw new Exception("Nu au fost găsite companii active în baza de date!");
+        }
+        
+        echo "🏢 Găsite " . count($companies) . " companii active:\n";
+        foreach ($companies as $company) {
+            echo "   - {$company['name']} (DB: {$company['db_name']})\n";
+            $databases[] = [
+                'name' => $company['db_name'],
+                'label' => $company['name'],
+                'id' => $company['id']
+            ];
+        }
+        echo "\n";
+    }
+    
+    echo str_repeat("=", 80) . "\n\n";
+    
     // Împarte SQL în comenzi individuale
     $statements = array_filter(
         array_map('trim', explode(';', $sql)),
         function($stmt) {
-            // Elimină comentariile și liniile goale
             $stmt = trim($stmt);
             return !empty($stmt) && 
                    strpos($stmt, '--') !== 0 && 
@@ -111,56 +144,95 @@ try {
     );
     
     echo "📋 Găsite " . count($statements) . " comenzi SQL de executat\n\n";
-    echo str_repeat("=", 80) . "\n\n";
     
-    // Execută fiecare comandă
-    $successCount = 0;
-    $errorCount = 0;
+    // Execută migrarea pe fiecare bază de date
+    $totalSuccess = 0;
+    $totalErrors = 0;
     
-    foreach ($statements as $index => $statement) {
-        if (empty(trim($statement))) continue;
+    foreach ($databases as $dbInfo) {
+        echo str_repeat("=", 80) . "\n";
+        echo "🎯 Migrare pe: <strong>{$dbInfo['label']}</strong> (DB: {$dbInfo['name']})\n";
+        echo str_repeat("=", 80) . "\n\n";
         
         try {
-            $pdo->exec($statement);
-            $successCount++;
+            // Conectare la baza de date țintă
+            $dsn = 'mysql:host=' . DatabaseConfig::getHost() . ';dbname=' . $dbInfo['name'] . ';charset=utf8mb4';
+            $pdoTenant = new PDO(
+                $dsn,
+                DatabaseConfig::getUsername(),
+                DatabaseConfig::getPassword(),
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false
+                ]
+            );
             
-            // Afișează progresul pentru comenzi importante
-            if (preg_match('/CREATE\s+TABLE\s+`?(\w+)`?/i', $statement, $matches)) {
-                echo "✓ Tabelă creată: " . $matches[1] . "\n";
-            } elseif (preg_match('/CREATE\s+TRIGGER\s+`?(\w+)`?/i', $statement, $matches)) {
-                echo "✓ Trigger creat: " . $matches[1] . "\n";
-            } elseif (preg_match('/CREATE\s+(?:OR\s+REPLACE\s+)?VIEW\s+`?(\w+)`?/i', $statement, $matches)) {
-                echo "✓ View creat: " . $matches[1] . "\n";
+            echo "✓ Conexiune stabilită la {$dbInfo['name']}\n\n";
+            
+            $successCount = 0;
+            $errorCount = 0;
+            
+            // Execută fiecare comandă SQL
+            foreach ($statements as $statement) {
+                if (empty(trim($statement))) continue;
+                
+                try {
+                    $pdoTenant->exec($statement);
+                    $successCount++;
+                    
+                    // Afișează progresul pentru comenzi importante
+                    if (preg_match('/CREATE\s+TABLE\s+`?(\w+)`?/i', $statement, $matches)) {
+                        echo "  ✓ Tabelă creată: " . $matches[1] . "\n";
+                    } elseif (preg_match('/CREATE\s+TRIGGER\s+`?(\w+)`?/i', $statement, $matches)) {
+                        echo "  ✓ Trigger creat: " . $matches[1] . "\n";
+                    } elseif (preg_match('/CREATE\s+(?:OR\s+REPLACE\s+)?VIEW\s+`?(\w+)`?/i', $statement, $matches)) {
+                        echo "  ✓ View creat: " . $matches[1] . "\n";
+                    }
+                } catch (PDOException $e) {
+                    // Ignoră erorile "already exists"
+                    if (strpos($e->getMessage(), 'already exists') === false) {
+                        $errorCount++;
+                        echo "  ✗ Eroare: " . $e->getMessage() . "\n";
+                    }
+                }
             }
-        } catch (PDOException $e) {
-            $errorCount++;
-            // Ignoră erorile "already exists" (dacă rulezi din nou scriptul)
-            if (strpos($e->getMessage(), 'already exists') === false) {
-                echo "✗ Eroare: " . $e->getMessage() . "\n";
-                echo "   SQL: " . substr($statement, 0, 100) . "...\n\n";
+            
+            echo "\nRezultate pentru {$dbInfo['label']}:\n";
+            echo "  ✓ Succes: $successCount comenzi\n";
+            echo "  ✗ Erori: $errorCount\n\n";
+            
+            // Verifică tabelele create
+            echo "Verificare tabele:\n";
+            $tables = [
+                'services', 'service_appointments', 'service_history', 'maintenance_rules',
+                'work_orders', 'service_mechanics', 'work_order_parts', 'work_order_labor',
+                'work_order_checklist', 'service_notifications'
+            ];
+            
+            foreach ($tables as $table) {
+                $stmt = $pdoTenant->query("SHOW TABLES LIKE '$table'");
+                $exists = $stmt->rowCount() > 0;
+                echo "  " . ($exists ? "✓" : "✗") . " $table\n";
             }
+            echo "\n";
+            
+            $totalSuccess += $successCount;
+            $totalErrors += $errorCount;
+            
+        } catch (Exception $e) {
+            echo "  ✗ EROARE la conectare/migrare: " . $e->getMessage() . "\n\n";
+            $totalErrors++;
         }
     }
     
-    echo "\n" . str_repeat("=", 80) . "\n\n";
-    echo "<strong>✅ MIGRARE COMPLETĂ!</strong>\n\n";
-    echo "Rezultate:\n";
-    echo "  - Comenzi executate cu succes: $successCount\n";
-    echo "  - Erori: $errorCount\n\n";
-    
-    // Verifică tabelele create
-    echo "Verificare tabele create:\n";
-    $tables = [
-        'services', 'service_appointments', 'service_history', 'maintenance_rules',
-        'work_orders', 'service_mechanics', 'work_order_parts', 'work_order_labor',
-        'work_order_checklist', 'service_notifications'
-    ];
-    
-    foreach ($tables as $table) {
-        $stmt = $pdo->query("SHOW TABLES LIKE '$table'");
-        $exists = $stmt->rowCount() > 0;
-        echo ($exists ? "  ✓" : "  ✗") . " $table\n";
-    }
+    echo "\n" . str_repeat("=", 80) . "\n";
+    echo "<strong>✅ MIGRARE COMPLETĂ PE TOATE BAZELE!</strong>\n";
+    echo str_repeat("=", 80) . "\n\n";
+    echo "Sumar final:\n";
+    echo "  - Baze procesate: " . count($databases) . "\n";
+    echo "  - Total comenzi executate: $totalSuccess\n";
+    echo "  - Total erori: $totalErrors\n";
     
     echo "\n" . str_repeat("=", 80) . "\n\n";
     echo "<h2 style='color: green;'>🎉 Succes! Modulul Service este gata de utilizare!</h2>\n\n";
