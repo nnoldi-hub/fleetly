@@ -239,7 +239,7 @@ $router->addRoute('POST', '/service/services/delete', 'ServiceController', 'dele
 $router->addRoute('GET', '/service/services/internal-setup', 'ServiceController', 'internalSetup');
 $router->addRoute('POST', '/service/services/internal-setup', 'ServiceController', 'internalSetup');
 // Rute Workshop (Atelier)
-$router->addRoute('GET', '/service/workshop', 'WorkOrderController', 'dashboard');
+$router->addRoute('GET', '/service/workshop', 'WorkOrderController', 'index');
 $router->addRoute('GET', '/service/workshop/add', 'WorkOrderController', 'add');
 $router->addRoute('POST', '/service/workshop/add', 'WorkOrderController', 'add');
 $router->addRoute('GET', '/service/workshop/edit', 'WorkOrderController', 'edit');
