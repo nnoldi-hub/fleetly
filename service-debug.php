@@ -5,6 +5,19 @@ ini_set('display_errors', 1);
 
 echo "<h1>Service Module Debug</h1>";
 
+// Start session (required for Auth)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Simulate logged in user (for testing)
+if (!isset($_SESSION['user_id'])) {
+    $_SESSION['user_id'] = 1;
+    $_SESSION['user_role'] = 'admin';
+    $_SESSION['tenant_id'] = 1;
+    echo "<div style='background:yellow;padding:10px;margin-bottom:20px;'>⚠️ Simulated login session created for testing</div>";
+}
+
 // Load dependencies
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/config/database.php';
@@ -40,10 +53,12 @@ try {
 
 echo "<h2>Step 3: Test WorkOrderController instantiation</h2>";
 try {
+    echo "Creating WorkOrderController instance...<br>";
     $controller = new WorkOrderController();
     echo "✓ WorkOrderController instantiated<br>";
-} catch (Exception $e) {
+} catch (Throwable $e) {
     echo "✗ Error creating controller: " . $e->getMessage() . "<br>";
+    echo "File: " . $e->getFile() . " Line: " . $e->getLine() . "<br>";
     echo "<pre>" . $e->getTraceAsString() . "</pre>";
     die();
 }
@@ -58,8 +73,9 @@ try {
     echo "✓ dashboard() executed successfully<br>";
     echo "<h3>Output preview (first 500 chars):</h3>";
     echo "<pre>" . htmlspecialchars(substr($output, 0, 500)) . "</pre>";
-} catch (Exception $e) {
+} catch (Throwable $e) {
     echo "✗ Error in dashboard(): " . $e->getMessage() . "<br>";
+    echo "File: " . $e->getFile() . " Line: " . $e->getLine() . "<br>";
     echo "<pre>" . $e->getTraceAsString() . "</pre>";
 }
 
