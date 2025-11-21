@@ -24,6 +24,10 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/core/Database.php';
 require_once __DIR__ . '/core/Model.php';
 require_once __DIR__ . '/core/Controller.php';
+require_once __DIR__ . '/core/Auth.php';
+require_once __DIR__ . '/core/User.php';
+require_once __DIR__ . '/core/Company.php';
+echo "✓ Core classes loaded<br><br>";
 
 echo "<h2>Step 1: Load Service Models</h2>";
 try {
