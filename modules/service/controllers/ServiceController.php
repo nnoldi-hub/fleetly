@@ -20,7 +20,7 @@ class ServiceController extends Controller {
     public function __construct() {
         parent::__construct();
         $this->serviceModel = new Service();
-        $this->auth = new Auth();
+        $this->auth = Auth::getInstance();
         
         // Verificare autentificare
         if (!$this->auth->isLoggedIn()) {

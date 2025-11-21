@@ -23,7 +23,7 @@ class WorkOrderController extends Controller {
         parent::__construct();
         $this->workOrderModel = new WorkOrder();
         $this->serviceModel = new Service();
-        $this->auth = new Auth();
+        $this->auth = Auth::getInstance();
         
         if (!$this->auth->isLoggedIn()) {
             $this->redirect('/auth/login');
