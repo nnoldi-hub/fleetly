@@ -8,9 +8,10 @@
  * @version 1.0
  */
 
-require_once __DIR__ . '/../../../core/Controller.php';
-require_once __DIR__ . '/../../../core/Auth.php';
-require_once __DIR__ . '/../models/Service.php';
+// Dependencies are already loaded by index.php
+// require_once __DIR__ . '/../../../core/Controller.php';
+// require_once __DIR__ . '/../../../core/Auth.php';
+// require_once __DIR__ . '/../models/Service.php';
 
 class ServiceController extends Controller {
     private $serviceModel;
