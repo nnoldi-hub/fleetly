@@ -159,12 +159,12 @@ $pageTitle = "Dashboard - Fleet Management System";
                                 <!-- Service Module -->
                                 <div class="row mt-3">
                                     <div class="col-md-3 mb-3">
-                                        <a href="<?= BASE_URL ?>service/services" class="btn btn-outline-primary btn-block">
+                                        <a href="<?= ROUTE_BASE ?>service/services" class="btn btn-outline-primary btn-block">
                                             <i class="fas fa-tools mr-2"></i>Service-uri
                                         </a>
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <a href="<?= BASE_URL ?>service/workshop" class="btn btn-outline-warning btn-block">
+                                        <a href="<?= ROUTE_BASE ?>service/workshop" class="btn btn-outline-warning btn-block">
                                             <i class="fas fa-warehouse mr-2"></i>Atelier Intern
                                         </a>
                                     </div>
