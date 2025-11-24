@@ -220,19 +220,18 @@ class WorkOrder extends Model {
      * @return array|null Detalii ordine
      */
     public function getWorkOrderDetails($id, $tenantId) {
+        // Simplified query - vehicles uses different column names in tenant DB
         $sql = "SELECT wo.*, 
-                       v.plate_number, v.make, v.model, v.year, v.vin,
+                       v.registration_number as plate_number, v.brand as make, v.model, v.year as year, v.vin_number as vin,
                        m.name as mechanic_name, m.specialization, m.hourly_rate as mechanic_rate,
-                       s.name as service_name,
-                       u.name as created_by_name
+                       s.name as service_name
                 FROM work_orders wo
-                JOIN vehicles v ON wo.vehicle_id = v.id
+                LEFT JOIN vehicles v ON wo.vehicle_id = v.id
                 LEFT JOIN service_mechanics m ON wo.assigned_mechanic_id = m.id
                 LEFT JOIN services s ON wo.service_id = s.id
-                LEFT JOIN users u ON wo.created_by = u.id
-                WHERE wo.id = ? AND wo.tenant_id = ?";
+                WHERE wo.id = ?";
         
-        $workOrder = $this->db->fetchOn($this->table, $sql, [$id, $tenantId]);
+        $workOrder = $this->db->fetchOn($this->table, $sql, [$id]);
         
         if (!$workOrder) {
             return null;
