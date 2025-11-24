@@ -205,17 +205,27 @@ class WorkOrderController extends Controller {
         $id = $_GET['id'] ?? 0;
         $tenantId = $this->auth->getTenantId();
         
-        $workOrder = $this->workOrderModel->getWorkOrderDetails($id, $tenantId);
+        try {
+            $workOrder = $this->workOrderModel->getWorkOrderDetails($id, $tenantId);
+        } catch (Exception $e) {
+            error_log('[WorkOrderController] getWorkOrderDetails failed: ' . $e->getMessage());
+            $this->error404('Ordine de lucru nu a fost găsită');
+        }
         
         if (!$workOrder) {
             $this->error404('Ordine de lucru nu a fost găsită');
         }
         
         // Obținere mecanici pentru alocare
-        $sql = "SELECT * FROM service_mechanics 
-                WHERE tenant_id = ? AND is_active = 1 
-                ORDER BY name";
-        $mechanics = $this->db->fetchAllOn('service_mechanics', $sql, [$tenantId]);
+        try {
+            $sql = "SELECT * FROM service_mechanics 
+                    WHERE is_active = 1 
+                    ORDER BY name";
+            $mechanics = $this->db->fetchAllOn('service_mechanics', $sql, []);
+        } catch (Exception $e) {
+            error_log('[WorkOrderController] mechanics query failed: ' . $e->getMessage());
+            $mechanics = [];
+        }
         
         $this->render('workshop/work_order_view', [
             'pageTitle' => 'Ordine de Lucru ' . $workOrder['work_order_number'],
