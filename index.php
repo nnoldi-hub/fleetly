@@ -248,6 +248,14 @@ $router->addRoute('GET', '/service/workshop/view', 'WorkOrderController', 'view'
 $router->addRoute('POST', '/service/workshop/delete', 'WorkOrderController', 'delete');
 $router->addRoute('POST', '/service/workshop/update-status', 'WorkOrderController', 'updateStatus');
 $router->addRoute('GET', '/service/workshop/vehicles', 'WorkOrderController', 'vehiclesInService');
+// Rute Mecanici
+$router->addRoute('GET', '/service/mechanics', 'MechanicController', 'index');
+$router->addRoute('GET', '/service/mechanics/add', 'MechanicController', 'add');
+$router->addRoute('POST', '/service/mechanics/add', 'MechanicController', 'add');
+$router->addRoute('GET', '/service/mechanics/edit', 'MechanicController', 'edit');
+$router->addRoute('POST', '/service/mechanics/edit', 'MechanicController', 'edit');
+$router->addRoute('GET', '/service/mechanics/view', 'MechanicController', 'view');
+$router->addRoute('GET', '/service/mechanics/delete', 'MechanicController', 'delete');
 
 // Obține calea curentă
 
