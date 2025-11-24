@@ -100,7 +100,7 @@ class ServiceController extends Controller {
                 $serviceId = $this->serviceModel->createService($data);
                 
                 $_SESSION['success_message'] = 'Service adăugat cu succes!';
-                $this->redirect('/service/services/view/' . $serviceId);
+                $this->redirect('/service/services/view?id=' . $serviceId);
                 
             } catch (Exception $e) {
                 $_SESSION['error_message'] = 'Eroare: ' . $e->getMessage();
@@ -162,7 +162,7 @@ class ServiceController extends Controller {
                 $this->serviceModel->updateService($id, $data);
                 
                 $_SESSION['success_message'] = 'Service actualizat cu succes!';
-                $this->redirect('/service/services/view/' . $id);
+                $this->redirect('/service/services/view?id=' . $id);
                 
             } catch (Exception $e) {
                 $_SESSION['error_message'] = 'Eroare: ' . $e->getMessage();
@@ -319,7 +319,7 @@ class ServiceController extends Controller {
                     // Creare nou
                     $serviceId = $this->serviceModel->createService($data);
                     $_SESSION['success_message'] = 'Service intern configurat cu succes!';
-                    $this->redirect('/service/services/view/' . $serviceId);
+                    $this->redirect('/service/services/view?id=' . $serviceId);
                     return;
                 }
                 

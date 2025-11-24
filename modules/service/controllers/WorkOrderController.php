@@ -134,7 +134,7 @@ class WorkOrderController extends Controller {
                 }
                 
                 $_SESSION['success_message'] = 'Ordine de lucru creată cu succes!';
-                $this->redirect('/service/workshop/view/' . $workOrderId);
+                $this->redirect('/service/workshop/view?id=' . $workOrderId);
                 
             } catch (Exception $e) {
                 $_SESSION['error_message'] = 'Eroare: ' . $e->getMessage();
@@ -231,7 +231,7 @@ class WorkOrderController extends Controller {
                 $this->db->queryOn('work_orders', $sql, $values);
                 
                 $_SESSION['success_message'] = 'Ordine actualizată cu succes!';
-                $this->redirect('/service/workshop/view/' . $id);
+                $this->redirect('/service/workshop/view?id=' . $id);
                 
             } catch (Exception $e) {
                 $_SESSION['error_message'] = 'Eroare: ' . $e->getMessage();
