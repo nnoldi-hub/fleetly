@@ -164,16 +164,26 @@ class WorkOrderController extends Controller {
         }
         
         // Obținere vehicule pentru dropdown
-        $sql = "SELECT id, plate_number, make, model FROM vehicles 
-                WHERE tenant_id = ? AND is_active = 1 
-                ORDER BY plate_number";
-        $vehicles = $this->db->fetchAllOn('vehicles', $sql, [$tenantId]);
+        try {
+            $sql = "SELECT id, plate_number, make, model FROM vehicles 
+                    WHERE tenant_id = ? AND is_active = 1 
+                    ORDER BY plate_number";
+            $vehicles = $this->db->fetchAllOn('vehicles', $sql, [$tenantId]);
+        } catch (Exception $e) {
+            error_log('[WorkOrderController] vehicles query failed: ' . $e->getMessage());
+            $vehicles = [];
+        }
         
         // Obținere mecanici
-        $sql = "SELECT * FROM service_mechanics 
-                WHERE tenant_id = ? AND service_id = ? AND is_active = 1 
-                ORDER BY name";
-        $mechanics = $this->db->fetchAllOn('service_mechanics', $sql, [$tenantId, $internalService['id']]);
+        try {
+            $sql = "SELECT * FROM service_mechanics 
+                    WHERE tenant_id = ? AND service_id = ? AND is_active = 1 
+                    ORDER BY name";
+            $mechanics = $this->db->fetchAllOn('service_mechanics', $sql, [$tenantId, $internalService['id']]);
+        } catch (Exception $e) {
+            error_log('[WorkOrderController] mechanics query failed: ' . $e->getMessage());
+            $mechanics = [];
+        }
         
         $this->render('workshop/work_order_add', [
             'pageTitle' => 'Ordine de Lucru Nouă',
