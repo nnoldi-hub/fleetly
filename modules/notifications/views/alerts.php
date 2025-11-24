@@ -344,6 +344,7 @@ function markAsRead(notificationId) {
 
 // Marchează toate notificările ca citite
 function markAllAsRead(e) {
+    console.log('markAllAsRead called', e);
     if (!confirm('Sigur doriți să marcați toate notificările ca citite?')) {
         return;
     }
@@ -353,7 +354,10 @@ function markAllAsRead(e) {
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesare...';
     
-    fetch('<?= rtrim(BASE_URL, "/") ?>/modules/notifications/index.php?action=mark-all-read', {
+    const url = '<?= rtrim(BASE_URL, "/") ?>/modules/notifications/index.php?action=mark-all-read';
+    console.log('Fetching URL:', url);
+    
+    fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -446,6 +450,7 @@ setInterval(function() {
 
 // Generează notificări automate de sistem
 function generateSystemNotifications(e) {
+    console.log('generateSystemNotifications called', e);
     if (!confirm('Generez notificări pentru asigurări/mentenanță/documente în expirare?')) {
         return;
     }
@@ -455,7 +460,10 @@ function generateSystemNotifications(e) {
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generare...';
     
-    fetch('<?= rtrim(BASE_URL, "/") ?>/modules/notifications/index.php?action=generate-system', {
+    const url = '<?= rtrim(BASE_URL, "/") ?>/modules/notifications/index.php?action=generate-system';
+    console.log('Fetching URL:', url);
+    
+    fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
