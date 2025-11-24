@@ -203,8 +203,18 @@ class ServiceController extends Controller {
             $this->error404('Service nu a fost găsit');
         }
         
-        // Obținere statistici
-        $stats = $this->serviceModel->getServiceStats($id, 'year');
+        // Obținere statistici (handle missing tables gracefully)
+        try {
+            $stats = $this->serviceModel->getServiceStats($id, 'year');
+        } catch (Exception $e) {
+            error_log('[ServiceController] getServiceStats failed: ' . $e->getMessage());
+            $stats = [
+                'total_interventions' => 0,
+                'total_cost' => 0,
+                'avg_cost' => 0,
+                'period' => 'year'
+            ];
+        }
         
         // Obținere istoricul intervențiilor recente (doar dacă tabelul există)
         $recentServices = [];
