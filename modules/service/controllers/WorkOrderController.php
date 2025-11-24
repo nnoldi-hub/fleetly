@@ -164,22 +164,14 @@ class WorkOrderController extends Controller {
         }
         
         // Obținere vehicule pentru dropdown
+        // Vehicles are in CORE DB, not tenant DB!
         try {
-            // Check what columns actually exist
-            $columns = $this->db->query("SHOW COLUMNS FROM vehicles")->fetchAll();
-            $columnNames = array_column($columns, 'Field');
-            error_log('[WorkOrderController] Available vehicle columns: ' . implode(', ', $columnNames));
-            
-            // Build query based on available columns
-            $hasPlateNumber = in_array('plate_number', $columnNames);
-            $selectFields = 'id';
-            $selectFields .= $hasPlateNumber ? ', plate_number' : ', registration_number as plate_number';
-            $selectFields .= ', make, model';
-            
-            $sql = "SELECT $selectFields FROM vehicles 
+            $sql = "SELECT id, plate_number, make, model 
+                    FROM vehicles 
                     WHERE tenant_id = ? AND is_active = 1 
-                    ORDER BY " . ($hasPlateNumber ? 'plate_number' : 'registration_number');
-            $vehicles = $this->db->fetchAllOn('vehicles', $sql, [$tenantId]);
+                    ORDER BY plate_number";
+            // Use core DB for vehicles
+            $vehicles = $this->db->fetchAll($sql, [$tenantId]);
             error_log('[WorkOrderController] Found ' . count($vehicles) . ' vehicles for tenant_id=' . $tenantId);
         } catch (Exception $e) {
             error_log('[WorkOrderController] vehicles query failed: ' . $e->getMessage());
