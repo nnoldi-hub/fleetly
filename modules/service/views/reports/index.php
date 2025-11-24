@@ -118,37 +118,40 @@
             </div>
         </div>
 
-        <!-- Placeholder pentru rapoarte viitoare -->
+        <!-- Statistici Piese -->
         <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100 hover-shadow bg-light">
+            <div class="card h-100 hover-shadow">
                 <div class="card-body text-center">
                     <div class="mb-3">
-                        <i class="fas fa-chart-pie fa-3x text-secondary"></i>
+                        <i class="fas fa-chart-pie fa-3x text-danger"></i>
                     </div>
-                    <h5 class="card-title text-muted">Statistici Piese</h5>
+                    <h5 class="card-title">Statistici Piese</h5>
                     <p class="card-text text-muted">
                         Analiza consumului de piese și inventory
                     </p>
-                    <button class="btn btn-secondary" disabled>
-                        <i class="fas fa-hourglass-half"></i> În curând
-                    </button>
+                    <a href="<?= ROUTE_BASE ?>service/reports/parts-stats?date_from=<?= $dateFrom ?>&date_to=<?= $dateTo ?>" 
+                       class="btn btn-danger">
+                        <i class="fas fa-chart-pie"></i> Vezi Raport
+                    </a>
                 </div>
             </div>
         </div>
 
+        <!-- Raport Activitate -->
         <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100 hover-shadow bg-light">
+            <div class="card h-100 hover-shadow">
                 <div class="card-body text-center">
                     <div class="mb-3">
-                        <i class="fas fa-tasks fa-3x text-secondary"></i>
+                        <i class="fas fa-tasks fa-3x text-dark"></i>
                     </div>
-                    <h5 class="card-title text-muted">Raport Activitate</h5>
+                    <h5 class="card-title">Raport Activitate</h5>
                     <p class="card-text text-muted">
                         Istoric complet activități și modificări
                     </p>
-                    <button class="btn btn-secondary" disabled>
-                        <i class="fas fa-hourglass-half"></i> În curând
-                    </button>
+                    <a href="<?= ROUTE_BASE ?>service/reports/activity-log?date_from=<?= $dateFrom ?>&date_to=<?= $dateTo ?>" 
+                       class="btn btn-dark">
+                        <i class="fas fa-history"></i> Vezi Raport
+                    </a>
                 </div>
             </div>
         </div>

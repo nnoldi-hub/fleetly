@@ -331,6 +331,205 @@ class ServiceReportController extends Controller {
     }
     
     /**
+     * Raport Statistici Piese
+     */
+    public function partsStats() {
+        $tenantId = $this->auth->getTenantId();
+        $internalService = $this->serviceModel->getInternalService($tenantId);
+        
+        $dateFrom = $_GET['date_from'] ?? date('Y-m-01');
+        $dateTo = $_GET['date_to'] ?? date('Y-m-d');
+        
+        // Top piese utilizate
+        $sql = "SELECT 
+                    wop.part_name,
+                    wop.part_number,
+                    COUNT(*) as usage_count,
+                    SUM(wop.quantity) as total_quantity,
+                    AVG(wop.unit_price) as avg_price,
+                    SUM(wop.quantity * wop.unit_price) as total_cost,
+                    GROUP_CONCAT(DISTINCT wop.supplier SEPARATOR ', ') as suppliers
+                FROM work_order_parts wop
+                JOIN work_orders wo ON wop.work_order_id = wo.id
+                WHERE wo.service_id = ?
+                AND DATE(wo.entry_date) BETWEEN ? AND ?
+                GROUP BY wop.part_name, wop.part_number
+                ORDER BY usage_count DESC
+                LIMIT 50";
+        
+        $topParts = $this->db->fetchAllOn('work_order_parts', $sql, [$internalService['id'], $dateFrom, $dateTo]);
+        
+        // Costuri totale piese
+        $sql = "SELECT 
+                    COUNT(DISTINCT wop.id) as total_parts_used,
+                    SUM(wop.quantity) as total_quantity,
+                    SUM(wop.quantity * wop.unit_price) as total_cost,
+                    AVG(wop.quantity * wop.unit_price) as avg_part_cost
+                FROM work_order_parts wop
+                JOIN work_orders wo ON wop.work_order_id = wo.id
+                WHERE wo.service_id = ?
+                AND DATE(wo.entry_date) BETWEEN ? AND ?";
+        
+        $partsOverview = $this->db->fetchOn('work_order_parts', $sql, [$internalService['id'], $dateFrom, $dateTo]);
+        
+        // Furnizori frecvenți
+        $sql = "SELECT 
+                    wop.supplier,
+                    COUNT(*) as order_count,
+                    SUM(wop.quantity * wop.unit_price) as total_spent
+                FROM work_order_parts wop
+                JOIN work_orders wo ON wop.work_order_id = wo.id
+                WHERE wo.service_id = ?
+                AND DATE(wo.entry_date) BETWEEN ? AND ?
+                AND wop.supplier IS NOT NULL AND wop.supplier != ''
+                GROUP BY wop.supplier
+                ORDER BY order_count DESC
+                LIMIT 10";
+        
+        $topSuppliers = $this->db->fetchAllOn('work_order_parts', $sql, [$internalService['id'], $dateFrom, $dateTo]);
+        
+        // Evoluție lunară costuri piese
+        $sql = "SELECT 
+                    DATE_FORMAT(wo.entry_date, '%Y-%m') as month,
+                    COUNT(DISTINCT wop.id) as parts_count,
+                    SUM(wop.quantity * wop.unit_price) as total_cost
+                FROM work_order_parts wop
+                JOIN work_orders wo ON wop.work_order_id = wo.id
+                WHERE wo.service_id = ?
+                AND DATE(wo.entry_date) BETWEEN ? AND ?
+                GROUP BY DATE_FORMAT(wo.entry_date, '%Y-%m')
+                ORDER BY month";
+        
+        $monthlyTrend = $this->db->fetchAllOn('work_order_parts', $sql, [$internalService['id'], $dateFrom, $dateTo]);
+        
+        $this->render('reports/parts_stats', [
+            'pageTitle' => 'Statistici Piese',
+            'service' => $internalService,
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
+            'topParts' => $topParts,
+            'partsOverview' => $partsOverview,
+            'topSuppliers' => $topSuppliers,
+            'monthlyTrend' => $monthlyTrend
+        ]);
+    }
+    
+    /**
+     * Raport Activitate (Audit Log)
+     */
+    public function activityLog() {
+        $tenantId = $this->auth->getTenantId();
+        $internalService = $this->serviceModel->getInternalService($tenantId);
+        
+        $dateFrom = $_GET['date_from'] ?? date('Y-m-d', strtotime('-7 days'));
+        $dateTo = $_GET['date_to'] ?? date('Y-m-d');
+        $activityType = $_GET['activity_type'] ?? '';
+        
+        // Construim query pentru activități
+        $activities = [];
+        
+        // 1. Work Orders create/update
+        $sql = "SELECT 
+                    'work_order' as type,
+                    'created' as action,
+                    wo.id as entity_id,
+                    wo.work_order_number as entity_name,
+                    wo.created_at as activity_date,
+                    wo.created_by as user_id,
+                    CONCAT('Ordine creată pentru vehicul ', v.registration_number) as description
+                FROM work_orders wo
+                LEFT JOIN vehicles v ON wo.vehicle_id = v.id
+                WHERE wo.service_id = ?
+                AND DATE(wo.created_at) BETWEEN ? AND ?
+                " . ($activityType && $activityType == 'work_order' ? "" : "");
+        
+        $workOrderActivities = $this->db->fetchAllOn('work_orders', $sql, [$internalService['id'], $dateFrom, $dateTo]);
+        $activities = array_merge($activities, $workOrderActivities);
+        
+        // 2. Status changes (by checking updated_at vs created_at)
+        $sql = "SELECT 
+                    'work_order' as type,
+                    'status_changed' as action,
+                    wo.id as entity_id,
+                    wo.work_order_number as entity_name,
+                    wo.updated_at as activity_date,
+                    wo.created_by as user_id,
+                    CONCAT('Status schimbat în: ', wo.status) as description
+                FROM work_orders wo
+                WHERE wo.service_id = ?
+                AND DATE(wo.updated_at) BETWEEN ? AND ?
+                AND wo.updated_at != wo.created_at
+                " . ($activityType && $activityType == 'status_change' ? "" : "");
+        
+        $statusChanges = $this->db->fetchAllOn('work_orders', $sql, [$internalService['id'], $dateFrom, $dateTo]);
+        $activities = array_merge($activities, $statusChanges);
+        
+        // 3. Parts added
+        $sql = "SELECT 
+                    'part' as type,
+                    'added' as action,
+                    wop.id as entity_id,
+                    wop.part_name as entity_name,
+                    wop.created_at as activity_date,
+                    wo.created_by as user_id,
+                    CONCAT('Piesă adăugată la ordinea ', wo.work_order_number, ': ', wop.quantity, 'x ', wop.part_name) as description
+                FROM work_order_parts wop
+                JOIN work_orders wo ON wop.work_order_id = wo.id
+                WHERE wo.service_id = ?
+                AND DATE(wop.created_at) BETWEEN ? AND ?
+                " . ($activityType && $activityType == 'part' ? "" : "");
+        
+        $partActivities = $this->db->fetchAllOn('work_order_parts', $sql, [$internalService['id'], $dateFrom, $dateTo]);
+        $activities = array_merge($activities, $partActivities);
+        
+        // 4. Labor started/ended
+        $sql = "SELECT 
+                    'labor' as type,
+                    'started' as action,
+                    wol.id as entity_id,
+                    sm.name as entity_name,
+                    wol.start_time as activity_date,
+                    wol.mechanic_id as user_id,
+                    CONCAT('Mecanic ', sm.name, ' a început lucrul la ordinea ', wo.work_order_number) as description
+                FROM work_order_labor wol
+                JOIN work_orders wo ON wol.work_order_id = wo.id
+                JOIN service_mechanics sm ON wol.mechanic_id = sm.id
+                WHERE wo.service_id = ?
+                AND DATE(wol.start_time) BETWEEN ? AND ?
+                " . ($activityType && $activityType == 'labor' ? "" : "");
+        
+        $laborActivities = $this->db->fetchAllOn('work_order_labor', $sql, [$internalService['id'], $dateFrom, $dateTo]);
+        $activities = array_merge($activities, $laborActivities);
+        
+        // Sort by date DESC
+        usort($activities, function($a, $b) {
+            return strtotime($b['activity_date']) - strtotime($a['activity_date']);
+        });
+        
+        // Limit to 200 most recent
+        $activities = array_slice($activities, 0, 200);
+        
+        // Statistics
+        $stats = [
+            'total_activities' => count($activities),
+            'work_orders_created' => count(array_filter($activities, fn($a) => $a['type'] == 'work_order' && $a['action'] == 'created')),
+            'status_changes' => count(array_filter($activities, fn($a) => $a['action'] == 'status_changed')),
+            'parts_added' => count(array_filter($activities, fn($a) => $a['type'] == 'part')),
+            'labor_sessions' => count(array_filter($activities, fn($a) => $a['type'] == 'labor'))
+        ];
+        
+        $this->render('reports/activity_log', [
+            'pageTitle' => 'Raport Activitate',
+            'service' => $internalService,
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
+            'activityType' => $activityType,
+            'activities' => $activities,
+            'stats' => $stats
+        ]);
+    }
+    
+    /**
      * Export raport CSV
      */
     public function export() {

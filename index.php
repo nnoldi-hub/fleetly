@@ -265,6 +265,8 @@ $router->addRoute('GET', '/service/reports/profitability', 'ServiceReportControl
 $router->addRoute('GET', '/service/reports/vehicle-costs', 'ServiceReportController', 'vehicleCosts');
 $router->addRoute('GET', '/service/reports/mechanic-performance', 'ServiceReportController', 'mechanicPerformance');
 $router->addRoute('GET', '/service/reports/work-times', 'ServiceReportController', 'workTimes');
+$router->addRoute('GET', '/service/reports/parts-stats', 'ServiceReportController', 'partsStats');
+$router->addRoute('GET', '/service/reports/activity-log', 'ServiceReportController', 'activityLog');
 $router->addRoute('GET', '/service/reports/export', 'ServiceReportController', 'export');
 
 // Obține calea curentă
