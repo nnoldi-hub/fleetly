@@ -165,13 +165,14 @@ class WorkOrderController extends Controller {
         
         // Obținere vehicule pentru dropdown (vehicles is in TENANT DB)
         try {
-            // Vehicles use registration_number not plate_number in tenant DB
+            // In tenant DB, all vehicles belong to this tenant (no tenant_id column needed)
+            // Vehicles use registration_number, brand columns
             $sql = "SELECT id, registration_number as plate_number, brand as make, model 
                     FROM vehicles 
-                    WHERE tenant_id = ? AND status = 'active' 
+                    WHERE status = 'active' 
                     ORDER BY registration_number";
-            $vehicles = $this->db->fetchAllOn('vehicles', $sql, [$tenantId]);
-            error_log('[WorkOrderController] Found ' . count($vehicles) . ' vehicles for tenant_id=' . $tenantId);
+            $vehicles = $this->db->fetchAllOn('vehicles', $sql, []);
+            error_log('[WorkOrderController] Found ' . count($vehicles) . ' vehicles');
         } catch (Exception $e) {
             error_log('[WorkOrderController] vehicles query failed: ' . $e->getMessage());
             $vehicles = [];
