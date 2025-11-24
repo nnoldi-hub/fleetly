@@ -61,6 +61,12 @@
                 <a class="nav-link text-white" href="<?= ROUTE_BASE ?>service/workshop"><i class="fas fa-warehouse me-2"></i>Atelier Intern</a>
             </li>
             <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="<?= ROUTE_BASE ?>service/mechanics"><i class="fas fa-user-cog me-2"></i>Mecanici</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="<?= ROUTE_BASE ?>service/reports"><i class="fas fa-chart-line me-2"></i>Rapoarte Service</a>
+            </li>
+            <li class="nav-item mb-2">
                 <a class="nav-link text-white" href="<?= ROUTE_BASE ?>fuel"><i class="fas fa-gas-pump me-2"></i>Combustibil</a>
             </li>
             <li class="nav-item mb-2">
@@ -141,6 +147,12 @@
             </li>
             <li class="nav-item mb-2">
                 <a class="nav-link" href="<?= ROUTE_BASE ?>service/workshop"><i class="fas fa-warehouse me-2"></i>Atelier Intern</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link" href="<?= ROUTE_BASE ?>service/mechanics"><i class="fas fa-user-cog me-2"></i>Mecanici</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link" href="<?= ROUTE_BASE ?>service/reports"><i class="fas fa-chart-line me-2"></i>Rapoarte Service</a>
             </li>
             <li class="nav-item mb-2">
                 <a class="nav-link" href="<?= ROUTE_BASE ?>fuel"><i class="fas fa-gas-pump me-2"></i>Combustibil</a>

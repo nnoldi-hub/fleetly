@@ -215,4 +215,12 @@ $router->addRoute('GET', '/service/mechanics/edit', 'MechanicController', 'edit'
 $router->addRoute('POST', '/service/mechanics/edit', 'MechanicController', 'edit');
 $router->addRoute('GET', '/service/mechanics/delete', 'MechanicController', 'delete');
 
+// Rapoarte Service
+$router->addRoute('GET', '/service/reports', 'ServiceReportController', 'index');
+$router->addRoute('GET', '/service/reports/profitability', 'ServiceReportController', 'profitability');
+$router->addRoute('GET', '/service/reports/vehicle-costs', 'ServiceReportController', 'vehicleCosts');
+$router->addRoute('GET', '/service/reports/mechanic-performance', 'ServiceReportController', 'mechanicPerformance');
+$router->addRoute('GET', '/service/reports/work-times', 'ServiceReportController', 'workTimes');
+$router->addRoute('GET', '/service/reports/export', 'ServiceReportController', 'export');
+
 // Sf�r?it liste
