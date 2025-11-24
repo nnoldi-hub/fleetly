@@ -236,6 +236,8 @@ $router->addRoute('GET', '/service/services/edit', 'ServiceController', 'edit');
 $router->addRoute('POST', '/service/services/edit', 'ServiceController', 'edit');
 $router->addRoute('GET', '/service/services/view', 'ServiceController', 'view');
 $router->addRoute('POST', '/service/services/delete', 'ServiceController', 'delete');
+$router->addRoute('POST', '/service/services/activate', 'ServiceController', 'activate');
+$router->addRoute('POST', '/service/services/deactivate', 'ServiceController', 'activate');
 $router->addRoute('GET', '/service/services/internal-setup', 'ServiceController', 'internalSetup');
 $router->addRoute('POST', '/service/services/internal-setup', 'ServiceController', 'internalSetup');
 // Rute Workshop (Atelier)
