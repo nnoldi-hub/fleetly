@@ -21,10 +21,10 @@
                 </h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <div class="btn-group me-2">
-                        <button type="button" class="btn btn-sm btn-success" onclick="generateSystemNotifications()">
+                        <button type="button" class="btn btn-sm btn-success" onclick="generateSystemNotifications(event)">
                             <i class="fas fa-magic"></i> Generează Notificări
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="markAllAsRead()">
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="markAllAsRead(event)">
                             <i class="fas fa-check-double"></i> Marchează toate ca citite
                         </button>
                         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshAlerts()">
@@ -343,17 +343,17 @@ function markAsRead(notificationId) {
 }
 
 // Marchează toate notificările ca citite
-function markAllAsRead() {
+function markAllAsRead(e) {
     if (!confirm('Sigur doriți să marcați toate notificările ca citite?')) {
         return;
     }
     
-    const btn = event.target;
+    const btn = e ? e.target : event.target;
     const originalHtml = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesare...';
     
-    fetch('<?= rtrim(BASE_URL, "/") ?>/index.php/notifications/mark-all-read', {
+    fetch('<?= rtrim(BASE_URL, "/") ?>/modules/notifications/index.php?action=mark-all-read', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -445,17 +445,17 @@ setInterval(function() {
 }, 300000); // 5 minute
 
 // Generează notificări automate de sistem
-function generateSystemNotifications() {
+function generateSystemNotifications(e) {
     if (!confirm('Generez notificări pentru asigurări/mentenanță/documente în expirare?')) {
         return;
     }
     
-    const btn = event.target;
+    const btn = e ? e.target : event.target;
     const originalHtml = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generare...';
     
-    fetch('<?= rtrim(BASE_URL, "/") ?>/index.php/notifications/generate-system', {
+    fetch('<?= rtrim(BASE_URL, "/") ?>/modules/notifications/index.php?action=generate-system', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
