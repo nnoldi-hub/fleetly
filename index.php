@@ -259,6 +259,14 @@ $router->addRoute('POST', '/service/mechanics/edit', 'MechanicController', 'edit
 $router->addRoute('GET', '/service/mechanics/view', 'MechanicController', 'view');
 $router->addRoute('GET', '/service/mechanics/delete', 'MechanicController', 'delete');
 
+// Rute Rapoarte Service
+$router->addRoute('GET', '/service/reports', 'ServiceReportController', 'index');
+$router->addRoute('GET', '/service/reports/profitability', 'ServiceReportController', 'profitability');
+$router->addRoute('GET', '/service/reports/vehicle-costs', 'ServiceReportController', 'vehicleCosts');
+$router->addRoute('GET', '/service/reports/mechanic-performance', 'ServiceReportController', 'mechanicPerformance');
+$router->addRoute('GET', '/service/reports/work-times', 'ServiceReportController', 'workTimes');
+$router->addRoute('GET', '/service/reports/export', 'ServiceReportController', 'export');
+
 // Obține calea curentă
 
 // Normalizează calea pentru rutare corectă (suport și pentru subdirector ex: /fleet-management)
