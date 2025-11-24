@@ -498,9 +498,10 @@ class WorkOrder extends Model {
      * @return bool True dacă are acces
      */
     public function checkTenantAccess($workOrderId, $tenantId) {
+        // In tenant DB, all work orders belong to this tenant (no tenant_id column)
         $sql = "SELECT COUNT(*) as count FROM work_orders 
-                WHERE id = ? AND tenant_id = ?";
-        $result = $this->db->fetchOn($this->table, $sql, [$workOrderId, $tenantId]);
+                WHERE id = ?";
+        $result = $this->db->fetchOn($this->table, $sql, [$workOrderId]);
         return $result && $result['count'] > 0;
     }
 }
