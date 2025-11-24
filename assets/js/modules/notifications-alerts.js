@@ -183,28 +183,45 @@ setInterval(function() {
     updateNotificationCount();
 }, 300000); // 5 minute
 
-// Attach event listeners when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Notification alerts JavaScript loaded!');
-    
-    // Generate notifications button
-    const btnGenerate = document.getElementById('btn-generate-notifications');
-    if (btnGenerate) {
-        btnGenerate.addEventListener('click', generateSystemNotifications);
-        console.log('Generate button listener attached');
+// Initialization logic extracted so we can call it immediately if DOM already loaded
+function initNotificationAlerts() {
+    console.log('[Notifications] Initializing listeners');
+    try {
+        // Generate notifications button
+        const btnGenerate = document.getElementById('btn-generate-notifications');
+        if (btnGenerate && !btnGenerate.__notificationsBound) {
+            btnGenerate.addEventListener('click', generateSystemNotifications);
+            btnGenerate.__notificationsBound = true;
+            console.log('[Notifications] Generate button listener attached');
+        }
+        
+        // Mark all as read button
+        const btnMarkAll = document.getElementById('btn-mark-all-read');
+        if (btnMarkAll && !btnMarkAll.__notificationsBound) {
+            btnMarkAll.addEventListener('click', markAllAsRead);
+            btnMarkAll.__notificationsBound = true;
+            console.log('[Notifications] Mark all button listener attached');
+        }
+        
+        // Refresh button
+        const btnRefresh = document.getElementById('btn-refresh-alerts');
+        if (btnRefresh && !btnRefresh.__notificationsBound) {
+            btnRefresh.addEventListener('click', refreshAlerts);
+            btnRefresh.__notificationsBound = true;
+            console.log('[Notifications] Refresh button listener attached');
+        }
+    } catch (err) {
+        console.error('[Notifications] Initialization error', err);
     }
-    
-    // Mark all as read button
-    const btnMarkAll = document.getElementById('btn-mark-all-read');
-    if (btnMarkAll) {
-        btnMarkAll.addEventListener('click', markAllAsRead);
-        console.log('Mark all button listener attached');
-    }
-    
-    // Refresh button
-    const btnRefresh = document.getElementById('btn-refresh-alerts');
-    if (btnRefresh) {
-        btnRefresh.addEventListener('click', refreshAlerts);
-        console.log('Refresh button listener attached');
-    }
-});
+}
+
+// Attach event listeners when DOM is ready, or immediately if already loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNotificationAlerts);
+} else {
+    // DOM already parsed
+    initNotificationAlerts();
+}
+
+// Expose init manually if needed for debugging
+window.initNotificationAlerts = initNotificationAlerts;

@@ -305,7 +305,7 @@
             </div>
         </div>
 
-<script src="<?= BASE_URL ?>assets/js/modules/notifications-alerts.js"></script>
+<?php // Removed explicit notifications-alerts.js include; footer now auto-injects based on URL ?>
 
 <?php
 // Helper local (dacă nu există global). Ideal mutat într-un utilitar comun.
