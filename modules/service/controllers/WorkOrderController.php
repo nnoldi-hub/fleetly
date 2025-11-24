@@ -163,13 +163,13 @@ class WorkOrderController extends Controller {
             }
         }
         
-        // Obținere vehicule pentru dropdown (vehicles is in core DB)
+        // Obținere vehicule pentru dropdown (vehicles is in TENANT DB)
         try {
-            $sql = "SELECT id, plate_number, make, model 
+            // Vehicles use registration_number not plate_number in tenant DB
+            $sql = "SELECT id, registration_number as plate_number, brand as make, model 
                     FROM vehicles 
-                    WHERE tenant_id = ? AND is_active = 1 
-                    ORDER BY plate_number";
-            // fetchAllOn will route to core DB because 'vehicles' is in coreTables
+                    WHERE tenant_id = ? AND status = 'active' 
+                    ORDER BY registration_number";
             $vehicles = $this->db->fetchAllOn('vehicles', $sql, [$tenantId]);
             error_log('[WorkOrderController] Found ' . count($vehicles) . ' vehicles for tenant_id=' . $tenantId);
         } catch (Exception $e) {
