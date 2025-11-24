@@ -35,11 +35,11 @@ $canEdit = $canEdit ?? false;
             <?php endif; ?>
         </div>
         <div class="col-md-4 text-end">
-            <a href="<?= ROUTE_BASE ?>/service/services" class="btn btn-secondary">
+            <a href="<?= ROUTE_BASE ?>service/services" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Înapoi
             </a>
             <?php if ($canEdit): ?>
-                <a href="<?= ROUTE_BASE ?>/service/services/edit?id=<?= $service['id'] ?>" class="btn btn-primary">
+                <a href="<?= ROUTE_BASE ?>service/services/edit?id=<?= $service['id'] ?>" class="btn btn-primary">
                     <i class="fas fa-edit"></i> Editează
                 </a>
                 <?php if ($service['service_type'] === 'internal'): ?>
@@ -327,7 +327,7 @@ $canEdit = $canEdit ?? false;
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
-                            <a href="<?= ROUTE_BASE ?>/service/services/edit?id=<?= $service['id'] ?>" 
+                                          <a href="<?= ROUTE_BASE ?>service/services/edit?id=<?= $service['id'] ?>" 
                                class="btn btn-primary">
                                 <i class="fas fa-edit"></i> Editează Date
                             </a>

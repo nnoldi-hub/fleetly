@@ -305,6 +305,7 @@ try {
     $router->route($_SERVER['REQUEST_METHOD'], $path);
 } catch (Exception $e) {
     // Dacă nu s-a găsit nicio rută, afișează o eroare 404
+    error_log('[ROUTER EXCEPTION] ' . $e->getMessage() . ' | PATH=' . ($path ?? 'n/a'));
     http_response_code(404);
     echo "<h1>404 - Pagina nu a fost găsită</h1>";
     echo "<p>Calea solicitată nu există.</p>";

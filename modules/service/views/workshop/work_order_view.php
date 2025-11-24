@@ -37,7 +37,7 @@ $canEdit = $canEdit ?? false;
             </p>
         </div>
         <div class="col-md-4 text-end">
-            <a href="<?= ROUTE_BASE ?>/service/workshop" class="btn btn-secondary">
+            <a href="<?= ROUTE_BASE ?>service/workshop" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Înapoi
             </a>
             <?php if ($canEdit && $wo['status'] !== 'delivered'): ?>

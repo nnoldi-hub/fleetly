@@ -18,11 +18,11 @@ $searchTerm = $searchTerm ?? '';
         <div class="col-md-4 text-end">
             <?php if ($userRole === 'admin'): ?>
                 <?php if (!$hasInternal): ?>
-                    <a href="<?= ROUTE_BASE ?>/service/services/internal-setup" class="btn btn-success me-2">
+                    <a href="<?= ROUTE_BASE ?>service/services/internal-setup" class="btn btn-success me-2">
                         <i class="fas fa-plus-circle"></i> Activează Service Intern
                     </a>
                 <?php endif; ?>
-                <a href="<?= ROUTE_BASE ?>/service/services/add" class="btn btn-primary">
+                <a href="<?= ROUTE_BASE ?>service/services/add" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Adaugă Service
                 </a>
             <?php endif; ?>
@@ -49,7 +49,7 @@ $searchTerm = $searchTerm ?? '';
     <!-- Filtre și căutare -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="<?= ROUTE_BASE ?>/service/services" class="row g-3">
+            <form method="GET" action="<?= ROUTE_BASE ?>service/services" class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">Tip Service</label>
                     <select name="type" class="form-select" onchange="this.form.submit()">
@@ -83,7 +83,7 @@ $searchTerm = $searchTerm ?? '';
             <?php else: ?>
                 Nu există service-uri înregistrate. 
                 <?php if ($userRole === 'admin'): ?>
-                    <a href="<?= ROUTE_BASE ?>/service/services/add">Adaugă primul service</a>
+                    <a href="<?= ROUTE_BASE ?>service/services/add">Adaugă primul service</a>
                 <?php endif; ?>
             <?php endif; ?>
         </div>
@@ -200,9 +200,9 @@ $searchTerm = $searchTerm ?? '';
             <h5><i class="fas fa-check-circle"></i> Service Intern Activ</h5>
             <p class="mb-2">Ai activat modulul de service intern. Poți accesa:</p>
             <ul class="mb-0">
-                <li><a href="<?= ROUTE_BASE ?>/service/workshop" class="alert-link">Dashboard Atelier</a> - Gestionare ordine de lucru</li>
-                <li><a href="<?= ROUTE_BASE ?>/service/mechanics" class="alert-link">Mecanici</a> - Gestionare personal atelier</li>
-                <li><a href="<?= ROUTE_BASE ?>/service/workshop/vehicles" class="alert-link">Vehicule în Service</a> - Status vehicule</li>
+                <li><a href="<?= ROUTE_BASE ?>service/workshop" class="alert-link">Dashboard Atelier</a> - Gestionare ordine de lucru</li>
+                <li><a href="<?= ROUTE_BASE ?>service/mechanics" class="alert-link">Mecanici</a> - Gestionare personal atelier</li>
+                <li><a href="<?= ROUTE_BASE ?>service/workshop/vehicles" class="alert-link">Vehicule în Service</a> - Status vehicule</li>
             </ul>
         </div>
     <?php endif; ?>
@@ -214,7 +214,7 @@ function toggleService(serviceId, action) {
         return;
     }
     
-    const url = '<?= ROUTE_BASE ?>/service/services/' + action + '?id=' + serviceId;
+    const url = '<?= ROUTE_BASE ?>service/services/' + action + '?id=' + serviceId;
     
     fetch(url, {
         method: 'POST',

@@ -18,10 +18,10 @@ $errors = $errors ?? [];
                     <span class="text-primary"><?= htmlspecialchars($service['name']) ?></span>
                 </h2>
                 <div>
-                    <a href="<?= ROUTE_BASE ?>/service/services/view?id=<?= $service['id'] ?>" class="btn btn-info">
+                    <a href="<?= ROUTE_BASE ?>service/services/view?id=<?= $service['id'] ?>" class="btn btn-info">
                         <i class="fas fa-eye"></i> Vizualizare
                     </a>
-                    <a href="<?= ROUTE_BASE ?>/service/services" class="btn btn-secondary">
+                    <a href="<?= ROUTE_BASE ?>service/services" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Înapoi
                     </a>
                 </div>
@@ -246,7 +246,7 @@ $errors = $errors ?? [];
                                 <button type="submit" class="btn btn-success btn-lg">
                                     <i class="fas fa-save"></i> Salvează Modificările
                                 </button>
-                                <a href="<?= ROUTE_BASE ?>/service/services/view?id=<?= $service['id'] ?>" 
+                                          <a href="<?= ROUTE_BASE ?>service/services/view?id=<?= $service['id'] ?>" 
                                    class="btn btn-outline-secondary btn-lg">
                                     Anulează
                                 </a>

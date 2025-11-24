@@ -17,10 +17,10 @@ $filters = $filters ?? [];
             <p class="text-muted"><?= htmlspecialchars($service['name'] ?? 'Atelier Intern') ?></p>
         </div>
         <div class="col-md-4 text-end">
-            <a href="<?= ROUTE_BASE ?>/service/workshop/add" class="btn btn-success">
+            <a href="<?= ROUTE_BASE ?>service/workshop/add" class="btn btn-success">
                 <i class="fas fa-plus"></i> Ordine de Lucru Nouă
             </a>
-            <a href="<?= ROUTE_BASE ?>/service/workshop/vehicles" class="btn btn-primary">
+            <a href="<?= ROUTE_BASE ?>service/workshop/vehicles" class="btn btn-primary">
                 <i class="fas fa-car"></i> Vehicule în Service
             </a>
         </div>
@@ -114,7 +114,7 @@ $filters = $filters ?? [];
     <!-- Filtre -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="<?= ROUTE_BASE ?>/service/workshop" class="row g-3">
+            <form method="GET" action="<?= ROUTE_BASE ?>service/workshop" class="row g-3">
                 <div class="col-md-3">
                     <label class="form-label">Status</label>
                     <select name="status" class="form-select">
