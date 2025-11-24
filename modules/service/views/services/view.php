@@ -43,7 +43,7 @@ $canEdit = $canEdit ?? false;
                     <i class="fas fa-edit"></i> Editează
                 </a>
                 <?php if ($service['service_type'] === 'internal'): ?>
-                    <a href="<?= ROUTE_BASE ?>/service/workshop" class="btn btn-success">
+                    <a href="<?= ROUTE_BASE ?>service/workshop" class="btn btn-success">
                         <i class="fas fa-th-large"></i> Dashboard Atelier
                     </a>
                 <?php endif; ?>
@@ -332,12 +332,12 @@ $canEdit = $canEdit ?? false;
                                 <i class="fas fa-edit"></i> Editează Date
                             </a>
                             <?php if ($service['service_type'] === 'internal'): ?>
-                                <a href="<?= ROUTE_BASE ?>/service/workshop" 
+                                <a href="<?= ROUTE_BASE ?>service/workshop" 
                                    class="btn btn-success">
                                     <i class="fas fa-tools"></i> Deschide Atelier
                                 </a>
                             <?php else: ?>
-                                <a href="<?= ROUTE_BASE ?>/service/appointments/add?service_id=<?= $service['id'] ?>" 
+                                <a href="<?= ROUTE_BASE ?>service/appointments/add?service_id=<?= $service['id'] ?>" 
                                    class="btn btn-info">
                                     <i class="fas fa-calendar-plus"></i> Programare Nouă
                                 </a>
@@ -360,7 +360,7 @@ function toggleActive(serviceId, newStatus) {
     const action = newStatus ? 'activat' : 'dezactivat';
     if (!confirm(`Sigur doriți să fie ${action} acest service?`)) return;
     
-    $.post('<?= ROUTE_BASE ?>/service/services/activate', {
+    $.post('<?= ROUTE_BASE ?>service/services/activate', {
         service_id: serviceId,
         is_active: newStatus
     }, function(response) {

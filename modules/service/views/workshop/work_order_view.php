@@ -481,7 +481,7 @@ const workOrderId = <?= $wo['id'] ?>;
 function updateStatus(newStatus) {
     if (!confirm('Sigur doriți să schimbați statusul?')) return;
     
-    $.post('<?= ROUTE_BASE ?>/service/workshop/update-status', {
+    $.post('<?= ROUTE_BASE ?>service/workshop/update-status', {
         work_order_id: workOrderId,
         status: newStatus
     }, function(response) {
@@ -497,7 +497,7 @@ function updateStatus(newStatus) {
 function addPart() {
     const formData = $('#partForm').serialize() + '&work_order_id=' + workOrderId;
     
-    $.post('<?= ROUTE_BASE ?>/service/workshop/add-part', formData, function(response) {
+    $.post('<?= ROUTE_BASE ?>service/workshop/add-part', formData, function(response) {
         if (response.success) {
             location.reload();
         } else {
@@ -510,7 +510,7 @@ function addPart() {
 function startLabor() {
     const formData = $('#laborForm').serialize() + '&work_order_id=' + workOrderId;
     
-    $.post('<?= ROUTE_BASE ?>/service/workshop/start-labor', formData, function(response) {
+    $.post('<?= ROUTE_BASE ?>service/workshop/start-labor', formData, function(response) {
         if (response.success) {
             location.reload();
         } else {
@@ -523,7 +523,7 @@ function startLabor() {
 function stopLabor(laborId) {
     if (!confirm('Sigur doriți să opriți cronometrul?')) return;
     
-    $.post('<?= ROUTE_BASE ?>/service/workshop/end-labor', {
+    $.post('<?= ROUTE_BASE ?>service/workshop/end-labor', {
         labor_id: laborId
     }, function(response) {
         if (response.success) {
@@ -545,7 +545,7 @@ function saveChecklist() {
         });
     });
     
-    $.post('<?= ROUTE_BASE ?>/service/workshop/update-checklist', {
+    $.post('<?= ROUTE_BASE ?>service/workshop/update-checklist', {
         work_order_id: workOrderId,
         items: JSON.stringify(items)
     }, function(response) {

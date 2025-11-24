@@ -16,8 +16,8 @@ $formData = $formData ?? [];
             <!-- Header -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2><i class="fas fa-plus-circle"></i> Ordine de Lucru Nouă</h2>
-                <a href="<?= ROUTE_BASE ?>/service/workshop" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Înapoi
+                <a href="<?= ROUTE_BASE ?>service/workshop" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Înapoi
                 </a>
             </div>
 
@@ -209,7 +209,7 @@ $formData = $formData ?? [];
                             <button type="submit" class="btn btn-success btn-lg">
                                 <i class="fas fa-save"></i> Creează Ordine de Lucru
                             </button>
-                            <a href="<?= ROUTE_BASE ?>/service/workshop" class="btn btn-outline-secondary">
+                            <a href="<?= ROUTE_BASE ?>service/workshop" class="btn btn-outline-secondary">
                                 Anulează
                             </a>
                         </div>

@@ -261,7 +261,7 @@ $filters = $filters ?? [];
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <a href="<?= ROUTE_BASE ?>/service/workshop/view?id=<?= $wo['id'] ?>" 
+                                        <a href="<?= ROUTE_BASE ?>service/workshop/view?id=<?= $wo['id'] ?>" 
                                            class="btn btn-sm btn-outline-primary" title="Detalii">
                                             <i class="fas fa-eye"></i>
                                         </a>

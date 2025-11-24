@@ -107,7 +107,7 @@ $searchTerm = $searchTerm ?? '';
                         
                         <div class="card-body">
                             <h5 class="card-title">
-                                <a href="<?= ROUTE_BASE ?>/service/services/view?id=<?= $service['id'] ?>" class="text-decoration-none">
+                                <a href="<?= ROUTE_BASE ?>service/services/view?id=<?= $service['id'] ?>" class="text-decoration-none">
                                     <?= htmlspecialchars($service['name']) ?>
                                 </a>
                             </h5>
@@ -161,13 +161,13 @@ $searchTerm = $searchTerm ?? '';
                         
                         <div class="card-footer bg-transparent">
                             <div class="d-flex justify-content-between align-items-center">
-                                <a href="<?= ROUTE_BASE ?>/service/services/view?id=<?= $service['id'] ?>" class="btn btn-sm btn-outline-primary">
+                                <a href="<?= ROUTE_BASE ?>service/services/view?id=<?= $service['id'] ?>" class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-eye"></i> Detalii
                                 </a>
                                 
                                 <?php if ($userRole === 'admin'): ?>
                                     <div class="btn-group">
-                                        <a href="<?= ROUTE_BASE ?>/service/services/edit?id=<?= $service['id'] ?>" 
+                                        <a href="<?= ROUTE_BASE ?>service/services/edit?id=<?= $service['id'] ?>" 
                                            class="btn btn-sm btn-outline-secondary">
                                             <i class="fas fa-edit"></i>
                                         </a>
