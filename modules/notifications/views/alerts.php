@@ -21,13 +21,13 @@
                 </h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <div class="btn-group me-2">
-                        <button type="button" class="btn btn-sm btn-success" onclick="generateSystemNotifications(event)">
+                        <button type="button" class="btn btn-sm btn-success" id="btn-generate-notifications">
                             <i class="fas fa-magic"></i> Generează Notificări
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="markAllAsRead(event)">
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="btn-mark-all-read">
                             <i class="fas fa-check-double"></i> Marchează toate ca citite
                         </button>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshAlerts()">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-refresh-alerts">
                             <i class="fas fa-sync-alt"></i> Actualizează
                         </button>
                         <a href="<?= ROUTE_BASE ?>notifications/preferences" class="btn btn-sm btn-outline-primary">

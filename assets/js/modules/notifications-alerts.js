@@ -183,4 +183,28 @@ setInterval(function() {
     updateNotificationCount();
 }, 300000); // 5 minute
 
-console.log('Notification alerts JavaScript loaded!');
+// Attach event listeners when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Notification alerts JavaScript loaded!');
+    
+    // Generate notifications button
+    const btnGenerate = document.getElementById('btn-generate-notifications');
+    if (btnGenerate) {
+        btnGenerate.addEventListener('click', generateSystemNotifications);
+        console.log('Generate button listener attached');
+    }
+    
+    // Mark all as read button
+    const btnMarkAll = document.getElementById('btn-mark-all-read');
+    if (btnMarkAll) {
+        btnMarkAll.addEventListener('click', markAllAsRead);
+        console.log('Mark all button listener attached');
+    }
+    
+    // Refresh button
+    const btnRefresh = document.getElementById('btn-refresh-alerts');
+    if (btnRefresh) {
+        btnRefresh.addEventListener('click', refreshAlerts);
+        console.log('Refresh button listener attached');
+    }
+});
