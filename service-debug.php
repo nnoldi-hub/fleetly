@@ -67,18 +67,22 @@ try {
     die();
 }
 
-echo "<h2>Step 4: Test dashboard method</h2>";
+echo "<h2>Step 4: Test index method</h2>";
 try {
-    // This will try to call the dashboard method
-    echo "Attempting to call dashboard()...<br>";
+    // This will try to call the index method
+    echo "Attempting to call index()...<br>";
     ob_start();
-    $controller->dashboard();
+    $controller->index();
     $output = ob_get_clean();
-    echo "✓ dashboard() executed successfully<br>";
-    echo "<h3>Output preview (first 500 chars):</h3>";
-    echo "<pre>" . htmlspecialchars(substr($output, 0, 500)) . "</pre>";
+    echo "✓ index() executed successfully<br>";
+    echo "<h3>Output preview (first 1000 chars):</h3>";
+    echo "<pre>" . htmlspecialchars(substr($output, 0, 1000)) . "</pre>";
+    
+    if (empty($output)) {
+        echo "<div style='background:orange;padding:10px;margin:10px 0;'>⚠️ Warning: Output is empty!</div>";
+    }
 } catch (Throwable $e) {
-    echo "✗ Error in dashboard(): " . $e->getMessage() . "<br>";
+    echo "✗ Error in index(): " . $e->getMessage() . "<br>";
     echo "File: " . $e->getFile() . " Line: " . $e->getLine() . "<br>";
     echo "<pre>" . $e->getTraceAsString() . "</pre>";
 }
