@@ -376,4 +376,20 @@ class Auth {
             die('Nu aveți permisiunea necesară');
         }
     }
+
+    /* ===================== Convenience Helpers (Added) ===================== */
+    // Returns tenant/company id used for scoping data (acts as tenant_id)
+    public function getTenantId() {
+        return $this->effectiveCompanyId();
+    }
+
+    // Returns current authenticated user id
+    public function getUserId() {
+        return $this->user->id ?? null;
+    }
+
+    // Returns current user role slug
+    public function getUserRole() {
+        return $this->user->role_slug ?? null;
+    }
 }
