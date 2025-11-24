@@ -15,8 +15,17 @@ class Router {
         $normMethod = strtoupper($method);
         $normUri = $this->normalizePath($uri);
         
+        // DEBUG: Log what we're trying to route
+        error_log('[ROUTER] Trying to route: method=' . $normMethod . ' uri=' . $uri . ' normalized=' . $normUri);
+        
         foreach ($this->routes as $route) {
+            // DEBUG: Log each route check
+            if ($route['method'] === $normMethod) {
+                error_log('[ROUTER] Checking route: ' . $route['path'] . ' -> ' . $route['controller'] . '::' . $route['action']);
+            }
+            
             if ($route['method'] === $normMethod && $this->matchPath($route['path'], $normUri)) {
+                error_log('[ROUTER] MATCH FOUND: ' . $route['path'] . ' -> ' . $route['controller'] . '::' . $route['action']);
                 $controllerClass = $route['controller'];
                 $action = $route['action'];
                 
@@ -24,12 +33,17 @@ class Router {
                     $controller = new $controllerClass();
                     if (method_exists($controller, $action)) {
                         return $controller->$action();
+                    } else {
+                        error_log('[ROUTER ERROR] Method not found: ' . $action . ' in ' . $controllerClass);
                     }
+                } else {
+                    error_log('[ROUTER ERROR] Controller class not found: ' . $controllerClass);
                 }
             }
         }
         
         // 404
+        error_log('[ROUTER] NO MATCH FOUND for: ' . $normUri);
         http_response_code(404);
         // Try to include header/footer using filesystem path to avoid relative include issues
         $hdr = __DIR__ . '/../includes/header.php';

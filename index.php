@@ -300,6 +300,14 @@ if ($path === '' || $path[0] !== '/') { $path = '/' . ltrim($path, '/'); }
 // Elimină eventuale dubluri de slash
 $path = preg_replace('#/+#','/',$path);
 
+// DEBUG ROUTING - Remove after fixing
+error_log('[ROUTER DEBUG] REQUEST_URI=' . ($_SERVER['REQUEST_URI'] ?? 'n/a'));
+error_log('[ROUTER DEBUG] SCRIPT_NAME=' . ($_SERVER['SCRIPT_NAME'] ?? 'n/a'));
+error_log('[ROUTER DEBUG] calcBase=' . ($calcBase ?? 'n/a'));
+error_log('[ROUTER DEBUG] configBase=' . ($configBase ?? 'n/a'));
+error_log('[ROUTER DEBUG] Final path=' . $path);
+error_log('[ROUTER DEBUG] Method=' . $_SERVER['REQUEST_METHOD']);
+
 // Rutează cererea
 try {
     $router->route($_SERVER['REQUEST_METHOD'], $path);
