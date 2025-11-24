@@ -163,17 +163,14 @@ class WorkOrderController extends Controller {
             }
         }
         
-        // Obținere vehicule pentru dropdown
-        // Vehicles are in CORE DB - use direct query on core connection
+        // Obținere vehicule pentru dropdown (vehicles is in core DB)
         try {
             $sql = "SELECT id, plate_number, make, model 
                     FROM vehicles 
                     WHERE tenant_id = ? AND is_active = 1 
                     ORDER BY plate_number";
-            // getConnection() returns core PDO
-            $stmt = $this->db->getConnection()->prepare($sql);
-            $stmt->execute([$tenantId]);
-            $vehicles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            // fetchAllOn will route to core DB because 'vehicles' is in coreTables
+            $vehicles = $this->db->fetchAllOn('vehicles', $sql, [$tenantId]);
             error_log('[WorkOrderController] Found ' . count($vehicles) . ' vehicles for tenant_id=' . $tenantId);
         } catch (Exception $e) {
             error_log('[WorkOrderController] vehicles query failed: ' . $e->getMessage());

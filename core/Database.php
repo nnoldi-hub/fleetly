@@ -9,7 +9,7 @@ class Database {
 
     // Tables that must stay in the core DB
     private $coreTables = [
-        'companies','users','roles','permissions','role_permissions','user_sessions','audit_logs','system_settings','intervention_requests'
+        'companies','users','roles','permissions','role_permissions','user_sessions','audit_logs','system_settings','intervention_requests','vehicles','vehicle_types','drivers'
     ];
 
     private function __construct() {
