@@ -1,15 +1,18 @@
 <?php
 /**
- * SIMPLE QUEUE TEST - No dependencies
+ * SIMPLE QUEUE TEST - Uses config file
  */
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Direct database connection
-$host = 'localhost';
-$dbname = 'wclsgyf_fleetly';
-$username = 'wclsgyf_fleetly';
-$password = 'fleety2024!';
+// Load database config
+$rootDir = dirname(__DIR__);
+require_once $rootDir . '/config/database.php';
+
+$host = DatabaseConfig::getHost();
+$dbname = DatabaseConfig::getDbName();
+$username = DatabaseConfig::getUsername();
+$password = DatabaseConfig::getPassword();
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
