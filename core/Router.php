@@ -62,16 +62,9 @@ class Router {
         // Ignoră orice prefix "/index.php" în comparații (suport URL-uri cu/ fără index.php)
         $r = str_replace('/index.php', '', $r);
         $u = str_replace('/index.php', '', $u);
-        if ($r === $u) return true;
-        // Extra safety: allow when the URI ends with the route path (helps when base path trimming fails)
-        if (strlen($u) > strlen($r)) {
-            $pos = strrpos($u, $r);
-            if ($pos !== false && $pos + strlen($r) === strlen($u)) {
-                // ensure boundary before match is a slash
-                if ($pos === 0 || $u[$pos - 1] === '/') return true;
-            }
-        }
-        return false;
+        
+        // STRICT MATCH ONLY - no fuzzy matching to avoid /service/services matching /service/services/view
+        return ($r === $u);
     }
 
     private function normalizePath($p) {
