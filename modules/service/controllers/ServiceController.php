@@ -20,6 +20,15 @@ class ServiceController extends Controller {
     public function __construct() {
         parent::__construct();
         Auth::getInstance()->requireAuth();
+        // Ensure tenant database selected (needed for 'services' table)
+        try {
+            $companyId = Auth::getInstance()->effectiveCompanyId();
+            if ($companyId) {
+                Database::getInstance()->setTenantDatabaseByCompanyId($companyId);
+            }
+        } catch (Throwable $e) {
+            // Fallback silently; core DB may not contain services table
+        }
         $this->serviceModel = new Service();
         $this->auth = Auth::getInstance();
     }

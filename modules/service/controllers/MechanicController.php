@@ -15,6 +15,13 @@ class MechanicController extends Controller {
     public function __construct() {
         parent::__construct();
         Auth::getInstance()->requireAuth();
+        // Ensure tenant DB is selected for service_mechanics table
+        try {
+            $companyId = Auth::getInstance()->effectiveCompanyId();
+            if ($companyId) {
+                Database::getInstance()->setTenantDatabaseByCompanyId($companyId);
+            }
+        } catch (Throwable $e) { /* silent fallback */ }
         $this->auth = Auth::getInstance();
         $this->serviceModel = new Service();
     }

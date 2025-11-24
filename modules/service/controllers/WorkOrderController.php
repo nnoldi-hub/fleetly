@@ -22,6 +22,13 @@ class WorkOrderController extends Controller {
     public function __construct() {
         parent::__construct();
         Auth::getInstance()->requireAuth();
+        // Select tenant DB so work_orders and related tables exist
+        try {
+            $companyId = Auth::getInstance()->effectiveCompanyId();
+            if ($companyId) {
+                Database::getInstance()->setTenantDatabaseByCompanyId($companyId);
+            }
+        } catch (Throwable $e) { /* ignore */ }
         $this->workOrderModel = new WorkOrder();
         $this->serviceModel = new Service();
         $this->auth = Auth::getInstance();
