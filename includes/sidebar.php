@@ -53,6 +53,13 @@
             <li class="nav-item mb-2">
                 <a class="nav-link text-white" href="<?= ROUTE_BASE ?>maintenance"><i class="fas fa-tools me-2"></i>Întreținere</a>
             </li>
+            <!-- Service Module links -->
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="<?= ROUTE_BASE ?>service/services"><i class="fas fa-tools me-2"></i>Service-uri</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white" href="<?= ROUTE_BASE ?>service/workshop"><i class="fas fa-warehouse me-2"></i>Atelier Intern</a>
+            </li>
             <li class="nav-item mb-2">
                 <a class="nav-link text-white" href="<?= ROUTE_BASE ?>fuel"><i class="fas fa-gas-pump me-2"></i>Combustibil</a>
             </li>
@@ -127,6 +134,13 @@
             </li>
             <li class="nav-item mb-2">
                 <a class="nav-link" href="<?= ROUTE_BASE ?>maintenance"><i class="fas fa-tools me-2"></i>Întreținere</a>
+            </li>
+            <!-- Service Module mobile links -->
+            <li class="nav-item mb-2">
+                <a class="nav-link" href="<?= ROUTE_BASE ?>service/services"><i class="fas fa-tools me-2"></i>Service-uri</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link" href="<?= ROUTE_BASE ?>service/workshop"><i class="fas fa-warehouse me-2"></i>Atelier Intern</a>
             </li>
             <li class="nav-item mb-2">
                 <a class="nav-link" href="<?= ROUTE_BASE ?>fuel"><i class="fas fa-gas-pump me-2"></i>Combustibil</a>
