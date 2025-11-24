@@ -52,6 +52,11 @@ try {
         case 'generateSystemNotifications':
             $controller->generateSystemNotifications();
             break;
+        case 'check-system':
+        case 'checkSystem':
+            // Render direct view fără Controller::render (are propriul layout)
+            include __DIR__ . '/views/check_system.php';
+            break;
         default:
             $controller->alerts();
             break;
