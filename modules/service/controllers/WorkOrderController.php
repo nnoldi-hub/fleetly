@@ -169,6 +169,13 @@ class WorkOrderController extends Controller {
                     WHERE tenant_id = ? AND is_active = 1 
                     ORDER BY plate_number";
             $vehicles = $this->db->fetchAllOn('vehicles', $sql, [$tenantId]);
+            error_log('[WorkOrderController] Found ' . count($vehicles) . ' vehicles for tenant_id=' . $tenantId);
+            if (count($vehicles) === 0) {
+                // Try without is_active filter to debug
+                $sql2 = "SELECT id, plate_number, make, model, is_active FROM vehicles WHERE tenant_id = ? ORDER BY plate_number";
+                $allVehicles = $this->db->fetchAllOn('vehicles', $sql2, [$tenantId]);
+                error_log('[WorkOrderController] Total vehicles (including inactive): ' . count($allVehicles));
+            }
         } catch (Exception $e) {
             error_log('[WorkOrderController] vehicles query failed: ' . $e->getMessage());
             $vehicles = [];
