@@ -14,7 +14,7 @@ $errors = $errors ?? [];
             <!-- Header -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2><i class="fas fa-edit"></i> Editare Ordine #<?= htmlspecialchars($workOrder['work_order_number']) ?></h2>
-                <a href="<?= ROUTE_BASE ?>service/workshop/view/<?= $workOrder['id'] ?>" class="btn btn-secondary">
+                <a href="<?= ROUTE_BASE ?>service/workshop/view?id=<?= $workOrder['id'] ?>" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Înapoi
                 </a>
             </div>
@@ -147,7 +147,7 @@ $errors = $errors ?? [];
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="fas fa-save"></i> Salvează Modificările
                             </button>
-                            <a href="<?= ROUTE_BASE ?>service/workshop/view/<?= $workOrder['id'] ?>" class="btn btn-outline-secondary">
+                            <a href="<?= ROUTE_BASE ?>service/workshop/view?id=<?= $workOrder['id'] ?>" class="btn btn-outline-secondary">
                                 Anulează
                             </a>
                         </div>

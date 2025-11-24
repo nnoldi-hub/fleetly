@@ -165,7 +165,8 @@ class WorkOrderController extends Controller {
     /**
      * Vizualizare detalii ordine de lucru
      */
-    public function view($id) {
+    public function view() {
+        $id = $_GET['id'] ?? 0;
         $tenantId = $this->auth->getTenantId();
         
         $workOrder = $this->workOrderModel->getWorkOrderDetails($id, $tenantId);
@@ -191,9 +192,10 @@ class WorkOrderController extends Controller {
     /**
      * Editare ordine de lucru
      */
-    public function edit($id) {
+    public function edit() {
+        $id = $_GET['id'] ?? 0;
         if (!$this->auth->isAdmin()) {
-            $this->redirect('/service/workshop/view/' . $id);
+            $this->redirect('/service/workshop/view?id=' . $id);
         }
         
         $tenantId = $this->auth->getTenantId();

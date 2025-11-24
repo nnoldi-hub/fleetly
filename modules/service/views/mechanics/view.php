@@ -20,7 +20,7 @@ $stats = $stats ?? [];
             <a href="<?= ROUTE_BASE ?>service/mechanics" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Înapoi
             </a>
-            <a href="<?= ROUTE_BASE ?>service/mechanics/edit/<?= $mechanic['id'] ?>" class="btn btn-warning text-white">
+            <a href="<?= ROUTE_BASE ?>service/mechanics/edit?id=<?= $mechanic['id'] ?>" class="btn btn-warning text-white">
                 <i class="fas fa-edit"></i> Editează
             </a>
         </div>
@@ -143,7 +143,7 @@ $stats = $stats ?? [];
                                                 <?= $priorityIcon ?> <?= ucfirst($order['priority']) ?>
                                             </td>
                                             <td>
-                                                <a href="<?= ROUTE_BASE ?>service/workshop/view/<?= $order['id'] ?>" class="btn btn-sm btn-info text-white">
+                                                <a href="<?= ROUTE_BASE ?>service/workshop/view?id=<?= $order['id'] ?>" class="btn btn-sm btn-info text-white">
                                                     <i class="fas fa-eye"></i> Detalii
                                                 </a>
                                             </td>

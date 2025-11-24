@@ -105,14 +105,14 @@ $service = $service ?? [];
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <a href="<?= ROUTE_BASE ?>service/mechanics/view/<?= $mechanic['id'] ?>" class="btn btn-sm btn-info text-white" title="Vezi detalii">
+                                        <a href="<?= ROUTE_BASE ?>service/mechanics/view?id=<?= $mechanic['id'] ?>" class="btn btn-sm btn-info text-white" title="Vezi detalii">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="<?= ROUTE_BASE ?>service/mechanics/edit/<?= $mechanic['id'] ?>" class="btn btn-sm btn-warning text-white" title="Editează">
+                                        <a href="<?= ROUTE_BASE ?>service/mechanics/edit?id=<?= $mechanic['id'] ?>" class="btn btn-sm btn-warning text-white" title="Editează">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <?php if ($mechanic['is_active']): ?>
-                                            <a href="<?= ROUTE_BASE ?>service/mechanics/delete/<?= $mechanic['id'] ?>" 
+                                            <a href="<?= ROUTE_BASE ?>service/mechanics/delete?id=<?= $mechanic['id'] ?>" 
                                                class="btn btn-sm btn-danger" 
                                                onclick="return confirm('Sigur vrei să dezactivezi acest mecanic?')" 
                                                title="Dezactivează">

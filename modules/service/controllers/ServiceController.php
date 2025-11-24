@@ -117,11 +117,12 @@ class ServiceController extends Controller {
     /**
      * Formular editare service
      */
-    public function edit($id) {
+    public function edit() {
         if (!$this->auth->isAdmin()) {
             $this->redirect('/service/services');
         }
         
+        $id = $_GET['id'] ?? 0;
         $tenantId = $this->auth->getTenantId();
         
         // Verificare acces
@@ -178,7 +179,8 @@ class ServiceController extends Controller {
     /**
      * Vizualizare detalii service
      */
-    public function view($id) {
+    public function view() {
+        $id = $_GET['id'] ?? 0;
         $tenantId = $this->auth->getTenantId();
         
         if (!$this->serviceModel->checkTenantAccess($id, $tenantId)) {
@@ -217,11 +219,12 @@ class ServiceController extends Controller {
     /**
      * Ștergere service (soft delete)
      */
-    public function delete($id) {
+    public function delete() {
         if (!$this->auth->isAdmin()) {
             $this->json(['success' => false, 'message' => 'Acces interzis'], 403);
         }
         
+        $id = $_POST['id'] ?? $_GET['id'] ?? 0;
         $tenantId = $this->auth->getTenantId();
         
         if (!$this->serviceModel->checkTenantAccess($id, $tenantId)) {
@@ -250,11 +253,12 @@ class ServiceController extends Controller {
     /**
      * Activare service
      */
-    public function activate($id) {
+    public function activate() {
         if (!$this->auth->isAdmin()) {
             $this->json(['success' => false, 'message' => 'Acces interzis'], 403);
         }
         
+        $id = $_POST['id'] ?? $_GET['id'] ?? 0;
         $tenantId = $this->auth->getTenantId();
         
         if (!$this->serviceModel->checkTenantAccess($id, $tenantId)) {

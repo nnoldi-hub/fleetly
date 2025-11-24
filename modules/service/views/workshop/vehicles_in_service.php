@@ -89,10 +89,10 @@ $service = $service ?? [];
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <a href="<?= ROUTE_BASE ?>service/workshop/view/<?= $wo['id'] ?>" class="btn btn-sm btn-info text-white" title="Vezi detalii">
+                                        <a href="<?= ROUTE_BASE ?>service/workshop/view?id=<?= $wo['id'] ?>" class="btn btn-sm btn-info text-white" title="Vezi detalii">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="<?= ROUTE_BASE ?>service/workshop/edit/<?= $wo['id'] ?>" class="btn btn-sm btn-warning text-white" title="Editează">
+                                        <a href="<?= ROUTE_BASE ?>service/workshop/edit?id=<?= $wo['id'] ?>" class="btn btn-sm btn-warning text-white" title="Editează">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                     </td>

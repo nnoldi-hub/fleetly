@@ -122,11 +122,12 @@ class MechanicController extends Controller {
     /**
      * Formular editare mecanic
      */
-    public function edit($id) {
+    public function edit() {
         if (!$this->auth->isAdmin()) {
             $this->redirect('/service/mechanics');
         }
         
+        $id = $_GET['id'] ?? 0;
         $tenantId = $this->auth->getTenantId();
         
         $sql = "SELECT * FROM service_mechanics WHERE id = ? AND tenant_id = ?";
@@ -180,7 +181,8 @@ class MechanicController extends Controller {
     /**
      * Vizualizare detalii mecanic
      */
-    public function view($id) {
+    public function view() {
+        $id = $_GET['id'] ?? 0;
         $tenantId = $this->auth->getTenantId();
         
         $sql = "SELECT sm.* FROM service_mechanics sm
@@ -219,11 +221,12 @@ class MechanicController extends Controller {
     /**
      * Dezactivare mecanic
      */
-    public function delete($id) {
+    public function delete() {
         if (!$this->auth->isAdmin()) {
             $this->json(['success' => false, 'message' => 'Acces interzis'], 403);
         }
         
+        $id = $_GET['id'] ?? 0;
         $tenantId = $this->auth->getTenantId();
         
         try {
