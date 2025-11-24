@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const newStatus = this.value;
             const originalValue = this.querySelector('option[selected]')?.value || this.value;
             
-            fetch('<?= ROUTE_BASE ?>service/workshop/updateStatus', {
+            fetch('<?= ROUTE_BASE ?>service/workshop/update-status', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
