@@ -204,5 +204,15 @@ $router->addRoute('POST', '/service/workshop/add-part', 'WorkOrderController', '
 $router->addRoute('POST', '/service/workshop/start-labor', 'WorkOrderController', 'startLabor');
 $router->addRoute('POST', '/service/workshop/end-labor', 'WorkOrderController', 'endLabor');
 $router->addRoute('POST', '/service/workshop/update-checklist', 'WorkOrderController', 'updateChecklist');
+$router->addRoute('POST', '/service/workshop/delete', 'WorkOrderController', 'delete');
+
+// Mecanici (Service Mechanics)
+$router->addRoute('GET', '/service/mechanics', 'MechanicController', 'index');
+$router->addRoute('GET', '/service/mechanics/add', 'MechanicController', 'add');
+$router->addRoute('POST', '/service/mechanics/add', 'MechanicController', 'add');
+$router->addRoute('GET', '/service/mechanics/view', 'MechanicController', 'view');
+$router->addRoute('GET', '/service/mechanics/edit', 'MechanicController', 'edit');
+$router->addRoute('POST', '/service/mechanics/edit', 'MechanicController', 'edit');
+$router->addRoute('GET', '/service/mechanics/delete', 'MechanicController', 'delete');
 
 // Sf�r?it liste

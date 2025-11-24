@@ -201,9 +201,9 @@ class MechanicController extends Controller {
         }
         
         // Obținere ordine active
-        $sql = "SELECT wo.*, v.plate_number, v.make, v.model
+        $sql = "SELECT wo.*, v.registration_number AS plate_number, v.brand AS make, v.model
                 FROM work_orders wo
-                JOIN vehicles v ON wo.vehicle_id = v.id
+                LEFT JOIN vehicles v ON wo.vehicle_id = v.id
                 WHERE wo.assigned_mechanic_id = ? AND wo.status IN ('pending', 'in_progress')
                 ORDER BY wo.priority DESC, wo.entry_date ASC";
         $activeOrders = $this->db->fetchAllOn('work_orders', $sql, [$id]);
