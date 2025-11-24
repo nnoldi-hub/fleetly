@@ -39,6 +39,16 @@
             <script src="<?= BASE_URL ?>assets/js/modules/<?= $jsFile ?>.js"></script>
         <?php endforeach; ?>
     <?php endif; ?>
+
+    <?php
+    // Auto-include script de notificări dacă suntem pe pagina de notificări
+    // Funcționează și fără $jsFiles setat din controller (fallback pe shared hosting fără rewrite)
+    $reqUri = $_SERVER['REQUEST_URI'] ?? '';
+    if (stripos($reqUri, 'notifications') !== false) {
+        echo '<script src="' . BASE_URL . 'assets/js/modules/notifications-alerts.js"></script>' . "\n";
+        echo '<script>console.log("[Notifications] Script extern încărcat automat.");</script>' . "\n";
+    }
+    ?>
     
     <!-- Fix pentru dropdown-uri -->
     <script>
