@@ -206,15 +206,21 @@ class ServiceController extends Controller {
         // Obținere statistici
         $stats = $this->serviceModel->getServiceStats($id, 'year');
         
-        // Obținere istoricul intervențiilor recente
-        $sql = "SELECT sh.*, v.plate_number, v.make, v.model
-                FROM service_history sh
-                JOIN vehicles v ON sh.vehicle_id = v.id
-                WHERE sh.service_id = ? AND sh.tenant_id = ?
-                ORDER BY sh.service_date DESC
-                LIMIT 10";
-        
-        $recentServices = $this->db->fetchAllOn('service_history', $sql, [$id, $tenantId]);
+        // Obținere istoricul intervențiilor recente (doar dacă tabelul există)
+        $recentServices = [];
+        try {
+            $sql = "SELECT sh.*, v.plate_number, v.make, v.model
+                    FROM service_history sh
+                    JOIN vehicles v ON sh.vehicle_id = v.id
+                    WHERE sh.service_id = ? AND sh.tenant_id = ?
+                    ORDER BY sh.created_at DESC
+                    LIMIT 10";
+            
+            $recentServices = $this->db->fetchAllOn('service_history', $sql, [$id, $tenantId]);
+        } catch (Exception $e) {
+            // service_history table might not exist yet - silent fail
+            error_log('[ServiceController] service_history query failed: ' . $e->getMessage());
+        }
         
         $this->render('services/view', [
             'pageTitle' => $service['name'],

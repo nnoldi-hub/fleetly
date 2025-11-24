@@ -65,10 +65,25 @@ class WorkOrderController extends Controller {
         $filters = array_filter($filters);
         
         // Obținere ordine de lucru
-        $workOrders = $this->workOrderModel->getAllByTenant($tenantId, $filters, 50);
+        try {
+            $workOrders = $this->workOrderModel->getAllByTenant($tenantId, $filters, 50);
+        } catch (Exception $e) {
+            error_log('[WorkOrderController] getAllByTenant failed: ' . $e->getMessage());
+            $workOrders = [];
+        }
         
         // Statistici dashboard
-        $stats = $this->workOrderModel->getWorkshopStats($tenantId, $internalService['id']);
+        try {
+            $stats = $this->workOrderModel->getWorkshopStats($tenantId, $internalService['id']);
+        } catch (Exception $e) {
+            error_log('[WorkOrderController] getWorkshopStats failed: ' . $e->getMessage());
+            $stats = [
+                'total_orders' => 0,
+                'pending_orders' => 0,
+                'in_progress_orders' => 0,
+                'completed_today' => 0
+            ];
+        }
         
         // Obținere mecanici pentru filtru
         $sql = "SELECT * FROM service_mechanics 
@@ -448,7 +463,12 @@ class WorkOrderController extends Controller {
             $this->redirect('/service/services/internal-setup');
         }
         
-        $workOrders = $this->workOrderModel->getActiveWorkOrders($tenantId, $internalService['id']);
+        try {
+            $workOrders = $this->workOrderModel->getActiveWorkOrders($tenantId, $internalService['id']);
+        } catch (Exception $e) {
+            error_log('[WorkOrderController] getActiveWorkOrders failed: ' . $e->getMessage());
+            $workOrders = [];
+        }
         
         $this->render('workshop/vehicles_in_service', [
             'pageTitle' => 'Vehicule în Atelier',
