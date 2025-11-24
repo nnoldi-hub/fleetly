@@ -228,9 +228,15 @@ $filters = $filters ?? [];
                                         ];
                                         $statusInfo = $statusLabels[$wo['status']] ?? ['badge' => 'secondary', 'text' => $wo['status']];
                                         ?>
-                                        <span class="badge bg-<?= $statusInfo['badge'] ?>">
-                                            <?= $statusInfo['text'] ?>
-                                        </span>
+                                        <select class="form-select form-select-sm status-quick-update" 
+                                                data-work-order-id="<?= $wo['id'] ?>" 
+                                                style="width: auto; display: inline-block;">
+                                            <option value="pending" <?= $wo['status'] === 'pending' ? 'selected' : '' ?>>În Așteptare</option>
+                                            <option value="in_progress" <?= $wo['status'] === 'in_progress' ? 'selected' : '' ?>>În Lucru</option>
+                                            <option value="waiting_parts" <?= $wo['status'] === 'waiting_parts' ? 'selected' : '' ?>>Așteptare Piese</option>
+                                            <option value="completed" <?= $wo['status'] === 'completed' ? 'selected' : '' ?>>Finalizat</option>
+                                            <option value="delivered" <?= $wo['status'] === 'delivered' ? 'selected' : '' ?>>Livrat</option>
+                                        </select>
                                     </td>
                                     <td>
                                         <?php
@@ -261,10 +267,20 @@ $filters = $filters ?? [];
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <a href="<?= ROUTE_BASE ?>service/workshop/view?id=<?= $wo['id'] ?>" 
-                                           class="btn btn-sm btn-outline-primary" title="Detalii">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="<?= ROUTE_BASE ?>service/workshop/view?id=<?= $wo['id'] ?>" 
+                                               class="btn btn-outline-primary" title="Detalii">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="<?= ROUTE_BASE ?>service/workshop/edit?id=<?= $wo['id'] ?>" 
+                                               class="btn btn-outline-warning" title="Editează">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button onclick="deleteWorkOrder(<?= $wo['id'] ?>, '<?= htmlspecialchars($wo['work_order_number']) ?>')" 
+                                                    class="btn btn-outline-danger" title="Șterge">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -304,5 +320,65 @@ let autoRefresh = setInterval(function() {
 // Oprește auto-refresh dacă utilizatorul interacționează
 document.addEventListener('click', function() {
     clearInterval(autoRefresh);
+});
+
+// Delete work order
+function deleteWorkOrder(id, orderNumber) {
+    if (!confirm(`Sigur doriți să ștergeți ordinea de lucru ${orderNumber}?\n\nAceastă acțiune nu poate fi anulată!`)) {
+        return;
+    }
+    
+    fetch('<?= ROUTE_BASE ?>service/workshop/delete', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'id=' + id
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Ordine ștearsă cu succes!');
+            location.reload();
+        } else {
+            alert('Eroare: ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('Eroare la ștergere: ' + error);
+    });
+}
+
+// Quick status update
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.status-quick-update').forEach(select => {
+        select.addEventListener('change', function() {
+            const workOrderId = this.dataset.workOrderId;
+            const newStatus = this.value;
+            const originalValue = this.querySelector('option[selected]')?.value || this.value;
+            
+            fetch('<?= ROUTE_BASE ?>service/workshop/updateStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'work_order_id=' + workOrderId + '&status=' + newStatus
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Success - reload to show updated badge
+                    location.reload();
+                } else {
+                    alert('Eroare: ' + data.message);
+                    this.value = originalValue; // Revert
+                }
+            })
+            .catch(error => {
+                alert('Eroare la actualizare: ' + error);
+                this.value = originalValue; // Revert
+            });
+        });
+    });
 });
 </script>

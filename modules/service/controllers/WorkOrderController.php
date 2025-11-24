@@ -322,6 +322,48 @@ class WorkOrderController extends Controller {
     }
     
     /**
+     * Ștergere ordine de lucru (AJAX)
+     */
+    public function delete() {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->json(['success' => false, 'message' => 'Metodă invalidă'], 405);
+        }
+        
+        if (!$this->auth->isAdmin()) {
+            $this->json(['success' => false, 'message' => 'Acces interzis'], 403);
+        }
+        
+        $tenantId = $this->auth->getTenantId();
+        $id = $_POST['id'] ?? null;
+        
+        if (!$id) {
+            $this->json(['success' => false, 'message' => 'ID ordine lipsă'], 400);
+        }
+        
+        try {
+            // Verificăm că ordinea aparține tenant-ului
+            $workOrder = $this->workOrderModel->getWorkOrderDetails($id, $tenantId);
+            
+            if (!$workOrder) {
+                $this->json(['success' => false, 'message' => 'Ordine nu a fost găsită'], 404);
+            }
+            
+            // Ștergem toate înregistrările asociate
+            $this->db->queryOn('work_order_parts', "DELETE FROM work_order_parts WHERE work_order_id = ?", [$id]);
+            $this->db->queryOn('work_order_labor', "DELETE FROM work_order_labor WHERE work_order_id = ?", [$id]);
+            $this->db->queryOn('work_order_checklist', "DELETE FROM work_order_checklist WHERE work_order_id = ?", [$id]);
+            
+            // Ștergem ordinea
+            $this->db->queryOn('work_orders', "DELETE FROM work_orders WHERE id = ?", [$id]);
+            
+            $this->json(['success' => true, 'message' => 'Ordine ștearsă cu succes']);
+        } catch (Exception $e) {
+            error_log('[WorkOrderController] delete failed: ' . $e->getMessage());
+            $this->json(['success' => false, 'message' => 'Eroare la ștergere: ' . $e->getMessage()], 500);
+        }
+    }
+    
+    /**
      * Alocare mecanic (AJAX)
      */
     public function assignMechanic() {
