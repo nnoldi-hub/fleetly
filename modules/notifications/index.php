@@ -41,15 +41,18 @@ try {
             $controller->markAsRead();
             break;
         case 'markAllAsRead':
+        case 'mark-all-read': // alias pentru JavaScript
             $controller->markAllAsRead();
             break;
         case 'dismiss':
             $controller->dismiss();
             break;
         case 'getUnreadCount':
+        case 'unread-count': // alias pentru JavaScript
             $controller->getUnreadCount();
             break;
         case 'generateSystemNotifications':
+        case 'generate-system': // alias pentru JavaScript
             $controller->generateSystemNotifications();
             break;
         case 'check-system':
