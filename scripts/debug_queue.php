@@ -2,10 +2,17 @@
 /**
  * DEBUG SCRIPT - Detailed queue processing debug
  */
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 $rootDir = dirname(__DIR__);
-require_once $rootDir . '/config/config.php';
-require_once $rootDir . '/core/Database.php';
+
+try {
+    require_once $rootDir . '/config/config.php';
+    require_once $rootDir . '/core/Database.php';
+} catch (Throwable $e) {
+    die("Failed to load config: " . $e->getMessage());
+}
 
 header('Content-Type: text/html; charset=utf-8');
 ?>
