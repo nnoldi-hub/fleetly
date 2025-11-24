@@ -112,16 +112,16 @@ class WorkOrder extends Model {
      */
     public function getAllByTenant($tenantId, $filters = [], $limit = null, $offset = null) {
         $sql = "SELECT wo.*, 
-                       v.plate_number, v.make, v.model, v.year,
+                       v.registration_number AS plate_number, v.brand AS make, v.model, v.year,
                        m.name as mechanic_name,
                        s.name as service_name
                 FROM work_orders wo
-                JOIN vehicles v ON wo.vehicle_id = v.id
+                LEFT JOIN vehicles v ON wo.vehicle_id = v.id
                 LEFT JOIN service_mechanics m ON wo.assigned_mechanic_id = m.id
                 LEFT JOIN services s ON wo.service_id = s.id
-                WHERE wo.tenant_id = ?";
+                WHERE 1=1";
         
-        $params = [$tenantId];
+        $params = [];
         
         // Aplicare filtre
         if (!empty($filters['status'])) {
@@ -197,16 +197,16 @@ class WorkOrder extends Model {
         
         if ($serviceId) {
             $sql = "SELECT wo.*, 
-                           v.plate_number, v.make, v.model,
+                           v.registration_number AS plate_number, v.brand AS make, v.model,
                            m.name as mechanic_name
                     FROM work_orders wo
-                    JOIN vehicles v ON wo.vehicle_id = v.id
+                    LEFT JOIN vehicles v ON wo.vehicle_id = v.id
                     LEFT JOIN service_mechanics m ON wo.assigned_mechanic_id = m.id
-                    WHERE wo.tenant_id = ? AND wo.service_id = ?
+                    WHERE wo.service_id = ?
                     AND wo.status IN ('pending', 'in_progress', 'waiting_parts')
                     ORDER BY wo.priority, wo.entry_date";
             
-            return $this->db->fetchAllOn($this->table, $sql, [$tenantId, $serviceId]);
+            return $this->db->fetchAllOn($this->table, $sql, [$serviceId]);
         }
         
         return $this->getAllByTenant($tenantId, $filters);
