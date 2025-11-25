@@ -27,8 +27,15 @@ class ReportController extends Controller {
             'totalVehicles' => $safeCount(function() { return $this->vehicleModel->getTotalCount(); }),
             'totalFuelRecords' => $safeCount(function() { return $this->fuelModel->getTotalCount(); }),
             'totalMaintenanceRecords' => $safeCount(function() { return $this->maintenanceModel->getTotalCount(); }),
-            // Poate lipsi tabela insurance în unele instalații; tratăm sigur
-            'totalInsuranceRecords' => $safeCount(function() { return $this->insuranceModel->getTotalCount(); })
+            // Numara polite din insurance + documente asigurare din documents
+            'totalInsuranceRecords' => $safeCount(function() { 
+                $insuranceCount = $this->insuranceModel->getTotalCount();
+                // Adauga si documentele de tip asigurare
+                $db = Database::getInstance()->getConnection();
+                $stmt = $db->query("SELECT COUNT(*) FROM documents WHERE document_type LIKE '%asigur%' OR document_type LIKE '%RCA%' OR document_type LIKE '%CASCO%'");
+                $documentsCount = (int)$stmt->fetchColumn();
+                return $insuranceCount + $documentsCount;
+            })
         ];
 
         $this->render('index', $data);
