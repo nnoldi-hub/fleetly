@@ -46,7 +46,16 @@
     $reqUri = $_SERVER['REQUEST_URI'] ?? '';
     if (stripos($reqUri, 'notifications') !== false) {
         echo '<script src="' . BASE_URL . 'assets/js/modules/notifications-alerts.js"></script>' . "\n";
-        echo '<script>console.log("[Notifications] Script extern încărcat automat.");</script>' . "\n";
+        echo '<script>' . "\n";
+        echo '  console.log("[Notifications] Script extern încărcat automat.");' . "\n";
+        echo '  // Force immediate initialization since DOM is already loaded' . "\n";
+        echo '  if (typeof initNotificationAlerts === "function") {' . "\n";
+        echo '    initNotificationAlerts();' . "\n";
+        echo '    console.log("[Notifications] Initialization forced after script load.");' . "\n";
+        echo '  } else {' . "\n";
+        echo '    console.error("[Notifications] initNotificationAlerts not found!");' . "\n";
+        echo '  }' . "\n";
+        echo '</script>' . "\n";
     }
     ?>
     
