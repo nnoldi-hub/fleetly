@@ -52,9 +52,16 @@ class LoginController extends Controller {
                 // Select the tenant database for this user's company
                 try {
                     if (!empty($user->company_id)) {
-                        Database::getInstance()->setTenantDatabaseByCompanyId($user->company_id);
+                        error_log('[LOGIN] Setting tenant DB for company_id: ' . $user->company_id);
+                        $db = Database::getInstance()->setTenantDatabaseByCompanyId($user->company_id);
+                        error_log('[LOGIN] Tenant DB set to: ' . ($db ? 'SUCCESS' : 'FAILED'));
+                        // Store in session for verification
+                        if (!empty($_SESSION['acting_company']['db'])) {
+                            error_log('[LOGIN] Session tenant DB: ' . $_SESSION['acting_company']['db']);
+                        }
                     }
                 } catch (Throwable $e) {
+                    error_log('[LOGIN] Exception setting tenant DB: ' . $e->getMessage());
                 }
                 $this->redirect('/dashboard');
             }

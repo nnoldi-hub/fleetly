@@ -48,15 +48,22 @@ class Database {
 
     // ---------- Multi-tenant helpers ----------
     public function setTenantDatabaseByCompanyId($companyId) {
+        error_log('[Database] setTenantDatabaseByCompanyId called with company_id: ' . $companyId);
+        
         // First try to get the explicit database_name from companies table
         try {
             $stmt = $this->core->prepare("SELECT database_name FROM companies WHERE id = ? LIMIT 1");
             $stmt->execute([(int)$companyId]);
             $company = $stmt->fetch();
             
+            error_log('[Database] Query result: ' . json_encode($company));
+            
             if ($company && !empty($company['database_name'])) {
                 // Use the explicitly configured database name
+                error_log('[Database] Using explicit database_name: ' . $company['database_name']);
                 return $this->setTenantDatabase($company['database_name']);
+            } else {
+                error_log('[Database] No database_name found in companies table, using fallback');
             }
         } catch (Throwable $e) {
             error_log('[Database] Failed to fetch company database_name: ' . $e->getMessage());
@@ -65,6 +72,7 @@ class Database {
         // Fallback: generate name using prefix pattern
         $prefix = method_exists('DatabaseConfig', 'getTenantDbPrefix') ? DatabaseConfig::getTenantDbPrefix() : '';
         $dbName = $prefix . 'fm_tenant_' . (int)$companyId;
+        error_log('[Database] Using fallback database name: ' . $dbName);
         return $this->setTenantDatabase($dbName);
     }
 
