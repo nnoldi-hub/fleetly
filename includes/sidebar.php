@@ -87,6 +87,11 @@
                             </a>
                         </li>
                         <li class="nav-item mb-2">
+                            <a class="nav-link text-white" href="<?= ROUTE_BASE ?>service/parts">
+                                <i class="fas fa-boxes me-2"></i>Piese
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
                             <a class="nav-link text-white" href="<?= ROUTE_BASE ?>service/reports">
                                 <i class="fas fa-chart-line me-2"></i>Rapoarte Service
                             </a>
@@ -246,6 +251,11 @@
                         <li class="nav-item mb-2">
                             <a class="nav-link" href="<?= ROUTE_BASE ?>service/mechanics">
                                 <i class="fas fa-user-cog me-2"></i>Mecanici
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a class="nav-link" href="<?= ROUTE_BASE ?>service/parts">
+                                <i class="fas fa-boxes me-2"></i>Piese
                             </a>
                         </li>
                         <li class="nav-item mb-2">
