@@ -4,13 +4,14 @@
 ?>
         <div class="container-fluid px-0">
             <?php 
-            $breadcrumbs = [
-                'Acasă' => '/',
-                'Notificări' => '/modules/notifications/',
-                'Alerte' => ''
-            ];
-            include 'includes/breadcrumb.php'; 
+            // Breadcrumb simplu fără include pentru a evita timeout
             ?>
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="<?= BASE_URL ?>"><i class="fas fa-home"></i> Acasă</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><i class="fas fa-bell"></i> Notificări</li>
+                </ol>
+            </nav>
             
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2">
