@@ -7,7 +7,7 @@
 <div class="container-fluid py-4">
     <?php 
     $breadcrumb = [
-        ['title' => 'Notificări', 'url' => ROUTE_BASE . 'notifications/alerts'],
+        ['title' => 'Notificări', 'url' => ROUTE_BASE . 'notifications'],
         ['title' => 'Preferințe', 'url' => '']
     ];
     include ROOT_PATH . '/includes/breadcrumb.php'; 
@@ -19,7 +19,7 @@
             <i class="fas fa-sliders-h text-primary me-2"></i>
             Preferințe Notificări
         </h1>
-        <a href="<?= ROUTE_BASE ?>notifications/alerts" class="btn btn-outline-secondary">
+        <a href="<?= ROUTE_BASE ?>notifications" class="btn btn-outline-secondary">
             <i class="fas fa-arrow-left me-2"></i>Înapoi la Notificări
         </a>
     </div>
@@ -342,7 +342,7 @@
                             <i class="fas fa-undo me-2"></i>Resetare Implicite
                         </button>
                     </div>
-                    <a href="<?= ROUTE_BASE ?>notifications/alerts" class="btn btn-outline-secondary">
+                    <a href="<?= ROUTE_BASE ?>notifications" class="btn btn-outline-secondary">
                         Anulare
                     </a>
                 </div>
