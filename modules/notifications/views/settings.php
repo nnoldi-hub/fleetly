@@ -18,11 +18,30 @@ $priorities = [
 ?>
 <div class="container-fluid py-4">
   <?php include 'includes/breadcrumb.php'; ?>
+  
+  <!-- Info Box pentru Superadmin -->
+  <div class="alert alert-warning border-warning mb-4">
+    <div class="d-flex align-items-center">
+      <i class="fas fa-user-shield fa-3x me-3 text-warning"></i>
+      <div>
+        <h5 class="alert-heading mb-1">
+          <i class="fas fa-crown me-2"></i>Setări Globale - Doar Superadmin
+        </h5>
+        <p class="mb-0">
+          <strong>Această pagină este destinată DOAR superadminului</strong> pentru configurarea sistemului global de notificări (SMTP, SMS provider, categorii active).<br>
+          <strong>Utilizatorii normali</strong> folosesc <a href="<?php echo ROUTE_BASE; ?>notifications/preferences" class="alert-link"><i class="fas fa-user-cog"></i> Preferințe Personale</a> pentru a-și configura unde primesc notificările (email, telefon, tipuri dorite).
+        </p>
+      </div>
+    </div>
+  </div>
+  
   <div class="row g-4">
     <div class="col-12 col-lg-9">
       <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h5 class="mb-0">Setări notificări</h5>
+        <div class="card-header d-flex justify-content-between align-items-center bg-warning text-dark">
+          <h5 class="mb-0">
+            <i class="fas fa-cog me-2"></i>Configurare Sistem Notificări
+          </h5>
         </div>
         <div class="card-body">
           <?php if (!empty($_SESSION['success'])): ?>

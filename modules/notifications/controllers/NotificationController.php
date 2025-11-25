@@ -792,27 +792,6 @@ class NotificationController extends Controller {
             $prefsModel = new NotificationPreference();
             $prefs = $prefsModel->getOrDefault($userId, $companyId);
             
-            // Timezones suportate
-            $timezones = [
-                'Europe/Bucharest' => 'București (GMT+2/+3)',
-                'Europe/London' => 'Londra (GMT+0/+1)',
-                'Europe/Paris' => 'Paris (GMT+1/+2)',
-                'America/New_York' => 'New York (GMT-5/-4)',
-                'America/Los_Angeles' => 'Los Angeles (GMT-8/-7)',
-                'Asia/Dubai' => 'Dubai (GMT+4)',
-                'Asia/Tokyo' => 'Tokyo (GMT+9)'
-            ];
-            
-            // Notification types disponibile
-            $notificationTypes = [
-                'document_expiry' => ['label' => 'Expirare Documente', 'icon' => 'fa-file-alt'],
-                'insurance_expiry' => ['label' => 'Expirare Asigurări', 'icon' => 'fa-shield-alt'],
-                'maintenance_due' => ['label' => 'Mentenanță Scadentă', 'icon' => 'fa-wrench'],
-                'system_alert' => ['label' => 'Alerte Sistem', 'icon' => 'fa-exclamation-triangle'],
-                'fuel_expense' => ['label' => 'Cheltuieli Combustibil', 'icon' => 'fa-gas-pump'],
-                'driver_license' => ['label' => 'Permise Conducere', 'icon' => 'fa-id-card']
-            ];
-            
             // Decode enabled_types JSON
             $enabledTypes = [];
             if (!empty($prefs['enabled_types'])) {
@@ -829,13 +808,14 @@ class NotificationController extends Controller {
                 }
             }
             
-            $this->render('preferences', [
-                'prefs' => $prefs,
-                'enabledTypes' => $enabledTypes,
-                'quietHours' => $quietHours,
-                'timezones' => $timezones,
-                'notificationTypes' => $notificationTypes,
-                'pageTitle' => 'Preferințe Notificări'
+            // VIEW SIMPLIFICAT pentru utilizatori normali (fără SMTP/SMS config)
+            $this->render('preferences_simple', [
+                'prefs' => array_merge($prefs, [
+                    'enabled_types' => $enabledTypes,
+                    'quiet_hours' => $quietHours
+                ]),
+                'currentUser' => $currentUser,
+                'pageTitle' => 'Preferințele Mele'
             ]);
             
         } catch (Throwable $e) {
@@ -865,36 +845,54 @@ class NotificationController extends Controller {
                 throw new Exception('User ID invalid');
             }
             
-            // Collect form data
+            // SIMPLIFICAT: Colectăm doar email, phone, enabled_types și quiet_hours
+            // Notificările in-app sunt MEREU active
+            // Email/SMS se activează automat dacă sunt completate
             $data = [
-                'in_app_enabled' => isset($_POST['in_app_enabled']) ? 1 : 0,
-                'email_enabled' => isset($_POST['email_enabled']) ? 1 : 0,
-                'sms_enabled' => isset($_POST['sms_enabled']) ? 1 : 0,
-                'push_enabled' => isset($_POST['push_enabled']) ? 1 : 0,
+                'in_app_enabled' => 1, // MEREU activ
                 'enabled_types' => $_POST['enabled_types'] ?? [],
-                'min_priority' => $_POST['min_priority'] ?? 'low',
-                'frequency' => $_POST['frequency'] ?? 'immediate',
-                'days_before_expiry' => (int)($_POST['days_before_expiry'] ?? 30),
-                'timezone' => $_POST['timezone'] ?? 'Europe/Bucharest',
                 'quiet_hours' => $_POST['quiet_hours'] ?? ['start' => '22:00', 'end' => '08:00']
             ];
             
-            // Email/phone overrides (optional)
-            if (!empty($_POST['email'])) {
-                $data['email'] = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ?: null;
+            // Email (validare și activare automată)
+            $email = trim($_POST['email'] ?? '');
+            if (!empty($email)) {
+                $validEmail = filter_var($email, FILTER_VALIDATE_EMAIL);
+                if (!$validEmail) {
+                    throw new Exception('Adresa de email nu este validă');
+                }
+                $data['email'] = $validEmail;
+                $data['email_enabled'] = 1; // Activează automat dacă e completat
+            } else {
+                $data['email'] = $currentUser->email ?? null;
+                $data['email_enabled'] = !empty($currentUser->email) ? 1 : 0;
             }
-            if (!empty($_POST['phone'])) {
-                $data['phone'] = preg_replace('/[^0-9+]/', '', $_POST['phone']);
+            
+            // Telefon (validare și activare automată)
+            $phone = trim($_POST['phone'] ?? '');
+            if (!empty($phone)) {
+                $cleanPhone = preg_replace('/[^0-9+]/', '', $phone);
+                if (strlen($cleanPhone) < 10) {
+                    throw new Exception('Numărul de telefon nu este valid');
+                }
+                $data['phone'] = $cleanPhone;
+                $data['sms_enabled'] = 1; // Activează automat dacă e completat
+            } else {
+                $data['phone'] = null;
+                $data['sms_enabled'] = 0;
             }
             
             // Validation
-            if ($data['days_before_expiry'] < 7 || $data['days_before_expiry'] > 90) {
-                throw new Exception('Zile înainte de expirare trebuie să fie între 7 și 90');
+            if (empty($data['enabled_types']) || !is_array($data['enabled_types'])) {
+                throw new Exception('Selectează cel puțin un tip de notificare!');
             }
             
-            if (empty($data['enabled_types']) || !is_array($data['enabled_types'])) {
-                throw new Exception('Selectați cel puțin un tip de notificare');
-            }
+            // Setări default pentru preferințe avansate (controlate de admin)
+            $data['min_priority'] = 'low';
+            $data['frequency'] = 'immediate';
+            $data['days_before_expiry'] = 30;
+            $data['timezone'] = 'Europe/Bucharest';
+            $data['push_enabled'] = 0;
             
             // Save to database
             $prefsModel = new NotificationPreference();
@@ -905,16 +903,12 @@ class NotificationController extends Controller {
                 NotificationLog::log('preferences_update', 'success', [
                     'user_id' => $userId,
                     'company_id' => $companyId,
-                    'channels' => array_filter([
-                        $data['email_enabled'] ? 'email' : null,
-                        $data['sms_enabled'] ? 'sms' : null,
-                        $data['push_enabled'] ? 'push' : null,
-                        $data['in_app_enabled'] ? 'in_app' : null
-                    ]),
-                    'frequency' => $data['frequency']
+                    'email' => !empty($data['email']) ? 'set' : 'empty',
+                    'phone' => !empty($data['phone']) ? 'set' : 'empty',
+                    'enabled_types_count' => count($data['enabled_types'])
                 ]);
                 
-                $_SESSION['success_message'] = 'Preferințele au fost salvate cu succes!';
+                $_SESSION['success_message'] = 'Preferințele tale au fost salvate cu succes!';
             } else {
                 throw new Exception('Eroare la salvarea preferințelor');
             }
