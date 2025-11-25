@@ -284,29 +284,24 @@ $configBase = rtrim(parse_url(BASE_URL, PHP_URL_PATH) ?? '', '/'); // ex: /fleet
 
 
 $path = $requestUri;
-// 1) încearcă cu baza calculată din SCRIPT_NAME
-if (!empty($calcBase) && $calcBase !== '/' && strpos($requestUri, $calcBase) === 0) {
-    $path = substr($requestUri, strlen($calcBase));
-}
-// 2) dacă nu s-a decupat, încearcă cu baza din BASE_URL
-elseif (!empty($configBase) && $configBase !== '/' && strpos($requestUri, $configBase) === 0) {
-    $path = substr($requestUri, strlen($configBase));
-}
 
-// 3) elimină prefixul /index.php dacă este prezent (mod_rewrite dezactivat)
-if (strpos($path, '/index.php') === 0) {
-    $path = substr($path, strlen('/index.php'));
-}
+// Special case: dacă URL conține /index.php/ oriunde, extragem direct calea după el
+if (strpos($requestUri, '/index.php/') !== false) {
+    // Extract path after /index.php/
+    $path = preg_replace('#^.*?/index\.php(/.*?)(\?.*)?$#', '$1', $requestUri);
+} else {
+    // 1) încearcă cu baza calculată din SCRIPT_NAME
+    if (!empty($calcBase) && $calcBase !== '/' && strpos($requestUri, $calcBase) === 0) {
+        $path = substr($requestUri, strlen($calcBase));
+    }
+    // 2) dacă nu s-a decupat, încearcă cu baza din BASE_URL
+    elseif (!empty($configBase) && $configBase !== '/' && strpos($requestUri, $configBase) === 0) {
+        $path = substr($requestUri, strlen($configBase));
+    }
 
-// Patch: acceptă și varianta /index.php/drivers/edit?id=XX când path rămâne gol după decupare
-if ($path === '' || $path === '/') {
-    // Dacă REQUEST_URI conține index.php/drivers/edit dar path a fost golit
-    $raw = $_SERVER['REQUEST_URI'] ?? '';
-    if (preg_match('#/index\.php/(drivers|vehicles|users|maintenance|fuel|documents)/#', $raw)) {
-        $parts = parse_url($raw, PHP_URL_PATH);
-        // Elimină orice prefix până la /index.php/
-        $parts = preg_replace('#^.*?/index\.php/#','/', $parts);
-        if ($parts) { $path = rtrim($parts,'/'); if ($path[0] !== '/') $path = '/'.$path; }
+    // 3) elimină prefixul /index.php dacă este prezent (mod_rewrite dezactivat)
+    if (strpos($path, '/index.php') === 0) {
+        $path = substr($path, strlen('/index.php'));
     }
 }
 
