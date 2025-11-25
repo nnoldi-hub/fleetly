@@ -1,8 +1,6 @@
 <?php
 // modules/service/views/parts/form.php
 $isEdit = isset($part) && $part !== null;
-$pageTitle = $isEdit ? 'Editeaza Piesa' : 'Adauga Piesa';
-ob_start();
 ?>
 
 <div class="container-fluid py-4">
@@ -232,10 +230,3 @@ ob_start();
         </div>
     </div>
 </div>
-
-<?php
-$content = ob_get_clean();
-include __DIR__ . '/../../../../includes/header.php';
-echo $content;
-include __DIR__ . '/../../../../includes/footer.php';
-?>

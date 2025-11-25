@@ -1,7 +1,5 @@
 <?php
 // modules/service/views/parts/view.php
-$pageTitle = 'Detalii Piesa - ' . $part['name'];
-ob_start();
 ?>
 
 <div class="container-fluid py-4">
@@ -339,10 +337,3 @@ ob_start();
         </div>
     </div>
 </div>
-
-<?php
-$content = ob_get_clean();
-include __DIR__ . '/../../../../includes/header.php';
-echo $content;
-include __DIR__ . '/../../../../includes/footer.php';
-?>

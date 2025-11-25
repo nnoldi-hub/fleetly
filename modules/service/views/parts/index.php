@@ -1,7 +1,5 @@
 <?php
 // modules/service/views/parts/index.php
-$pageTitle = 'Gestiune Piese - Atelier';
-ob_start();
 ?>
 
 <div class="container-fluid py-4">
@@ -284,10 +282,3 @@ function showStockModal(partId, partName) {
     new bootstrap.Modal(document.getElementById('stockModal')).show();
 }
 </script>
-
-<?php
-$content = ob_get_clean();
-include __DIR__ . '/../../../../includes/header.php';
-echo $content;
-include __DIR__ . '/../../../../includes/footer.php';
-?>
