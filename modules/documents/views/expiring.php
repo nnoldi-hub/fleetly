@@ -65,32 +65,33 @@ $documentTypes = [
 ];
 ?>
 
-<div class="main-content">
-    <div class="container-fluid">
-        <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="<?= BASE_URL ?>">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="<?= BASE_URL ?>modules/documents/">Documente</a></li>
-                <li class="breadcrumb-item active">În Expirare</li>
-            </ol>
-        </nav>
+<div class="container-fluid px-0">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="<?= BASE_URL ?>"><i class="fas fa-home"></i> Acasă</a></li>
+            <li class="breadcrumb-item"><a href="<?= BASE_URL ?>modules/documents/">Documente</a></li>
+            <li class="breadcrumb-item active">În Expirare</li>
+        </ol>
+    </nav>
 
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3 mb-0">
-                <i class="fas fa-exclamation-triangle text-warning me-2"></i>
-                Documente în Expirare
-            </h1>
-            <div class="btn-group">
-                <a href="<?= BASE_URL ?>modules/documents/views/add.php" class="btn btn-primary">
+    <!-- Header -->
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">
+            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+            Documente în Expirare
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <a href="<?= BASE_URL ?>modules/documents/views/add.php" class="btn btn-sm btn-primary">
                     <i class="fas fa-plus me-1"></i> Adaugă Document
                 </a>
-                <a href="<?= BASE_URL ?>modules/documents/" class="btn btn-outline-secondary">
+                <a href="<?= BASE_URL ?>modules/documents/" class="btn btn-sm btn-outline-secondary">
                     <i class="fas fa-list me-1"></i> Toate Documentele
                 </a>
             </div>
         </div>
+    </div>
 
         <!-- Statistici Rapide -->
         <div class="row mb-4">
@@ -590,3 +591,5 @@ const printStyles = `
 `;
 document.head.insertAdjacentHTML('beforeend', printStyles);
 </script>
+    </div>
+</div>
