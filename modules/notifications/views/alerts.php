@@ -1,6 +1,18 @@
 <?php
 // View curățat: layout (header/footer, sesiune, config) este gestionat de Controller::render.
 // Presupunem că $notifications, $unreadCount, $stats, $filters sunt furnizate în $data.
+
+// Helper local (dacă nu există global). Ideal mutat într-un utilitar comun.
+if (!function_exists('timeAgo')) {
+    function timeAgo($datetime) {
+        $time = time() - strtotime($datetime);
+        if ($time < 60) return 'acum ' . $time . ' secunde';
+        if ($time < 3600) return 'acum ' . floor($time/60) . ' minute';
+        if ($time < 86400) return 'acum ' . floor($time/3600) . ' ore';
+        if ($time < 2592000) return 'acum ' . floor($time/86400) . ' zile';
+        return date('d.m.Y H:i', strtotime($datetime));
+    }
+}
 ?>
         <div class="container-fluid px-0">
             <?php 
@@ -307,17 +319,3 @@
         </div>
 
 <?php // Removed explicit notifications-alerts.js include; footer now auto-injects based on URL ?>
-
-<?php
-// Helper local (dacă nu există global). Ideal mutat într-un utilitar comun.
-if (!function_exists('timeAgo')) {
-    function timeAgo($datetime) {
-        $time = time() - strtotime($datetime);
-        if ($time < 60) return 'acum ' . $time . ' secunde';
-        if ($time < 3600) return 'acum ' . floor($time/60) . ' minute';
-        if ($time < 86400) return 'acum ' . floor($time/3600) . ' ore';
-        if ($time < 2592000) return 'acum ' . floor($time/86400) . ' zile';
-        return date('d.m.Y H:i', strtotime($datetime));
-    }
-}
-?>
