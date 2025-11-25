@@ -3,15 +3,16 @@
 ## Problema
 Paginile de rapoarte (ex: `/reports/fleet`) returnează eroarea 404 cu mesajul "Pagina nu a fost găsită" și în log apare eroarea SQL:
 ```
-SQLSTATE[42S02]: Base table or view not found: 1146 Table 'wclsgzyf_fleetly.vehicles' doesn't exist
+SQLSTATE[42S02]: Base table or view not found: 1146 Table 'wclsgzyf_fm_tenant_1.vehicles' doesn't exist
 ```
+(Sistemul încerca să acceseze tabela `vehicles` care trebuie să fie în baza TENANT, nu în CORE)
 
 ## Cauza
 Sistemul nu reușea să acceseze baza de date tenant corectă din cauza a două probleme:
 
 1. **Router-ul nu procesa corect URL-urile cu `/index.php/`**: Când mod_rewrite nu este activ sau configurația Apache nu este optimizată, URL-urile conțin `/index.php/reports/fleet` iar router-ul nu extragea corect path-ul.
 
-2. **Numele bazei de date tenant nu era configurat explicit**: Sistemul genera automat numele bazei tenant ca `{prefix}fm_tenant_{id}` (ex: `wclsgzyf_fm_tenant_1`), dar pe server baza de date se numește `wclsgzyf_fleetly`.
+2. **Numele bazei de date tenant nu era configurat explicit**: Sistemul genera automat numele bazei tenant ca `{prefix}fm_tenant_{id}` (ex: `wclsgzyf_fm_tenant_1`), dar câmpul `database_name` din tabela `companies` era NULL sau incorect.
 
 ## Soluție Implementată
 
@@ -34,20 +35,22 @@ git pull origin main
 ```
 
 ### 2. Actualizează tabela companies în baza core
-Conectează-te la baza de date core (ex: `wclsgzyf_core` sau `fleet_management_core`) și rulează:
+Conectează-te la baza de date **CORE** (cea care conține tabela `companies` - ex: `wclsgzyf_fleetly` pentru Hostico sau `fleet_management_core` pentru local) și rulează:
 
 ```sql
 -- Verifică numele companiei și ID-ul
 SELECT id, name, database_name FROM companies;
 
--- Setează database_name explicit pentru compania ta
-UPDATE companies SET database_name = 'wclsgzyf_fleetly' WHERE id = 1;
+-- Setează database_name explicit pentru compania ta (numele bazei TENANT, nu CORE!)
+UPDATE companies SET database_name = 'wclsgzyf_fm_tenant_1' WHERE id = 1;
 
 -- Verifică actualizarea
 SELECT id, name, database_name FROM companies;
 ```
 
-**Notă importantă:** Înlocuiește `wclsgzyf_fleetly` cu numele real al bazei de date tenant de pe serverul tău.
+**Notă importantă:** 
+- Conectează-te la baza **CORE** (ex: `wclsgzyf_fleetly`) care conține tabela `companies`
+- Setează `database_name` la numele bazei **TENANT** (ex: `wclsgzyf_fm_tenant_1`) care conține datele flotei (vehicles, documents, etc.)
 
 ### 3. Verifică configurația database.override.php
 Asigură-te că fișierul `config/database.override.php` pe server conține:
@@ -56,11 +59,11 @@ Asigură-te că fișierul `config/database.override.php` pe server conține:
 <?php
 return [
     'host'             => 'localhost',
-    'db'               => 'wclsgzyf_core',           // baza centrală (core)
+    'db'               => 'wclsgzyf_fleetly',        // baza centrală (CORE) - conține companies, users, roles
     'user'             => 'wclsgzyf_username',       // utilizator cPanel
     'pass'             => 'your_password_here',      // parola din cPanel
-    'tenancy_mode'     => 'multi',                   // multi-tenant
-    'tenant_db_prefix' => 'wclsgzyf_'                // prefix cPanel
+    'tenancy_mode'     => 'multi',                   // multi-tenant activat
+    'tenant_db_prefix' => 'wclsgzyf_'                // prefix cPanel pentru baze tenant
 ];
 ```
 
