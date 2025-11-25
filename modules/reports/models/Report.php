@@ -297,7 +297,7 @@ class Report extends Model {
     // Metode helper pentru calcule și statistici
     private function getFleetSummary($dateFrom, $dateTo, $vehicleId = '') {
         $vehicleFilter = '';
-        $params = [$dateFrom, $dateTo];
+        $params = [];
         
         if (!empty($vehicleId)) {
             $vehicleFilter = 'AND v.id = ?';
@@ -310,17 +310,17 @@ class Report extends Model {
                         COALESCE(SUM(f.liters), 0) as total_fuel_liters,
                         COALESCE(SUM(f.total_cost), 0) as total_fuel_cost,
                         COALESCE(SUM(m.cost), 0) as total_maintenance_cost,
-                        COALESCE(SUM(i.annual_premium), 0) as total_insurance_cost,
+                        COALESCE(SUM(i.premium_amount), 0) as total_insurance_cost,
                         AVG(f.cost_per_liter) as avg_fuel_price
                     FROM vehicles v
                     LEFT JOIN fuel_consumption f ON v.id = f.vehicle_id AND f.fuel_date BETWEEN ? AND ?
                     LEFT JOIN maintenance m ON v.id = m.vehicle_id AND m.service_date BETWEEN ? AND ?
-                    LEFT JOIN insurance i ON v.id = i.vehicle_id AND i.start_date <= ? AND i.end_date >= ?
+                    LEFT JOIN insurance i ON v.id = i.vehicle_id AND i.start_date <= ? AND i.expiry_date >= ?
                     WHERE v.status = 'active' {$vehicleFilter}";
 
-            $params = array_merge($params, [$dateFrom, $dateTo], [$dateFrom, $dateTo]);
-            if (!empty($vehicleId)) { $params[] = $vehicleId; }
-            return $this->db->fetch($sql, $params);
+            $queryParams = [$dateFrom, $dateTo, $dateFrom, $dateTo, $dateFrom, $dateTo];
+            if (!empty($vehicleId)) { $queryParams[] = $vehicleId; }
+            return $this->db->fetchOn('vehicles', $sql, $queryParams);
         } else {
             // Fallback without insurance table
             $sql = "SELECT 
@@ -335,9 +335,9 @@ class Report extends Model {
                     LEFT JOIN maintenance m ON v.id = m.vehicle_id AND m.service_date BETWEEN ? AND ?
                     WHERE v.status = 'active' {$vehicleFilter}";
 
-            $params = array_merge([$dateFrom, $dateTo], [$dateFrom, $dateTo]);
-            if (!empty($vehicleId)) { $params[] = $vehicleId; }
-            return $this->db->fetch($sql, $params);
+            $queryParams = [$dateFrom, $dateTo, $dateFrom, $dateTo];
+            if (!empty($vehicleId)) { $queryParams[] = $vehicleId; }
+            return $this->db->fetchOn('vehicles', $sql, $queryParams);
         }
     }
     
@@ -399,7 +399,7 @@ class Report extends Model {
                     ORDER BY v.registration_number";
         }
         
-        $vehicles = $this->db->fetchAll($sql, $params);
+        $vehicles = $this->db->fetchAllOn('vehicles', $sql, $params);
         
         // Calculăm consumul mediu pentru fiecare vehicul
         foreach ($vehicles as &$vehicle) {
@@ -448,7 +448,7 @@ class Report extends Model {
                                     AND f.mileage > 0
                                 ORDER BY f.fuel_date";
         
-        $result = $this->db->fetch($sql, [$vehicleId, $dateFrom, $dateTo]);
+        $result = $this->db->fetchOn('fuel_consumption', $sql, [$vehicleId, $dateFrom, $dateTo]);
         
         if ($result && $result['distance_traveled'] > 0) {
             return round(($result['total_liters'] / $result['distance_traveled']) * 100, 2);
@@ -467,7 +467,7 @@ class Report extends Model {
                 ORDER BY fuel_date DESC 
                 LIMIT 1";
         
-        $prevRecord = $this->db->fetch($sql, [$vehicleId, $currentDate]);
+        $prevRecord = $this->db->fetchOn('fuel_consumption', $sql, [$vehicleId, $currentDate]);
         
         if ($prevRecord && $currentOdometer > $prevRecord['mileage']) {
             $distance = $currentOdometer - $prevRecord['mileage'];
@@ -494,7 +494,7 @@ class Report extends Model {
         LEFT JOIN vehicle_types vt ON v.vehicle_type_id = vt.id
         WHERE v.id = ?";
         
-    return $this->db->fetch($sql, [$vehicleId]);
+    return $this->db->fetchOn('vehicles', $sql, [$vehicleId]);
     }
     
     private function getVehicleFuelData($vehicleId, $dateFrom, $dateTo) {
@@ -506,7 +506,7 @@ class Report extends Model {
                                     AND f.fuel_date BETWEEN ? AND ?
                                 ORDER BY f.fuel_date";
         
-        $records = $this->db->fetchAll($sql, [$vehicleId, $dateFrom, $dateTo]);
+        $records = $this->db->fetchAllOn('fuel_consumption', $sql, [$vehicleId, $dateFrom, $dateTo]);
         
         // Calculăm consumul pentru fiecare înregistrare
         foreach ($records as &$record) {
@@ -536,7 +536,7 @@ class Report extends Model {
                                     AND m.service_date BETWEEN ? AND ?
                                 ORDER BY m.service_date DESC";
         
-                return $this->db->fetchAll($sql, [$vehicleId, $dateFrom, $dateTo]);
+                return $this->db->fetchAllOn('maintenance', $sql, [$vehicleId, $dateFrom, $dateTo]);
     }
     
         private function getVehicleInsuranceData($vehicleId, $dateFrom, $dateTo) {
@@ -547,7 +547,7 @@ class Report extends Model {
                                     AND (i.start_date BETWEEN ? AND ? OR i.end_date BETWEEN ? AND ?)
                                 ORDER BY i.start_date DESC";
         
-                return $this->db->fetchAll($sql, [$vehicleId, $dateFrom, $dateTo, $dateFrom, $dateTo]);
+                return $this->db->fetchAllOn('insurance', $sql, [$vehicleId, $dateFrom, $dateTo, $dateFrom, $dateTo]);
     }
     
     private function getVehicleTimeline($vehicleId, $dateFrom, $dateTo) {
@@ -560,7 +560,7 @@ class Report extends Model {
                 FROM fuel_consumption
                 WHERE vehicle_id = ? AND fuel_date BETWEEN ? AND ?";
         
-        $fuelRecords = $this->db->fetchAll($sql, [$vehicleId, $dateFrom, $dateTo]);
+        $fuelRecords = $this->db->fetchAllOn('fuel_consumption', $sql, [$vehicleId, $dateFrom, $dateTo]);
         $timeline = array_merge($timeline, $fuelRecords);
         
         // Maintenance records
@@ -570,7 +570,7 @@ class Report extends Model {
                 FROM maintenance
         WHERE vehicle_id = ? AND service_date BETWEEN ? AND ?";
         
-        $maintenanceRecords = $this->db->fetchAll($sql, [$vehicleId, $dateFrom, $dateTo]);
+        $maintenanceRecords = $this->db->fetchAllOn('maintenance', $sql, [$vehicleId, $dateFrom, $dateTo]);
         $timeline = array_merge($timeline, $maintenanceRecords);
         
         // Insurance records
@@ -580,7 +580,7 @@ class Report extends Model {
                 FROM insurance
                 WHERE vehicle_id = ? AND start_date BETWEEN ? AND ?";
         
-        $insuranceRecords = $this->db->fetchAll($sql, [$vehicleId, $dateFrom, $dateTo]);
+        $insuranceRecords = $this->db->fetchAllOn('insurance', $sql, [$vehicleId, $dateFrom, $dateTo]);
         $timeline = array_merge($timeline, $insuranceRecords);
         
         // Sortăm cronologic
@@ -602,7 +602,7 @@ class Report extends Model {
                     LEFT JOIN maintenance m ON v.id = m.vehicle_id AND m.service_date BETWEEN ? AND ?
                     LEFT JOIN insurance i ON v.id = i.vehicle_id AND i.start_date BETWEEN ? AND ?
                     WHERE v.id = ?";
-            $result = $this->db->fetch($sql, [$dateFrom, $dateTo, $dateFrom, $dateTo, $dateFrom, $dateTo, $vehicleId]);
+            $result = $this->db->fetchOn('vehicles', $sql, [$dateFrom, $dateTo, $dateFrom, $dateTo, $dateFrom, $dateTo, $vehicleId]);
         } else {
             $sql = "SELECT 
                         COALESCE(SUM(f.total_cost), 0) as fuel_cost,
@@ -612,7 +612,7 @@ class Report extends Model {
                     LEFT JOIN fuel_consumption f ON v.id = f.vehicle_id AND f.fuel_date BETWEEN ? AND ?
                     LEFT JOIN maintenance m ON v.id = m.vehicle_id AND m.service_date BETWEEN ? AND ?
                     WHERE v.id = ?";
-            $result = $this->db->fetch($sql, [$dateFrom, $dateTo, $dateFrom, $dateTo, $vehicleId]);
+            $result = $this->db->fetchOn('vehicles', $sql, [$dateFrom, $dateTo, $dateFrom, $dateTo, $vehicleId]);
         }
         
         if ($result) {
@@ -652,7 +652,7 @@ class Report extends Model {
         
         $params[] = $limit;
         
-        return $this->db->fetchAll($sql, $params);
+        return $this->db->fetchAllOn('generated_reports', $sql, $params);
     }
     
     // Metode helper pentru analiza costurilor
@@ -691,7 +691,7 @@ class Report extends Model {
                     FROM fuel_consumption
                     WHERE fuel_date BETWEEN ? AND ?{$vehicleFilter}
                     GROUP BY period";
-            foreach ($this->db->fetchAll($sql, $paramsFuel) as $row) {
+            foreach ($this->db->fetchAllOn('fuel_consumption', $sql, $paramsFuel) as $row) {
                 if (isset($periods[$row['period']])) {
                     $periods[$row['period']]['fuel_cost'] = (float)$row['amount'];
                 }
@@ -704,7 +704,7 @@ class Report extends Model {
                     FROM maintenance
             WHERE service_date BETWEEN ? AND ?{$vehicleFilter}
                     GROUP BY period";
-            foreach ($this->db->fetchAll($sql, $paramsMaint) as $row) {
+            foreach ($this->db->fetchAllOn('maintenance', $sql, $paramsMaint) as $row) {
                 if (isset($periods[$row['period']])) {
                     $periods[$row['period']]['maintenance_cost'] = (float)$row['amount'];
                 }
@@ -720,7 +720,7 @@ class Report extends Model {
                 $sql = "SELECT vehicle_id, start_date, end_date, annual_premium
                         FROM insurance
                         WHERE start_date <= ? AND end_date >= ?{$vehCond}";
-                $rows = $this->db->fetchAll($sql, $paramsIns);
+                $rows = $this->db->fetchAllOn('insurance', $sql, $paramsIns);
                 foreach ($rows as $r) {
                     $s = new DateTime(max($r['start_date'], $dateFrom));
                     $e = new DateTime(min($r['end_date'], $dateTo));
