@@ -1,8 +1,7 @@
 <?php
 // modules/documents/views/expiring.php
+// View-ul este randat de Controller::render, deci NU includem header/footer aici
 $pageTitle = "Documente în Expirare";
-require_once ROOT_PATH . '/includes/header.php';
-require_once ROOT_PATH . '/includes/sidebar.php';
 
 // Obținem parametrii de filtrare
 $days = $_GET['days'] ?? 30;
@@ -591,5 +590,3 @@ const printStyles = `
 `;
 document.head.insertAdjacentHTML('beforeend', printStyles);
 </script>
-
-<?php require_once ROOT_PATH . '/includes/footer.php'; ?>
