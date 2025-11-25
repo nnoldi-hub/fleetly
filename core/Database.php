@@ -48,6 +48,21 @@ class Database {
 
     // ---------- Multi-tenant helpers ----------
     public function setTenantDatabaseByCompanyId($companyId) {
+        // First try to get the explicit database_name from companies table
+        try {
+            $stmt = $this->core->prepare("SELECT database_name FROM companies WHERE id = ? LIMIT 1");
+            $stmt->execute([(int)$companyId]);
+            $company = $stmt->fetch();
+            
+            if ($company && !empty($company['database_name'])) {
+                // Use the explicitly configured database name
+                return $this->setTenantDatabase($company['database_name']);
+            }
+        } catch (Throwable $e) {
+            error_log('[Database] Failed to fetch company database_name: ' . $e->getMessage());
+        }
+        
+        // Fallback: generate name using prefix pattern
         $prefix = method_exists('DatabaseConfig', 'getTenantDbPrefix') ? DatabaseConfig::getTenantDbPrefix() : '';
         $dbName = $prefix . 'fm_tenant_' . (int)$companyId;
         return $this->setTenantDatabase($dbName);
