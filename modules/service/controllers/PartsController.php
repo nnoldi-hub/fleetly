@@ -9,7 +9,18 @@ class PartsController extends Controller {
     
     public function __construct() {
         parent::__construct();
-        $this->checkAuth();
+        Auth::getInstance()->requireAuth();
+        
+        // Ensure tenant database selected
+        try {
+            $companyId = Auth::getInstance()->effectiveCompanyId();
+            if ($companyId) {
+                Database::getInstance()->setTenantDatabaseByCompanyId($companyId);
+            }
+        } catch (Throwable $e) {
+            // Fallback silently
+        }
+        
         $this->partModel = new Part();
     }
     
