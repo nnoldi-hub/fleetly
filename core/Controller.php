@@ -28,18 +28,30 @@ abstract class Controller {
     }
     
     protected function render($view, $data = []) {
-        // Curăță orice output buffer anterior
-        if (ob_get_level()) {
-            ob_clean();
+        // Curăță orice output buffer anterior DOAR dacă nu e JSON/AJAX
+        // Nu curățăm dacă avem debug logs importante
+        $isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') ||
+                  isset($_GET['ajax']) || isset($_POST['ajax']);
+        
+        if (ob_get_level() && !$isAjax && !isset($_GET['debug_render'])) {
+            // Only clean if buffer is not empty and not debugging
+            $bufferContent = ob_get_contents();
+            if (trim($bufferContent) === '') {
+                ob_clean();
+            }
         }
         
         extract($data);
         $viewFile = "modules/" . $this->getModuleName() . "/views/$view.php";
         
         if (file_exists($viewFile)) {
+            error_log("[Controller::render] Including header...");
             include 'includes/header.php';
+            error_log("[Controller::render] Including view: $viewFile");
             include $viewFile;
+            error_log("[Controller::render] Including footer...");
             include 'includes/footer.php';
+            error_log("[Controller::render] Render complete");
         } else {
             $this->error404("View not found: $viewFile");
         }

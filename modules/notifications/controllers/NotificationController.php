@@ -145,6 +145,20 @@ class NotificationController extends Controller {
         error_log("[NotificationController::alerts] Data prepared in " . round($elapsed, 3) . "s");
         error_log("[NotificationController::alerts] Calling render...");
         
+        // DEBUG: Test if render is the problem
+        if (isset($_GET['debug_render'])) {
+            error_log("[NotificationController::alerts] DEBUG MODE - bypassing full render");
+            echo "<h1>DEBUG: Render Bypass</h1>";
+            echo "<pre>";
+            echo "Notifications count: " . count($notifications) . "\n";
+            echo "Unread count: $unreadCount\n";
+            echo "Stats: " . print_r($stats, true) . "\n";
+            echo "Elapsed: " . round($elapsed, 3) . "s\n";
+            echo "</pre>";
+            echo "<p>If you see this, the problem is in header.php or footer.php includes.</p>";
+            exit;
+        }
+        
         // Folosim sistemul de layout standard
         $this->render('alerts', $data);
         
