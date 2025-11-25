@@ -264,6 +264,17 @@ $router->addRoute('POST', '/service/mechanics/edit', 'MechanicController', 'edit
 $router->addRoute('GET', '/service/mechanics/view', 'MechanicController', 'view');
 $router->addRoute('GET', '/service/mechanics/delete', 'MechanicController', 'delete');
 
+// Rute Piese (Parts Inventory)
+$router->addRoute('GET', '/service/parts', 'PartsController', 'index');
+$router->addRoute('GET', '/service/parts/add', 'PartsController', 'add');
+$router->addRoute('POST', '/service/parts/add', 'PartsController', 'add');
+$router->addRoute('GET', '/service/parts/view', 'PartsController', 'view');
+$router->addRoute('GET', '/service/parts/edit', 'PartsController', 'edit');
+$router->addRoute('POST', '/service/parts/edit', 'PartsController', 'edit');
+$router->addRoute('POST', '/service/parts/delete', 'PartsController', 'delete');
+$router->addRoute('POST', '/service/parts/adjustStock', 'PartsController', 'adjustStock');
+$router->addRoute('GET', '/api/parts', 'PartsController', 'apiGetParts');
+
 // Rute Rapoarte Service
 $router->addRoute('GET', '/service/reports', 'ServiceReportController', 'index');
 $router->addRoute('GET', '/service/reports/profitability', 'ServiceReportController', 'profitability');
