@@ -3,7 +3,7 @@
 // Marchează o notificare ca citită
 function markAsRead(notificationId) {
     const baseUrl = document.querySelector('meta[name="base-url"]')?.content || '';
-    fetch(baseUrl + '/modules/notifications/index.php?action=markAsRead', {
+    fetch(baseUrl + 'notifications/mark-read', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -45,7 +45,7 @@ function markAllAsRead(e) {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesare...';
     
     const baseUrl = document.querySelector('meta[name="base-url"]')?.content || '';
-    const url = baseUrl + '/modules/notifications/index.php?action=mark-all-read';
+    const url = baseUrl + 'notifications/mark-all-read';
     console.log('Fetching URL:', url);
     
     fetch(url, {
@@ -81,7 +81,7 @@ function dismissNotification(notificationId) {
     }
     
     const baseUrl = document.querySelector('meta[name="base-url"]')?.content || '';
-    fetch(baseUrl + '/modules/notifications/index.php?action=dismiss', {
+    fetch(baseUrl + 'notifications/dismiss', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -109,7 +109,7 @@ function dismissNotification(notificationId) {
 // Actualizează contorul de notificări
 function updateNotificationCount() {
     const baseUrl = document.querySelector('meta[name="base-url"]')?.content || '';
-    fetch(baseUrl + '/modules/notifications/index.php?action=unread-count', {
+    fetch(baseUrl + 'notifications/unread-count', {
         method: 'GET'
     })
     .then(response => response.json())
@@ -149,7 +149,7 @@ function generateSystemNotifications(e) {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generare...';
     
     const baseUrl = document.querySelector('meta[name="base-url"]')?.content || '';
-    const url = baseUrl + '/modules/notifications/index.php?action=generate-system';
+    const url = baseUrl + 'notifications/generate-system';
     console.log('Fetching URL:', url);
     
     fetch(url, {
