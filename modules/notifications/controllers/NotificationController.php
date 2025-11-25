@@ -30,6 +30,11 @@ class NotificationController extends Controller {
     }
     
     public function alerts() {
+        // Timeout protection
+        set_time_limit(30);
+        $startTime = microtime(true);
+        error_log("[NotificationController::alerts] START");
+        
         $page = $_GET['page'] ?? 1;
         $type = $_GET['type'] ?? '';
         $priority = $_GET['priority'] ?? '';
@@ -40,6 +45,7 @@ class NotificationController extends Controller {
         // Determine user (fallback to 1 when auth/session not wired yet)
         $userId = $_SESSION['user_id'] ?? 1;
         $conditions['user_id'] = $userId;
+        error_log("[NotificationController::alerts] User ID: $userId");
         
         // Aplicăm filtrele
         if (!empty($type)) {
@@ -56,14 +62,23 @@ class NotificationController extends Controller {
         
         $offset = ($page - 1) * $per_page;
         try {
+            error_log("[NotificationController::alerts] Calling getAllWithDetails...");
             $notifications = $this->notificationModel->getAllWithDetails($conditions, $offset, $per_page);
+            error_log("[NotificationController::alerts] Got " . count($notifications) . " notifications");
+            
+            error_log("[NotificationController::alerts] Calling getTotalCount...");
             $totalRecords = $this->notificationModel->getTotalCount($conditions);
             $totalPages = ceil($totalRecords / $per_page);
+            error_log("[NotificationController::alerts] Total: $totalRecords");
             
             // Obținem statistici
+            error_log("[NotificationController::alerts] Calling getStatistics...");
             $stats = $this->notificationModel->getStatistics($userId);
+            error_log("[NotificationController::alerts] Calling getUnreadCount...");
             $unreadCount = $this->notificationModel->getUnreadCount($userId);
+            error_log("[NotificationController::alerts] Unread: $unreadCount");
         } catch (Throwable $e) {
+            error_log("[NotificationController::alerts] ERROR: " . $e->getMessage());
             // Fallback prietenos în loc de 404 când lipsesc coloane sau există probleme de schemă
             $msg = $e->getMessage();
             $needsMigration = (stripos($msg, 'Unknown column') !== false || stripos($msg, 'doesn\'t exist') !== false);
@@ -126,8 +141,14 @@ class NotificationController extends Controller {
             'pageTitle' => 'Alerte și Notificări'
         ];
         
+        $elapsed = microtime(true) - $startTime;
+        error_log("[NotificationController::alerts] Data prepared in " . round($elapsed, 3) . "s");
+        error_log("[NotificationController::alerts] Calling render...");
+        
         // Folosim sistemul de layout standard
         $this->render('alerts', $data);
+        
+        error_log("[NotificationController::alerts] Render completed");
     }
     
     public function create() {
