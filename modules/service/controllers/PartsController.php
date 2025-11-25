@@ -24,6 +24,10 @@ class PartsController extends Controller {
         $this->partModel = new Part();
     }
     
+    protected function getModuleName() {
+        return 'service';
+    }
+    
     /**
      * Display parts list
      */
@@ -39,7 +43,7 @@ class PartsController extends Controller {
         $statistics = $this->partModel->getStatistics();
         $lowStockParts = $this->partModel->getLowStockParts();
         
-        $this->renderView('service/parts/index', [
+        $this->render('parts/index', [
             'parts' => $parts,
             'categories' => $categories,
             'statistics' => $statistics,
@@ -89,10 +93,10 @@ class PartsController extends Controller {
         
         $categories = $this->partModel->getCategories();
         
-        $this->renderView('service/parts/form', [
+        $this->render('parts/form', [
             'part' => null,
             'categories' => $categories,
-            'pageTitle' => 'Adauga Piesa'
+            'pageTitle' => 'Adauga Piesa Noua'
         ]);
     }
     
@@ -139,7 +143,7 @@ class PartsController extends Controller {
         
         $categories = $this->partModel->getCategories();
         
-        $this->renderView('service/parts/form', [
+        $this->render('parts/form', [
             'part' => $part,
             'categories' => $categories,
             'pageTitle' => 'Editeaza Piesa'
@@ -179,7 +183,7 @@ class PartsController extends Controller {
         $usageHistory = $this->partModel->getPartUsageHistory($id);
         $transactions = $this->partModel->getStockTransactions($id);
         
-        $this->renderView('service/parts/view', [
+        $this->render('parts/view', [
             'part' => $part,
             'usageHistory' => $usageHistory,
             'transactions' => $transactions,
