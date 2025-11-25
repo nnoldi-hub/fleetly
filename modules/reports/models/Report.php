@@ -362,14 +362,14 @@ class Report extends Model {
                         COALESCE(SUM(f.liters), 0) as fuel_consumed,
                         COALESCE(SUM(f.total_cost), 0) as fuel_cost,
                         COALESCE(SUM(m.cost), 0) as maintenance_cost,
-                        COALESCE(SUM(i.annual_premium), 0) as insurance_cost,
+                        COALESCE(SUM(i.premium_amount), 0) as insurance_cost,
                         COUNT(DISTINCT f.id) as fuel_records_count,
                         COUNT(DISTINCT m.id) as maintenance_records_count
                     FROM vehicles v
                     LEFT JOIN vehicle_types vt ON v.vehicle_type_id = vt.id
                     LEFT JOIN fuel_consumption f ON v.id = f.vehicle_id AND f.fuel_date BETWEEN ? AND ?
                     LEFT JOIN maintenance m ON v.id = m.vehicle_id AND m.service_date BETWEEN ? AND ?
-                    LEFT JOIN insurance i ON v.id = i.vehicle_id AND i.start_date <= ? AND i.end_date >= ?
+                    LEFT JOIN insurance i ON v.id = i.vehicle_id AND i.start_date <= ? AND i.expiry_date >= ?
                     WHERE v.status = 'active' {$vehicleFilter}
                     GROUP BY v.id
                     ORDER BY v.registration_number";
@@ -544,7 +544,7 @@ class Report extends Model {
                 $sql = "SELECT i.*
                                 FROM insurance i
                                 WHERE i.vehicle_id = ? 
-                                    AND (i.start_date BETWEEN ? AND ? OR i.end_date BETWEEN ? AND ?)
+                                    AND (i.start_date BETWEEN ? AND ? OR i.expiry_date BETWEEN ? AND ?)
                                 ORDER BY i.start_date DESC";
         
                 return $this->db->fetchAllOn('insurance', $sql, [$vehicleId, $dateFrom, $dateTo, $dateFrom, $dateTo]);
@@ -717,15 +717,15 @@ class Report extends Model {
                 $paramsIns = [$dateTo, $dateFrom];
                 $vehCond = '';
                 if (!empty($vehicleId)) { $vehCond = ' AND vehicle_id = ?'; $paramsIns[] = $vehicleId; }
-                $sql = "SELECT vehicle_id, start_date, end_date, annual_premium
+                $sql = "SELECT vehicle_id, start_date, expiry_date as end_date, premium_amount
                         FROM insurance
-                        WHERE start_date <= ? AND end_date >= ?{$vehCond}";
+                        WHERE start_date <= ? AND expiry_date >= ?{$vehCond}";
                 $rows = $this->db->fetchAllOn('insurance', $sql, $paramsIns);
                 foreach ($rows as $r) {
                     $s = new DateTime(max($r['start_date'], $dateFrom));
                     $e = new DateTime(min($r['end_date'], $dateTo));
                     if ($e < $s) continue;
-                    $daily = ((float)$r['annual_premium']) / 365.0;
+                    $daily = ((float)$r['premium_amount']) / 365.0;
                     // Iterate months overlapped
                     $mc = new DateTime($s->format('Y-m-01'));
                     while ($mc <= new DateTime($e->format('Y-m-01'))) {
