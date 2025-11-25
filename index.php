@@ -21,6 +21,11 @@ if (!function_exists('fm_output_no_diacritics')) {
     function fm_output_no_diacritics($buffer) {
         // Option to bypass via query for debugging: ?keep_diacritics=1
         if (!empty($_GET['keep_diacritics'])) { return $buffer; }
+        // Skip transliteration for JSON responses (AJAX/API calls)
+        $isJson = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') ||
+                  (isset($_SERVER['CONTENT_TYPE']) && stripos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) ||
+                  isset($_GET['ajax']) || isset($_POST['ajax']);
+        if ($isJson) { return $buffer; }
         $out = fm_transliterate_ro($buffer);
         // Curăță artefactele de encodare tip "??" rezultate din text sursă deja degradat
         // Eliminăm doar dublele consecutive în contexte de text, nu semnul întrebării singular.

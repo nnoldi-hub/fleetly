@@ -6,9 +6,12 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Dacă este cerere AJAX, setăm content-type JSON (pentru a expune erorile corect)
-$isAjax = isset($_GET['ajax']) || isset($_POST['ajax']);
+// Dacă este cerere AJAX, setăm content-type JSON și eliminăm output buffering existent
+$isAjax = isset($_GET['ajax']) || isset($_POST['ajax']) || 
+          (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
 if ($isAjax) {
+    // Clean any existing output buffers to prevent transliteration filter corruption
+    while (ob_get_level() > 0) { ob_end_clean(); }
     header('Content-Type: application/json; charset=utf-8');
 }
 
