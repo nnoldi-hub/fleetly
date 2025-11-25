@@ -12,16 +12,19 @@ $filters = $filters ?? [];
 <div class="container-fluid mt-4">
     <!-- Header -->
     <div class="row mb-4">
-        <div class="col-md-8">
+        <div class="col-md-6">
             <h2><i class="fas fa-tools"></i> Dashboard Atelier</h2>
             <p class="text-muted"><?= htmlspecialchars($service['name'] ?? 'Atelier Intern') ?></p>
         </div>
-        <div class="col-md-4 text-end">
-            <a href="<?= ROUTE_BASE ?>service/workshop/add" class="btn btn-success">
+        <div class="col-md-6 text-end">
+            <a href="<?= ROUTE_BASE ?>service/workshop/add" class="btn btn-success mb-2">
                 <i class="fas fa-plus"></i> Ordine de Lucru Nouă
             </a>
-            <a href="<?= ROUTE_BASE ?>service/workshop/vehicles" class="btn btn-primary">
+            <a href="<?= ROUTE_BASE ?>service/workshop/vehicles" class="btn btn-primary mb-2">
                 <i class="fas fa-car"></i> Vehicule în Service
+            </a>
+            <a href="<?= ROUTE_BASE ?>service/parts" class="btn btn-info mb-2">
+                <i class="fas fa-boxes"></i> Gestiune Piese
             </a>
         </div>
     </div>
@@ -106,6 +109,34 @@ $filters = $filters ?? [];
                         <?= number_format($stats['today']['revenue_today'] ?? 0, 0) ?> RON
                     </h3>
                     <p class="text-muted mb-0">Venit Astăzi</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Acces Rapid Piese -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="mb-2">
+                                <i class="fas fa-boxes text-info"></i> Gestiune Piese Atelier
+                            </h5>
+                            <p class="text-muted mb-0">
+                                Administrare inventar piese, stocuri, preturi si utilizare in reparatii
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a href="<?= ROUTE_BASE ?>service/parts" class="btn btn-info">
+                                <i class="fas fa-boxes"></i> Vezi Inventar Piese
+                            </a>
+                            <a href="<?= ROUTE_BASE ?>service/parts/add" class="btn btn-outline-info">
+                                <i class="fas fa-plus"></i> Adauga Piesa
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
