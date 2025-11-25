@@ -567,6 +567,18 @@ class NotificationController extends Controller {
 
     // Setări notificări: vizualizare și salvare preferințe per utilizator
     public function settings() {
+        // PROTECȚIE: Doar superadmin poate accesa setările sistem
+        require_once __DIR__ . '/../../../core/Auth.php';
+        $auth = Auth::getInstance();
+        $currentUser = $auth->user();
+        $userRole = $currentUser->role_slug ?? $currentUser->role ?? 'user';
+        
+        if ($userRole !== 'superadmin') {
+            $_SESSION['error_message'] = 'Acces interzis! Setările sistem sunt disponibile doar pentru superadmin.';
+            $this->redirect('/notifications/preferences');
+            return;
+        }
+        
         // Asigurăm existența tabelei system_settings în baza CORE pentru a evita 404 pe shared hosting
         $this->ensureSystemSettingsTable();
         $userId = $_SESSION['user_id'] ?? 1;

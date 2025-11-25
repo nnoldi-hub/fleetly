@@ -46,9 +46,19 @@ if (!function_exists('timeAgo')) {
                         <a href="<?= ROUTE_BASE ?>notifications/preferences" class="btn btn-sm btn-outline-primary">
                             <i class="fas fa-user-cog"></i> Preferințe
                         </a>
-                        <a href="<?= ROUTE_BASE ?>notifications/settings" class="btn btn-sm btn-outline-dark">
-                            <i class="fas fa-sliders-h"></i> Setări Admin
+                        <?php
+                        // Butonul "Setări Admin" apare DOAR pentru superadmin
+                        require_once __DIR__ . '/../../../core/Auth.php';
+                        $auth = Auth::getInstance();
+                        $currentUser = $auth->user();
+                        $userRole = $currentUser->role_slug ?? $currentUser->role ?? 'user';
+                        
+                        if ($userRole === 'superadmin'):
+                        ?>
+                        <a href="<?= ROUTE_BASE ?>notifications/settings" class="btn btn-sm btn-warning" title="Doar Superadmin">
+                            <i class="fas fa-crown"></i> Setări Sistem
                         </a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
