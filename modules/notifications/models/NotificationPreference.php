@@ -14,7 +14,7 @@ class NotificationPreference extends Model {
      */
     public function getByUserId($userId) {
         $sql = "SELECT * FROM notification_preferences WHERE user_id = ?";
-        $result = $this->db->fetch($sql, [$userId]);
+        $result = $this->db->fetchOn('notification_preferences', $sql, [$userId]);
         
         if ($result && !empty($result['enabled_types'])) {
             $result['enabled_types'] = json_decode($result['enabled_types'], true) ?: [];
@@ -83,7 +83,7 @@ class NotificationPreference extends Model {
             $sql = "UPDATE notification_preferences SET " . implode(', ', $updates) . " WHERE user_id = ?";
             
             try {
-                $this->db->query($sql, $params);
+                $this->db->queryOn('notification_preferences', $sql, $params);
                 return ['success' => true, 'action' => 'updated'];
             } catch (Throwable $e) {
                 return ['success' => false, 'message' => 'Update failed: ' . $e->getMessage()];
@@ -117,7 +117,7 @@ class NotificationPreference extends Model {
             ];
             
             try {
-                $this->db->query($sql, $params);
+                $this->db->queryOn('notification_preferences', $sql, $params);
                 return ['success' => true, 'action' => 'created', 'id' => $this->db->lastInsertId()];
             } catch (Throwable $e) {
                 return ['success' => false, 'message' => 'Insert failed: ' . $e->getMessage()];
@@ -193,7 +193,7 @@ class NotificationPreference extends Model {
      */
     public function getAllByCompany($companyId) {
         $sql = "SELECT * FROM notification_preferences WHERE company_id = ?";
-        $results = $this->db->fetchAll($sql, [$companyId]);
+        $results = $this->db->fetchAllOn('notification_preferences', $sql, [$companyId]);
         
         foreach ($results as &$result) {
             if (!empty($result['enabled_types'])) {
@@ -216,7 +216,7 @@ class NotificationPreference extends Model {
         $key = 'notifications_prefs_user_' . $userId;
         
         try {
-            $row = $db->fetch("SELECT setting_value FROM system_settings WHERE setting_key = ?", [$key]);
+            $row = $db->fetchOn('system_settings', "SELECT setting_value FROM system_settings WHERE setting_key = ?", [$key]);
             
             if (!$row || empty($row['setting_value'])) {
                 return ['success' => false, 'message' => 'No legacy preferences found'];
@@ -258,7 +258,7 @@ class NotificationPreference extends Model {
         
         try {
             // Get all users cu company_id
-            $users = $db->fetchAll("SELECT id, company_id FROM users WHERE status = 'active' AND company_id IS NOT NULL");
+            $users = $db->fetchAllOn('users', "SELECT id, company_id FROM users WHERE status = 'active' AND company_id IS NOT NULL");
             
             $migrated = 0;
             $skipped = 0;
@@ -296,7 +296,7 @@ class NotificationPreference extends Model {
     public function delete($userId) {
         $sql = "DELETE FROM notification_preferences WHERE user_id = ?";
         try {
-            $this->db->query($sql, [$userId]);
+            $this->db->queryOn('notification_preferences', $sql, [$userId]);
             return ['success' => true];
         } catch (Throwable $e) {
             return ['success' => false, 'message' => $e->getMessage()];

@@ -25,9 +25,9 @@ $companies = [];
 try {
     // Tabela companies sau distinct company_id din users (fallback dacă nu există tabela companies)
     try {
-        $companies = $db->fetchAll("SELECT id FROM companies WHERE status = 'active'", []);
+        $companies = $db->fetchAllOn('companies', "SELECT id FROM companies WHERE status = 'active'", []);
     } catch (Throwable $e) {
-        $companies = $db->fetchAll("SELECT DISTINCT company_id AS id FROM users WHERE company_id IS NOT NULL", []);
+        $companies = $db->fetchAllOn('users', "SELECT DISTINCT company_id AS id FROM users WHERE company_id IS NOT NULL", []);
     }
 } catch (Throwable $e) {
     out('Eroare la încărcarea companiilor: '.$e->getMessage());
@@ -49,10 +49,10 @@ foreach ($companies as $c) {
     try {
         // Schema nouă cu roles
         try {
-            $adminRow = $db->fetch("SELECT u.id FROM users u INNER JOIN roles r ON u.role_id = r.id WHERE 
+            $adminRow = $db->fetchOn('users', "SELECT u.id FROM users u INNER JOIN roles r ON u.role_id = r.id WHERE 
                 u.company_id = ? AND r.slug IN ('admin','manager','fleet_manager','superadmin') AND u.status='active' ORDER BY r.level ASC LIMIT 1", [$companyId]);
         } catch (Throwable $e) {
-            $adminRow = $db->fetch("SELECT id FROM users WHERE company_id = ? AND role IN ('admin','manager') AND status='active' LIMIT 1", [$companyId]);
+            $adminRow = $db->fetchOn('users', "SELECT id FROM users WHERE company_id = ? AND role IN ('admin','manager') AND status='active' LIMIT 1", [$companyId]);
         }
         if ($adminRow && isset($adminRow['id'])) { $adminUserId = (int)$adminRow['id']; }
     } catch (Throwable $e) { /* ignorăm */ }

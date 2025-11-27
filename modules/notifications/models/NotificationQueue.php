@@ -51,7 +51,7 @@ class NotificationQueue extends Model {
         ];
         
         try {
-            $this->db->query($sql, $params);
+            $this->db->queryOn('notification_queue', $sql, $params);
             $id = $this->db->lastInsertId();
             
             // Log în notification_logs
@@ -90,7 +90,7 @@ class NotificationQueue extends Model {
         $params[] = $limit;
         
         try {
-            return $this->db->fetchAll($sql, $params);
+            return $this->db->fetchAllOn('notification_queue', $sql, $params);
         } catch (Throwable $e) {
             return [];
         }
@@ -107,7 +107,7 @@ class NotificationQueue extends Model {
                 WHERE id = ?";
         
         try {
-            $this->db->query($sql, [$id]);
+            $this->db->queryOn('notification_queue', $sql, [$id]);
             return ['success' => true];
         } catch (Throwable $e) {
             return ['success' => false, 'message' => $e->getMessage()];
@@ -132,7 +132,7 @@ class NotificationQueue extends Model {
         $sql .= " WHERE id = ?";
         
         try {
-            $this->db->query($sql, $params);
+            $this->db->queryOn('notification_queue', $sql, $params);
             
             // Log success
             require_once __DIR__ . '/NotificationLog.php';
@@ -173,7 +173,7 @@ class NotificationQueue extends Model {
                 WHERE id = ?";
         
         try {
-            $this->db->query($sql, [$status, $errorMessage, $id]);
+            $this->db->queryOn('notification_queue', $sql, [$status, $errorMessage, $id]);
             
             // Log failure
             require_once __DIR__ . '/NotificationLog.php';
@@ -203,14 +203,14 @@ class NotificationQueue extends Model {
                 LIMIT ?";
         
         try {
-            $items = $this->db->fetchAll($sql, [$limit]);
+            $items = $this->db->fetchAllOn('notification_queue', $sql, [$limit]);
             
             $retried = 0;
             foreach ($items as $item) {
                 $updateSql = "UPDATE notification_queue 
                              SET status = 'pending', error_message = NULL 
                              WHERE id = ?";
-                $this->db->query($updateSql, [$item['id']]);
+                $this->db->queryOn('notification_queue', $updateSql, [$item['id']]);
                 $retried++;
             }
             
@@ -228,7 +228,7 @@ class NotificationQueue extends Model {
         $sql = "UPDATE notification_queue SET status = 'cancelled' WHERE id = ?";
         
         try {
-            $this->db->query($sql, [$id]);
+            $this->db->queryOn('notification_queue', $sql, [$id]);
             return ['success' => true];
         } catch (Throwable $e) {
             return ['success' => false, 'message' => $e->getMessage()];
@@ -240,7 +240,7 @@ class NotificationQueue extends Model {
      */
     public function getById($id) {
         $sql = "SELECT * FROM notification_queue WHERE id = ?";
-        return $this->db->fetch($sql, [$id]);
+        return $this->db->fetchOn('notification_queue', $sql, [$id]);
     }
     
     /**
@@ -248,7 +248,7 @@ class NotificationQueue extends Model {
      */
     public function getByNotificationId($notificationId) {
         $sql = "SELECT * FROM notification_queue WHERE notification_id = ? ORDER BY created_at ASC";
-        return $this->db->fetchAll($sql, [$notificationId]);
+        return $this->db->fetchAllOn('notification_queue', $sql, [$notificationId]);
     }
     
     /**
@@ -260,7 +260,7 @@ class NotificationQueue extends Model {
                   AND processed_at < DATE_SUB(NOW(), INTERVAL ? DAY)";
         
         try {
-            $this->db->query($sql, [$daysOld]);
+            $this->db->queryOn('notification_queue', $sql, [$daysOld]);
             return ['success' => true, 'affected' => $this->db->rowCount()];
         } catch (Throwable $e) {
             return ['success' => false, 'message' => $e->getMessage()];
@@ -292,7 +292,7 @@ class NotificationQueue extends Model {
         }
         
         try {
-            return $this->db->fetch($sql, $params);
+            return $this->db->fetchOn('notification_queue', $sql, $params);
         } catch (Throwable $e) {
             return null;
         }
@@ -313,7 +313,7 @@ class NotificationQueue extends Model {
         }
         
         try {
-            $result = $this->db->fetch($sql, $params);
+            $result = $this->db->fetchOn('notification_queue', $sql, $params);
             return (int)($result['count'] ?? 0);
         } catch (Throwable $e) {
             return 0;
@@ -328,7 +328,7 @@ class NotificationQueue extends Model {
                 WHERE notification_id = ? AND channel = ? AND status != 'cancelled'";
         
         try {
-            $result = $this->db->fetch($sql, [$notificationId, $channel]);
+            $result = $this->db->fetchOn('notification_queue', $sql, [$notificationId, $channel]);
             return (int)($result['count'] ?? 0) > 0;
         } catch (Throwable $e) {
             return false;
