@@ -46,23 +46,85 @@ class NotificationController extends Controller {
         header('Content-Type: application/json');
         
         try {
-            // Include scriptul de procesare
-            ob_start();
-            require_once __DIR__ . '/../../../scripts/process_notifications_queue.php';
-            $output = ob_get_clean();
+            require_once __DIR__ . '/../../../config/config.php';
+            require_once __DIR__ . '/../../../config/database.php';
+            require_once __DIR__ . '/../../../core/Database.php';
+            require_once __DIR__ . '/../../../core/Mailer.php';
+            
+            $db = Database::getInstance();
+            
+            // Găsește notificările pending în coadă
+            $sql = "SELECT * FROM notification_queue 
+                    WHERE status = 'pending' 
+                    AND attempts < max_attempts
+                    ORDER BY created_at ASC 
+                    LIMIT 50";
+            
+            $queueItems = $db->fetchAllOn('notification_queue', $sql);
+            
+            if (empty($queueItems)) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Nu există email-uri în coadă pentru trimitere.',
+                    'sent' => 0
+                ]);
+                exit;
+            }
+            
+            $sent = 0;
+            $failed = 0;
+            $mailer = new Mailer();
+            
+            foreach ($queueItems as $item) {
+                try {
+                    // Trimite email
+                    $result = $mailer->send(
+                        $item['recipient_email'],
+                        $item['subject'],
+                        $item['message']
+                    );
+                    
+                    if ($result) {
+                        // Marchează ca trimis
+                        $db->queryOn('notification_queue',
+                            "UPDATE notification_queue 
+                             SET status = 'sent', processed_at = NOW() 
+                             WHERE id = ?",
+                            [$item['id']]
+                        );
+                        $sent++;
+                    } else {
+                        throw new Exception('Mailer returned false');
+                    }
+                    
+                } catch (Throwable $e) {
+                    // Incrementează attempts
+                    $db->queryOn('notification_queue',
+                        "UPDATE notification_queue 
+                         SET attempts = attempts + 1, 
+                             error_message = ?,
+                             last_attempt_at = NOW(),
+                             status = IF(attempts + 1 >= max_attempts, 'failed', 'pending')
+                         WHERE id = ?",
+                        [$e->getMessage(), $item['id']]
+                    );
+                    $failed++;
+                }
+            }
             
             echo json_encode([
                 'success' => true,
-                'message' => 'Email-urile au fost procesate cu succes!',
-                'output' => $output
+                'message' => "Email-uri trimise: $sent, eșuate: $failed",
+                'sent' => $sent,
+                'failed' => $failed,
+                'total' => count($queueItems)
             ]);
             
         } catch (Throwable $e) {
-            ob_end_clean();
             http_response_code(500);
             echo json_encode([
                 'success' => false,
-                'message' => 'Eroare la procesarea email-urilor: ' . $e->getMessage()
+                'message' => 'Eroare: ' . $e->getMessage()
             ]);
         }
         exit;
