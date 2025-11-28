@@ -37,6 +37,9 @@ if (!function_exists('timeAgo')) {
                         <button type="button" class="btn btn-sm btn-success" id="btn-generate-notifications">
                             <i class="fas fa-magic"></i> Generează Notificări
                         </button>
+                        <button type="button" class="btn btn-sm btn-primary" id="btn-send-emails">
+                            <i class="fas fa-paper-plane"></i> Trimite Email-uri
+                        </button>
                         <button type="button" class="btn btn-sm btn-outline-primary" id="btn-mark-all-read">
                             <i class="fas fa-check-double"></i> Marchează toate ca citite
                         </button>
@@ -327,5 +330,42 @@ if (!function_exists('timeAgo')) {
                 </div>
             </div>
         </div>
+
+<script>
+// Handler pentru butonul "Trimite Email-uri"
+document.getElementById('btn-send-emails')?.addEventListener('click', function() {
+    if (!confirm('Sigur doriți să trimiteți email-urile din coadă?')) {
+        return;
+    }
+    
+    const btn = this;
+    const originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Se trimite...';
+    
+    fetch('<?= ROUTE_BASE ?>notifications?action=sendEmails', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('✅ ' + data.message);
+            location.reload();
+        } else {
+            alert('❌ ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('❌ Eroare: ' + error.message);
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+    });
+});
+</script>
 
 <?php // Removed explicit notifications-alerts.js include; footer now auto-injects based on URL ?>

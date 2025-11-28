@@ -26,7 +26,46 @@ class NotificationController extends Controller {
             return;
         }
         
+        // Verificăm dacă e cerere de trimitere email-uri
+        if (isset($_GET['action']) && $_GET['action'] === 'sendEmails') {
+            $this->sendEmailsFromQueue();
+            return;
+        }
+        if (isset($_POST['action']) && $_POST['action'] === 'sendEmails') {
+            $this->sendEmailsFromQueue();
+            return;
+        }
+        
         $this->alerts();
+    }
+    
+    /**
+     * Procesează coada de email-uri și trimite notificările
+     */
+    public function sendEmailsFromQueue() {
+        header('Content-Type: application/json');
+        
+        try {
+            // Include scriptul de procesare
+            ob_start();
+            require_once __DIR__ . '/../../../scripts/process_notifications_queue.php';
+            $output = ob_get_clean();
+            
+            echo json_encode([
+                'success' => true,
+                'message' => 'Email-urile au fost procesate cu succes!',
+                'output' => $output
+            ]);
+            
+        } catch (Throwable $e) {
+            ob_end_clean();
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Eroare la procesarea email-urilor: ' . $e->getMessage()
+            ]);
+        }
+        exit;
     }
     
     public function alerts() {
