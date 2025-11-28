@@ -9,7 +9,7 @@ Hour: 6
 Day: *
 Month: *
 Weekday: *
-Command: /usr/bin/php8.3 /home/wclsxxx/public_html/scripts/cron_generate_notifications.php >> /home/wclsxxx/logs/cron_notifications.log 2>&1
+Command: /usr/bin/php8.3 /home/wclsgzyf/public_html/scripts/cron_generate_notifications.php >> /home/wclsgzyf/logs/cron_notifications.log 2>&1
 ```
 
 ### 2️⃣ Procesare Email Queue (Every 5min)
@@ -19,7 +19,7 @@ Hour: *
 Day: *
 Month: *
 Weekday: *
-Command: /usr/bin/php8.3 /home/wclsxxx/public_html/scripts/process_notifications_queue.php >> /home/wclsxxx/logs/cron_queue.log 2>&1
+Command: /usr/bin/php8.3 /home/wclsgzyf/public_html/scripts/process_notifications_queue.php >> /home/wclsgzyf/logs/cron_queue.log 2>&1
 ```
 
 ---

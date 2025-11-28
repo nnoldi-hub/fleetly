@@ -117,9 +117,17 @@ class NotificationPreference extends Model {
             ];
             
             try {
+                // Debug: log query pentru debugging
+                error_log("NotificationPreference INSERT SQL: $sql");
+                error_log("NotificationPreference INSERT params: " . json_encode($params));
+                
                 $this->db->queryOn('notification_preferences', $sql, $params);
-                return ['success' => true, 'action' => 'created', 'id' => $this->db->lastInsertId()];
+                $insertId = $this->db->lastInsertIdOn('notification_preferences');
+                
+                error_log("NotificationPreference INSERT success, ID: $insertId");
+                return ['success' => true, 'action' => 'created', 'id' => $insertId];
             } catch (Throwable $e) {
+                error_log("NotificationPreference INSERT failed: " . $e->getMessage());
                 return ['success' => false, 'message' => 'Insert failed: ' . $e->getMessage()];
             }
         }
