@@ -8,8 +8,12 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once __DIR__ . '/../config/config.php';
-require_once __DIR__ . '/../core/Database.php';
+try {
+    require_once __DIR__ . '/../config/config.php';
+    require_once __DIR__ . '/../core/Database.php';
+} catch (Exception $e) {
+    die("Eroare la încărcarea fișierelor: " . $e->getMessage());
+}
 
 echo "<!DOCTYPE html><html><head><meta charset='UTF-8'><style>
 body { font-family: monospace; padding: 20px; background: #f5f5f5; }
@@ -25,7 +29,15 @@ echo "<h1>🧪 Test Complet Flow Notificări</h1>";
 echo "<p><strong>Data/Ora:</strong> " . date('Y-m-d H:i:s') . "</p>";
 echo "<hr>";
 
-$db = Database::getInstance();
+try {
+    $db = Database::getInstance();
+} catch (Exception $e) {
+    echo "<div class='step error'>";
+    echo "<h2>❌ Eroare la conectarea la baza de date</h2>";
+    echo "<p>" . $e->getMessage() . "</p>";
+    echo "</div></body></html>";
+    exit;
+}
 
 // ============================================================
 // STEP 1: Verifică documente care expiră în 30 zile
