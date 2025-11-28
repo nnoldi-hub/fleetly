@@ -1,11 +1,13 @@
 -- ========================================
--- Create notification_preferences table
--- Rulează acest script în baza de date TENANT
+-- Create notification_preferences for Hostico
+-- Run in tenant database (wclsgzyf_fm_tenant_1)
 -- ========================================
 
-USE wclsgzyf_fm_tenant_1;
+-- Drop existing tables if needed (CAUTION: removes data)
+-- DROP TABLE IF EXISTS notification_queue;
+-- DROP TABLE IF EXISTS notification_preferences;
 
--- 1. Tabel notification_preferences
+-- 1. Notification Preferences Table
 CREATE TABLE IF NOT EXISTS notification_preferences (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -17,30 +19,24 @@ CREATE TABLE IF NOT EXISTS notification_preferences (
     push_enabled TINYINT(1) DEFAULT 0,
     in_app_enabled TINYINT(1) DEFAULT 1,
     
-    -- Tipuri de notificări activate (JSON array)
+    -- Tipuri de notificări (JSON array: ["insurance_expiry", "document_expiry", "maintenance_due"])
     enabled_types JSON NULL,
     
     -- Frecvență trimitere
     frequency ENUM('immediate', 'daily', 'weekly') DEFAULT 'immediate',
     
-    -- Contact info (override pentru user.email/phone)
-    email VARCHAR(255) NULL COMMENT 'Override email (dacă diferit de users.email)',
-    phone VARCHAR(20) NULL COMMENT 'Override telefon pentru SMS',
-    push_token VARCHAR(512) NULL COMMENT 'Firebase/OneSignal token pentru push',
+    -- Contact info
+    email VARCHAR(255) NULL,
+    phone VARCHAR(20) NULL,
+    push_token VARCHAR(512) NULL,
     
-    -- Prioritate minimă pentru notificări
+    -- Setări
     min_priority ENUM('low', 'medium', 'high') DEFAULT 'low',
-    
-    -- Broadcast la toată compania (doar pentru admin/manager)
     broadcast_to_company TINYINT(1) DEFAULT 0,
-    
-    -- Zile înainte de expirare pentru alertă
     days_before_expiry INT DEFAULT 30,
     
     -- Quiet hours (JSON: {"start":"22:00", "end":"08:00"})
     quiet_hours JSON NULL,
-    
-    -- Timezone pentru schedulare
     timezone VARCHAR(50) DEFAULT 'Europe/Bucharest',
     
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -51,41 +47,31 @@ CREATE TABLE IF NOT EXISTS notification_preferences (
     KEY idx_frequency (frequency)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Note: Foreign keys omitted because users/companies tables might be in core DB
--- Constraints enforced at application level
-
--- 2. Tabel notification_queue (pentru procesare asincronă - opțional, dar recomandat)
+-- 2. Notification Queue Table
 CREATE TABLE IF NOT EXISTS notification_queue (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    notification_id INT NOT NULL COMMENT 'FK la notifications.id',
+    notification_id INT NOT NULL,
     user_id INT NOT NULL,
     company_id INT NOT NULL,
     
-    -- Canal de trimitere
     channel ENUM('email', 'sms', 'push', 'in_app') NOT NULL,
     
-    -- Date necesare pentru trimitere
     recipient_email VARCHAR(255) NULL,
     recipient_phone VARCHAR(20) NULL,
     recipient_push_token VARCHAR(512) NULL,
     
-    subject VARCHAR(255) NULL COMMENT 'Pentru email/push',
+    subject VARCHAR(255) NULL,
     message TEXT NOT NULL,
     
-    -- Status procesare
     status ENUM('pending', 'processing', 'sent', 'failed', 'cancelled') DEFAULT 'pending',
     attempts INT DEFAULT 0,
     max_attempts INT DEFAULT 3,
     
-    -- Schedulare (pentru frequency=daily/weekly)
-    scheduled_at TIMESTAMP NULL COMMENT 'Când să fie trimisă',
-    processed_at TIMESTAMP NULL COMMENT 'Când a fost procesată',
+    scheduled_at TIMESTAMP NULL,
+    processed_at TIMESTAMP NULL,
     
-    -- Errori
     error_message TEXT NULL,
     last_attempt_at TIMESTAMP NULL,
-    
-    -- Metadata (JSON pentru date custom)
     metadata JSON DEFAULT NULL,
     
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -98,9 +84,7 @@ CREATE TABLE IF NOT EXISTS notification_queue (
     KEY idx_processed_at (processed_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Note: Foreign keys omitted for cross-database compatibility
--- Referential integrity enforced at application level
-
 -- Verificare
-SELECT 'notification_preferences created' as status, COUNT(*) as row_count FROM notification_preferences;
-SELECT 'notification_queue created' as status, COUNT(*) as row_count FROM notification_queue;
+SELECT 'Tables created successfully!' as status;
+SELECT COUNT(*) as notification_preferences_count FROM notification_preferences;
+SELECT COUNT(*) as notification_queue_count FROM notification_queue;
