@@ -10,7 +10,7 @@ class Database {
     // Tables that must stay in the core DB
     private $coreTables = [
         'companies','users','roles','permissions','role_permissions','user_sessions','audit_logs','system_settings','intervention_requests',
-        'notification_preferences','notification_queue','notification_templates','notification_rate_limits','notification_logs'
+        'notification_preferences','notification_queue','notification_templates','notification_rate_limits','notification_logs',
     ];
 
     private function __construct() {
