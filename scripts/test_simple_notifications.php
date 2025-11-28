@@ -23,6 +23,7 @@ try {
 // Test 2: Database
 echo "<h2>Test 2: Database</h2>";
 try {
+    require_once __DIR__ . '/../config/database.php';
     require_once __DIR__ . '/../core/Database.php';
     $db = Database::getInstance();
     echo "✅ Database connected<br>";
