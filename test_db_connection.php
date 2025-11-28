@@ -9,15 +9,19 @@ try {
     require_once __DIR__ . '/config/config.php';
     echo "<p>✅ Config loaded</p>";
     
-    echo "<p>Step 2: Loading Database class...</p>";
+    echo "<p>Step 2: Loading database config...</p>";
+    require_once __DIR__ . '/config/database.php';
+    echo "<p>✅ Database config loaded</p>";
+    
+    echo "<p>Step 3: Loading Database class...</p>";
     require_once __DIR__ . '/core/Database.php';
     echo "<p>✅ Database class loaded</p>";
     
-    echo "<p>Step 3: Getting Database instance...</p>";
+    echo "<p>Step 4: Getting Database instance...</p>";
     $db = Database::getInstance();
     echo "<p>✅ Database instance created</p>";
     
-    echo "<p>Step 4: Testing simple query...</p>";
+    echo "<p>Step 5: Testing simple query...</p>";
     $result = $db->fetch("SELECT 1 as test");
     echo "<p>✅ Query executed: " . print_r($result, true) . "</p>";
     
