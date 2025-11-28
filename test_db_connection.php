@@ -6,11 +6,11 @@ echo "<h1>Debug Database Connection</h1>";
 
 try {
     echo "<p>Step 1: Loading config...</p>";
-    require_once __DIR__ . '/../config/config.php';
+    require_once __DIR__ . '/config/config.php';
     echo "<p>✅ Config loaded</p>";
     
     echo "<p>Step 2: Loading Database class...</p>";
-    require_once __DIR__ . '/../core/Database.php';
+    require_once __DIR__ . '/core/Database.php';
     echo "<p>✅ Database class loaded</p>";
     
     echo "<p>Step 3: Getting Database instance...</p>";
