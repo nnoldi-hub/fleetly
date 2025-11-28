@@ -20,6 +20,7 @@ if (php_sapi_name() !== 'cli') {
 // Autoload dependencies
 $rootDir = dirname(__DIR__);
 require_once $rootDir . '/config/config.php';
+require_once $rootDir . '/config/database.php';
 require_once $rootDir . '/config/Database.php';
 require_once $rootDir . '/modules/notifications/services/NotificationQueueProcessor.php';
 
