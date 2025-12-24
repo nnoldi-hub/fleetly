@@ -4,6 +4,12 @@ Acesta este un sistem de administrare flota multi‑tenant, cu panou SuperAdmin,
 
 ## Noutati (2025‑11‑07)
 
+- **Notificări SMS prin Twilio**: sistem complet integrat pentru trimiterea notificărilor pe SMS
+  - SDK oficial Twilio instalat și configurat
+  - Interfață de configurare în Setări > SMS
+  - Suport pentru test SMS direct din aplicație
+  - Rate limiting automat (20 SMS/oră, 100 SMS/zi per companie)
+  - Documentație completă în `docs/SMS_TWILIO_SETUP.md`
 - **Import CSV masiv**: modul nou `/import` permite importul bulk de vehicule, documente si soferi din fisiere CSV cu coloane romanesti (fara diacritice). Descarca template-uri, completeaza in Excel, upload cu validare si feedback detaliat.
 - Email SMTP: configurabil in `config/mail.php` (PHPMailer via Composer sau fallback mail()/log).
 - Reset admin: trimite email cu credentialele noi (daca email existent si mail activat).
@@ -114,6 +120,40 @@ composer install
 
 Emailurile trimise sau simulate se logheaza in `logs/mail.log` cand `enabled=false` sau daca trimiterea esueaza.
 
+### Configurare SMS (Twilio)
+
+Sistemul suportă trimiterea notificărilor pe SMS prin Twilio. Pentru configurare completă, consultați [SMS_TWILIO_SETUP.md](docs/SMS_TWILIO_SETUP.md).
+
+**Pași rapizi:**
+
+1. **Instalare SDK** (deja făcut):
+   ```powershell
+   composer require twilio/sdk
+   ```
+
+2. **Obținere credențiale Twilio**:
+   - Creați cont pe [https://www.twilio.com/](https://www.twilio.com/)
+   - Obțineți: Account SID, Auth Token, număr de telefon Twilio
+
+3. **Configurare în aplicație**:
+   - Accesați ca **SuperAdmin**: Notificări → Setări → SMS
+   - Completați formularul cu credențialele Twilio
+   - Testați cu butonul "Trimite SMS de test"
+
+4. **Activare pentru utilizatori**:
+   - Utilizatorii completează numărul de telefon în profil (format: +40712345678)
+   - Activează SMS în Notificări → Preferințe
+
+5. **Procesare automată** (cron job):
+   ```bash
+   */5 * * * * php /path/to/fleet-management/scripts/process_notifications_queue.php
+   ```
+
+**Documentație:**
+- Ghid complet: [docs/SMS_TWILIO_SETUP.md](docs/SMS_TWILIO_SETUP.md)
+- Ghid utilizatori: [docs/SMS_USER_GUIDE.md](docs/SMS_USER_GUIDE.md)
+- Script test: `php test_sms_twilio.php`
+
 ## Fluxuri cheie
 
 - Autentificare:
@@ -127,6 +167,7 @@ Emailurile trimise sau simulate se logheaza in `logs/mail.log` cand `enabled=fal
 
 ## Cunoscut / Limitari / Next steps
 
+- Notificări SMS: sistem complet implementat cu Twilio SDK; consultați documentația pentru configurare
 - Email notificari: optional, neconfigurat — se poate trimite parola noua prin SMTP.
 - Rapoarte avansate: pot fi extinse (charturi, exporturi dedicate, filtrare complexa).
 - Teste automate: nu exista inca — recomandat sa se adauge PHPUnit pentru core + controllere.

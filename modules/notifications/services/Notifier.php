@@ -144,59 +144,21 @@ class Notifier {
     }
 
     public function sendSms($to, $message, $sms = null) {
-        $sms = $sms ?: $this->loadSmsSettings();
-        // Normalize destination number to E.164-like format
-        $toRaw = $to;
-        $to = preg_replace('/[\s\-\(\)\.]/', '', (string)$to);
-        if (strpos($to, '00') === 0) { $to = '+' . substr($to, 2); }
-        if ($to !== '' && $to[0] !== '+') { $to = '+' . $to; }
-        if (!preg_match('/^\+[0-9]{8,15}$/', $to)) {
-            return [false, 'Număr de telefon invalid: ' . htmlspecialchars($toRaw) . ' (așteptat format +XXXXXXXXXXX)'];
-        }
+        // Folosim noua clasă SmsService pentru Twilio SDK
+        require_once __DIR__ . '/../../../core/SmsService.php';
+        
         try {
-            if (($sms['provider'] ?? 'twilio') === 'twilio') {
-                $sid = $sms['account_sid'] ?? '';
-                $token = $sms['auth_token'] ?? '';
-                $from = $sms['from'] ?? '';
-                if (!$sid || !$token || !$from) return [false, 'Configurați Twilio: Account SID, Auth Token și From Number.'];
-                $url = "https://api.twilio.com/2010-04-01/Accounts/{$sid}/Messages.json";
-                $data = http_build_query(['To' => $to, 'From' => $from, 'Body' => $message]);
-                $ch = curl_init($url);
-                curl_setopt_array($ch, [
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_POST => true,
-                    CURLOPT_POSTFIELDS => $data,
-                    CURLOPT_USERPWD => $sid . ':' . $token,
-                    CURLOPT_TIMEOUT => 20
-                ]);
-                $res = curl_exec($ch);
-                $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                $err = curl_error($ch);
-                curl_close($ch);
-                if ($http >= 200 && $http < 300) return [true, ''];
-                return [false, 'Twilio API ' . $http . ' ' . $res . ($err? (' Err: '.$err):'')];
-            }
-            $url = $sms['http_url'] ?? '';
-            if (!$url) return [false, 'Configurați URL-ul gateway-ului HTTP'];
-            $method = strtoupper($sms['http_method'] ?? 'GET');
-            $paramsT = $sms['http_params'] ?? '';
-            $params = str_replace(['{to}','{message}'], [urlencode($to), urlencode($message)], $paramsT);
-            $ch = curl_init($url);
-            if ($method === 'POST') {
-                curl_setopt($ch, CURLOPT_POST, true);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+            $smsService = new SmsService();
+            $result = $smsService->send($to, $message, $sms);
+            
+            if ($result['success']) {
+                return [true, ''];
             } else {
-                $sep = (strpos($url, '?') === false) ? '?' : '&';
-                curl_setopt($ch, CURLOPT_URL, $url . $sep . $params);
+                return [false, $result['error'] ?? 'Eroare necunoscută la trimiterea SMS'];
             }
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 20);
-            $res = curl_exec($ch);
-            $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $err = curl_error($ch);
-            curl_close($ch);
-            if ($http >= 200 && $http < 300) return [true, ''];
-            return [false, 'Gateway HTTP ' . $http . ' ' . $res . ($err? (' Err: '.$err):'')];
-        } catch (Throwable $e) { return [false, $e->getMessage()]; }
+        } catch (Throwable $e) {
+            error_log("[Notifier] SMS Error: " . $e->getMessage());
+            return [false, $e->getMessage()];
+        }
     }
 }
