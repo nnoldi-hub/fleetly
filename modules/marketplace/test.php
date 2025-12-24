@@ -14,6 +14,7 @@ try {
     require_once __DIR__ . '/../../core/Database.php';
     echo "Database class loaded OK<br>";
     
+    echo "Trying Database::getInstance()...<br>";
     $db = Database::getInstance();
     echo "Database instance OK<br>";
     
@@ -34,6 +35,10 @@ try {
     
 } catch (Exception $e) {
     echo "ERROR: " . $e->getMessage() . "<br>";
+    echo "File: " . $e->getFile() . "<br>";
+    echo "Line: " . $e->getLine() . "<br>";
+} catch (Error $e) {
+    echo "FATAL ERROR: " . $e->getMessage() . "<br>";
     echo "File: " . $e->getFile() . "<br>";
     echo "Line: " . $e->getLine() . "<br>";
 }
