@@ -211,17 +211,24 @@ class Order extends Model {
      * Get order statistics
      */
     public function getStatistics($companyId = null) {
+        $today = date('Y-m-d');
+        $monthStart = date('Y-m-01');
+        
         $sql = "SELECT 
                     COUNT(*) as total_orders,
-                    SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_orders,
+                    SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as orders_pending,
                     SUM(CASE WHEN status = 'confirmed' THEN 1 ELSE 0 END) as confirmed_orders,
-                    SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_orders,
-                    SUM(total) as total_revenue,
-                    AVG(total) as average_order_value
+                    SUM(CASE WHEN status = 'delivered' THEN 1 ELSE 0 END) as delivered_orders,
+                    COALESCE(SUM(CASE WHEN DATE(created_at) = ? THEN 1 ELSE 0 END), 0) as orders_today,
+                    COALESCE(SUM(CASE WHEN DATE(created_at) = ? THEN total_amount ELSE 0 END), 0) as revenue_today,
+                    COALESCE(SUM(CASE WHEN DATE(created_at) >= ? THEN 1 ELSE 0 END), 0) as orders_month,
+                    COALESCE(SUM(CASE WHEN DATE(created_at) >= ? THEN total_amount ELSE 0 END), 0) as revenue_month,
+                    COALESCE(SUM(total_amount), 0) as total_revenue,
+                    COALESCE(AVG(total_amount), 0) as average_order_value
                 FROM {$this->table}
                 WHERE 1=1";
         
-        $params = [];
+        $params = [$today, $today, $monthStart, $monthStart];
         
         if ($companyId) {
             $sql .= " AND company_id = ?";
