@@ -44,13 +44,18 @@ abstract class Controller {
         extract($data);
         $viewFile = "modules/" . $this->getModuleName() . "/views/$view.php";
         
-        if (file_exists($viewFile)) {
+        // Use absolute path for file_exists check
+        $absoluteViewFile = (defined('ROOT_PATH') ? ROOT_PATH : dirname(__DIR__)) . '/' . $viewFile;
+        
+        if (file_exists($absoluteViewFile)) {
             error_log("[Controller::render] Including header...");
-            include 'includes/header.php';
+            $headerFile = (defined('ROOT_PATH') ? ROOT_PATH : dirname(__DIR__)) . '/includes/header.php';
+            include $headerFile;
             error_log("[Controller::render] Including view: $viewFile");
-            include $viewFile;
+            include $absoluteViewFile;
             error_log("[Controller::render] Including footer...");
-            include 'includes/footer.php';
+            $footerFile = (defined('ROOT_PATH') ? ROOT_PATH : dirname(__DIR__)) . '/includes/footer.php';
+            include $footerFile;
             error_log("[Controller::render] Render complete");
         } else {
             $this->error404("View not found: $viewFile");
@@ -75,11 +80,13 @@ abstract class Controller {
     
     protected function error404($message = 'Page not found') {
         http_response_code(404);
-        include 'includes/header.php';
+        $headerFile = (defined('ROOT_PATH') ? ROOT_PATH : dirname(__DIR__)) . '/includes/header.php';
+        $footerFile = (defined('ROOT_PATH') ? ROOT_PATH : dirname(__DIR__)) . '/includes/footer.php';
+        include $headerFile;
         echo "<div class='container mt-5'>";
         echo "<div class='alert alert-danger'><h4>404 - $message</h4></div>";
         echo "</div>";
-        include 'includes/footer.php';
+        include $footerFile;
         exit;
     }
     
