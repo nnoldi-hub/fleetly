@@ -1,7 +1,8 @@
 <?php 
 $pageTitle = 'Admin - Detalii Comandă #' . $order['order_number'];
-require_once __DIR__ . '/../../../../includes/header.php'; 
 ?>
+
+<link href="<?= BASE_URL ?>assets/css/marketplace.css" rel="stylesheet">
 
 <div class="container-fluid py-4">
     <!-- Breadcrumb -->
@@ -303,5 +304,3 @@ document.getElementById('statusForm').addEventListener('submit', function(e) {
     });
 });
 </script>
-
-<?php require_once __DIR__ . '/../../../../includes/footer.php'; ?>

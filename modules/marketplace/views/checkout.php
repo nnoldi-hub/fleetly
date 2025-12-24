@@ -1,7 +1,8 @@
 <?php 
 $pageTitle = 'Finalizare Comandă';
-require_once __DIR__ . '/../../../includes/header.php'; 
 ?>
+
+<link href="<?= BASE_URL ?>assets/css/marketplace.css" rel="stylesheet">
 
 <div class="container py-4">
     <h1 class="mb-4"><i class="fas fa-clipboard-check me-3"></i>Finalizare Comandă</h1>
@@ -184,5 +185,3 @@ require_once __DIR__ . '/../../../includes/header.php';
 document.getElementById('payment_card').disabled = true;
 document.getElementById('payment_card').nextElementSibling.style.opacity = '0.5';
 </script>
-
-<?php require_once __DIR__ . '/../../../includes/footer.php'; ?>

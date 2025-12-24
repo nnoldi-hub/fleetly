@@ -1,7 +1,8 @@
 <?php 
 $pageTitle = $product['name'] ?? 'Produs';
-require_once __DIR__ . '/../../../includes/header.php'; 
 ?>
+
+<link href="<?= BASE_URL ?>assets/css/marketplace.css" rel="stylesheet">
 
 <style>
 .product-detail-image {
@@ -232,5 +233,3 @@ document.getElementById('addToCartForm').addEventListener('submit', function(e) 
     });
 });
 </script>
-
-<?php require_once __DIR__ . '/../../../includes/footer.php'; ?>

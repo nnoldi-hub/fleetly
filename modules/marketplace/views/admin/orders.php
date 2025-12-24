@@ -1,7 +1,8 @@
 <?php 
 $pageTitle = 'Admin - Comenzi';
-require_once __DIR__ . '/../../../../includes/header.php'; 
 ?>
+
+<link href="<?= BASE_URL ?>assets/css/marketplace.css" rel="stylesheet">
 
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -272,5 +273,3 @@ document.querySelectorAll('.status-select').forEach(select => {
     select.dataset.originalValue = select.value;
 });
 </script>
-
-<?php require_once __DIR__ . '/../../../../includes/footer.php'; ?>

@@ -1,7 +1,8 @@
 <?php 
 $pageTitle = 'Coș de Cumpărături';
-require_once __DIR__ . '/../../../includes/header.php'; 
 ?>
+
+<link href="<?= BASE_URL ?>assets/css/marketplace.css" rel="stylesheet">
 
 <div class="container py-4">
     <h1 class="mb-4"><i class="fas fa-shopping-cart me-3"></i>Coș de Cumpărături</h1>
@@ -212,5 +213,3 @@ function removeItem(cartId) {
     .catch(error => console.error('Error:', error));
 }
 </script>
-
-<?php require_once __DIR__ . '/../../../includes/footer.php'; ?>

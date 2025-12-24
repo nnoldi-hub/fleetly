@@ -1,7 +1,8 @@
 <?php 
 $pageTitle = 'Comenzile Mele';
-require_once __DIR__ . '/../../../includes/header.php'; 
 ?>
+
+<link href="<?= BASE_URL ?>assets/css/marketplace.css" rel="stylesheet">
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -156,5 +157,3 @@ require_once __DIR__ . '/../../../includes/header.php';
         <?php endif; ?>
     <?php endif; ?>
 </div>
-
-<?php require_once __DIR__ . '/../../../includes/footer.php'; ?>

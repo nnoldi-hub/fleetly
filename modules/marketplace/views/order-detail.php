@@ -1,7 +1,8 @@
 <?php 
 $pageTitle = 'Detalii Comandă #' . $order['order_number'];
-require_once __DIR__ . '/../../../includes/header.php'; 
 ?>
+
+<link href="<?= BASE_URL ?>assets/css/marketplace.css" rel="stylesheet">
 
 <div class="container py-4">
     <!-- Breadcrumb -->
@@ -241,5 +242,3 @@ function cancelOrder() {
     }
 }
 </script>
-
-<?php require_once __DIR__ . '/../../../includes/footer.php'; ?>

@@ -1,7 +1,8 @@
 <?php 
 $pageTitle = 'Marketplace Admin - Dashboard';
-require_once __DIR__ . '/../../../../includes/header.php'; 
 ?>
+
+<link href="<?= BASE_URL ?>assets/css/marketplace.css" rel="stylesheet">
 
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -201,5 +202,3 @@ require_once __DIR__ . '/../../../../includes/header.php';
         </div>
     </div>
 </div>
-
-<?php require_once __DIR__ . '/../../../../includes/footer.php'; ?>

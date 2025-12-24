@@ -1,7 +1,8 @@
 <?php 
 $pageTitle = 'Comandă Confirmată';
-require_once __DIR__ . '/../../../includes/header.php'; 
 ?>
+
+<link href="<?= BASE_URL ?>assets/css/marketplace.css" rel="stylesheet">
 
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -85,5 +86,3 @@ require_once __DIR__ . '/../../../includes/header.php';
         </div>
     </div>
 </div>
-
-<?php require_once __DIR__ . '/../../../includes/footer.php'; ?>
