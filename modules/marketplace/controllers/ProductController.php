@@ -57,16 +57,21 @@ class ProductController extends Controller {
         $user = Auth::getInstance()->user();
         $cartCount = $this->cartModel->getItemCount($user->company_id, $user->id);
         
-        // Get user's fleet vehicles
+        // Get user's fleet vehicles (try-catch in case vehicles table doesn't exist)
         $db = Database::getInstance();
         $vehicles = [];
         if ($user && $user->company_id) {
-            $vehicles = $db->fetchAll(
-                "SELECT id, registration_number, brand, model, vin 
-                 FROM vehicles WHERE company_id = ? AND status = 'active' 
-                 ORDER BY registration_number",
-                [$user->company_id]
-            );
+            try {
+                $vehicles = $db->fetchAll(
+                    "SELECT id, registration_number, brand, model, vin 
+                     FROM vehicles WHERE company_id = ? AND status = 'active' 
+                     ORDER BY registration_number",
+                    [$user->company_id]
+                );
+            } catch (Exception $e) {
+                // Table may not exist, continue without vehicles
+                $vehicles = [];
+            }
         }
         
         $this->render('product-detail', [
