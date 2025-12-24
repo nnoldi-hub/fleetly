@@ -30,6 +30,9 @@ define('APP_NAME', 'Fleet Management System');
 define('APP_VERSION', '1.0.0');
 define('ITEMS_PER_PAGE', 20);
 
+// Load database configuration
+require_once __DIR__ . '/database.php';
+
 // Setări notificări (deprecated - use config/mail.php)
 define('EMAIL_HOST', 'smtp.gmail.com');
 define('EMAIL_PORT', 587);
