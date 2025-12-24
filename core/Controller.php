@@ -27,11 +27,24 @@ abstract class Controller {
     public function __construct() {
         $this->db = Database::getInstance();
         
-        // Initialize Auth if not already loaded
-        if (!class_exists('Auth')) {
-            require_once __DIR__ . '/Auth.php';
+        // Auth will be loaded on-demand via $this->auth property access
+        // This prevents initialization issues in base classes
+    }
+    
+    /**
+     * Lazy load Auth instance when accessed
+     */
+    public function __get($name) {
+        if ($name === 'auth') {
+            if ($this->auth === null) {
+                if (!class_exists('Auth')) {
+                    require_once __DIR__ . '/Auth.php';
+                }
+                $this->auth = Auth::getInstance();
+            }
+            return $this->auth;
         }
-        $this->auth = Auth::getInstance();
+        return null;
     }
     
     protected function render($view, $data = []) {
