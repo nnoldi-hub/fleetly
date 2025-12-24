@@ -1,4 +1,8 @@
 <?php
+// Ensure Database class is loaded
+if (!class_exists('Database', false)) {
+    require_once __DIR__ . '/Database.php';
+}
 
 class Auth {
     private static $instance = null;
