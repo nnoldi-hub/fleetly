@@ -132,7 +132,7 @@ abstract class Controller {
         $className = get_class($this);
         $moduleName = strtolower(str_replace('Controller', '', $className));
         
-        // Mapare specială pentru controllere cu nume diferite de folderele lor
+        // Mapare specială pentru controllere cu nume diferite de folderelor lor
         $moduleMapping = [
             'vehicle' => 'vehicles',
             'driver' => 'drivers',
@@ -142,7 +142,15 @@ abstract class Controller {
             'report' => 'reports',
             'notification' => 'notifications',
             'insurance' => 'insurance',
-            'dashboard' => 'dashboard'
+            'dashboard' => 'dashboard',
+            // Marketplace controllers
+            'marketplace' => 'marketplace',
+            'product' => 'marketplace',
+            'cart' => 'marketplace',
+            'checkout' => 'marketplace',
+            'order' => 'marketplace',
+            'catalogadmin' => 'marketplace',
+            'orderadmin' => 'marketplace'
         ];
         
         return $moduleMapping[$moduleName] ?? $moduleName;

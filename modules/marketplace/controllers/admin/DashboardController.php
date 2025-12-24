@@ -38,11 +38,17 @@ class DashboardController extends Controller {
         // Get product count
         $productCount = $this->productModel->count([]);
         
-        $this->render('admin/dashboard', [
+        // Extract data for view
+        extract([
             'stats' => $stats,
             'recentOrders' => $recentOrders,
             'productCount' => $productCount,
             'pageTitle' => 'Marketplace Admin Dashboard'
         ]);
+        
+        $viewFile = __DIR__ . '/../../views/admin/dashboard.php';
+        include __DIR__ . '/../../../../includes/header.php';
+        include $viewFile;
+        include __DIR__ . '/../../../../includes/footer.php';
     }
 }
