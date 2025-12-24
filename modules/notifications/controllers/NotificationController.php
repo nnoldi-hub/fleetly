@@ -88,7 +88,7 @@ class NotificationController extends Controller {
                         // Marchează ca trimis
                         $db->queryOn('notification_queue',
                             "UPDATE notification_queue 
-                             SET status = 'sent', processed_at = NOW() 
+                             SET status = 'sent', last_attempt_at = NOW() 
                              WHERE id = ?",
                             [$item['id']]
                         );

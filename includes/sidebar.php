@@ -19,6 +19,10 @@
             <li class="nav-item mb-2">
                 <a class="nav-link text-white" href="<?= ROUTE_BASE ?>superadmin/companies"><i class="fas fa-sitemap me-2"></i>Gestionează flota</a>
             </li>
+            <!-- MARKETPLACE ADMIN -->
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white bg-success" href="<?= BASE_URL ?>modules/marketplace/?action=admin-dashboard"><i class="fas fa-store me-2"></i>Marketplace Admin</a>
+            </li>
             <li class="nav-item mb-2">
                 <a class="nav-link text-white" href="<?= ROUTE_BASE ?>settings"><i class="fas fa-user-cog me-2"></i>Setări profil</a>
             </li>
@@ -144,7 +148,14 @@
                 </div>
             </li>
 
-            <!-- 5. CONT UTILIZATOR -->
+            <!-- 5. MARKETPLACE -->
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white fw-bold bg-success" href="<?= BASE_URL ?>modules/marketplace/">
+                    <i class="fas fa-store me-2"></i>Marketplace
+                </a>
+            </li>
+
+            <!-- 6. CONT UTILIZATOR -->
             <li class="nav-item mb-2">
                 <a class="nav-link text-white fw-bold" data-bs-toggle="collapse" href="#userAccount" role="button" aria-expanded="false" aria-controls="userAccount">
                     <i class="fas fa-user-circle me-2"></i>Cont Utilizator
