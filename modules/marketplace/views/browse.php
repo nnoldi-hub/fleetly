@@ -216,9 +216,31 @@ $pageTitle = $pageTitle ?? 'Marketplace';
                                         </p>
                                         
                                         <div class="d-flex justify-content-between align-items-center mt-3">
-                                            <span class="price-tag">
-                                                <?= number_format($product['price'], 2) ?> <?= $product['currency'] ?>
-                                            </span>
+                                            <?php 
+                                            // Categorii cu preț variabil (solicită ofertă)
+                                            $quoteCategories = ['asigurari', 'roviniete'];
+                                            $isQuotePrice = in_array($product['category_slug'] ?? '', $quoteCategories);
+                                            
+                                            // Categorii care necesită selectarea unui vehicul
+                                            $vehicleCategories = ['asigurari', 'roviniete', 'anvelope', 'piese-auto'];
+                                            $requiresVehicle = in_array($product['category_slug'] ?? '', $vehicleCategories);
+                                            ?>
+                                            
+                                            <?php if ($isQuotePrice): ?>
+                                                <span class="badge bg-info fs-6">
+                                                    <i class="fas fa-hand-pointer me-1"></i>Solicită ofertă
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="price-tag">
+                                                    <?= number_format($product['price'], 2) ?> <?= $product['currency'] ?>
+                                                </span>
+                                            <?php endif; ?>
+                                            
+                                            <?php if ($requiresVehicle): ?>
+                                                <small class="text-muted" title="Necesită selectarea unui vehicul din flotă">
+                                                    <i class="fas fa-car"></i>
+                                                </small>
+                                            <?php endif; ?>
                                         </div>
                                         
                                         <div class="btn-group mt-3" role="group">
@@ -226,12 +248,20 @@ $pageTitle = $pageTitle ?? 'Marketplace';
                                                class="btn btn-outline-primary">
                                                 <i class="fas fa-info-circle me-1"></i> Detalii
                                             </a>
-                                            <button type="button" 
-                                                    class="btn btn-primary add-to-cart-btn"
-                                                    data-product-id="<?= $product['id'] ?>"
-                                                    data-product-name="<?= htmlspecialchars($product['name']) ?>">
-                                                <i class="fas fa-cart-plus me-1"></i> Adaugă
-                                            </button>
+                                            <?php if ($isQuotePrice): ?>
+                                                <a href="<?= BASE_URL ?>modules/marketplace/?action=product&slug=<?= $product['slug'] ?>" 
+                                                   class="btn btn-success">
+                                                    <i class="fas fa-paper-plane me-1"></i> Solicită
+                                                </a>
+                                            <?php else: ?>
+                                                <button type="button" 
+                                                        class="btn btn-primary add-to-cart-btn"
+                                                        data-product-id="<?= $product['id'] ?>"
+                                                        data-product-name="<?= htmlspecialchars($product['name']) ?>"
+                                                        data-requires-vehicle="<?= $requiresVehicle ? '1' : '0' ?>">
+                                                    <i class="fas fa-cart-plus me-1"></i> Adaugă
+                                                </button>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>
