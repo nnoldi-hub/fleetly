@@ -5,30 +5,40 @@
  * Handles all marketplace requests and routes to appropriate controllers
  */
 
-require_once __DIR__ . '/../../config/config.php';
-require_once __DIR__ . '/../../core/Auth.php';
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-// Authentication check
-$auth = Auth::getInstance();
-if (!$auth->check()) {
-    header('Location: ' . BASE_URL . 'modules/auth/index.php?action=login');
-    exit;
+try {
+    require_once __DIR__ . '/../../config/config.php';
+    require_once __DIR__ . '/../../core/Auth.php';
+
+    // Authentication check
+    $auth = Auth::getInstance();
+    if (!$auth->check()) {
+        header('Location: ' . BASE_URL . 'modules/auth/index.php?action=login');
+        exit;
+    }
+
+    $user = $auth->user();
+} catch (Exception $e) {
+    die('Initialization error: ' . $e->getMessage() . '<br>File: ' . $e->getFile() . '<br>Line: ' . $e->getLine());
 }
-
-$user = $auth->user();
 
 // Get action parameter
 $action = $_GET['action'] ?? 'index';
 
 // Simple routing based on action
-switch ($action) {
-    // Public routes
-    case 'index':
-    case 'browse':
-        require_once __DIR__ . '/controllers/MarketplaceController.php';
-        $controller = new MarketplaceController();
-        $controller->index();
-        break;
+try {
+    switch ($action) {
+        // Public routes
+        case 'index':
+        case 'browse':
+            require_once __DIR__ . '/controllers/MarketplaceController.php';
+            $controller = new MarketplaceController();
+            $controller->index();
+            break;
         
     case 'featured':
         require_once __DIR__ . '/controllers/MarketplaceController.php';
@@ -218,4 +228,7 @@ switch ($action) {
         http_response_code(404);
         echo '404 - Page not found';
         break;
+    }
+} catch (Exception $e) {
+    die('Controller error: ' . $e->getMessage() . '<br>File: ' . $e->getFile() . '<br>Line: ' . $e->getLine() . '<br>Trace: <pre>' . $e->getTraceAsString() . '</pre>');
 }
