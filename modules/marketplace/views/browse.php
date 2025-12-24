@@ -71,6 +71,14 @@ $pageTitle = $pageTitle ?? 'Marketplace';
 </style>
 
 <div class="container-fluid py-4">
+    <!-- Breadcrumb cu link înapoi -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="<?= BASE_URL ?>"><i class="fas fa-home me-1"></i>Dashboard</a></li>
+            <li class="breadcrumb-item active">Marketplace</li>
+        </ol>
+    </nav>
+
     <!-- Hero Section -->
     <div class="marketplace-hero">
         <div class="container">
