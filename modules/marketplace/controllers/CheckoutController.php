@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../core/Controller.php';
+require_once __DIR__ . '/../../../core/Auth.php';
 require_once __DIR__ . '/../models/Cart.php';
 require_once __DIR__ . '/../models/Order.php';
 require_once __DIR__ . '/../models/OrderItem.php';
@@ -27,7 +28,7 @@ class CheckoutController extends Controller {
      * Show checkout page
      */
     public function index() {
-        $user = $this->auth->user();
+        $user = Auth::getInstance()->user();
         $items = $this->cartModel->getItems($user->company_id, $user->id);
         
         // Check if cart is empty
@@ -72,7 +73,7 @@ class CheckoutController extends Controller {
             exit;
         }
         
-        $user = $this->auth->user();
+        $user = Auth::getInstance()->user();
         $items = $this->cartModel->getItems($user->company_id, $user->id);
         
         // Validate cart
@@ -298,7 +299,7 @@ class CheckoutController extends Controller {
             exit;
         }
         
-        $user = $this->auth->user();
+        $user = Auth::getInstance()->user();
         $order = $this->orderModel->getByOrderNumber($orderNumber, $user->company_id);
         
         if (!$order) {

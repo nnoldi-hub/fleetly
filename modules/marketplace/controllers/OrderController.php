@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../core/Controller.php';
+require_once __DIR__ . '/../../../core/Auth.php';
 require_once __DIR__ . '/../models/Order.php';
 require_once __DIR__ . '/../models/OrderItem.php';
 
@@ -20,7 +21,7 @@ class OrderController extends Controller {
      * Show order history
      */
     public function index() {
-        $user = $this->auth->user();
+        $user = Auth::getInstance()->user();
         $status = $_GET['status'] ?? '';
         $page = max(1, (int)($_GET['page'] ?? 1));
         $perPage = 20;
@@ -53,7 +54,7 @@ class OrderController extends Controller {
             exit;
         }
         
-        $user = $this->auth->user();
+        $user = Auth::getInstance()->user();
         $order = $this->orderModel->getByOrderNumber($orderNumber, $user->company_id);
         
         if (!$order) {

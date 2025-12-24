@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../core/Controller.php';
+require_once __DIR__ . '/../../../core/Auth.php';
 require_once __DIR__ . '/../models/Product.php';
 require_once __DIR__ . '/../models/Category.php';
 require_once __DIR__ . '/../models/Cart.php';
@@ -40,7 +41,7 @@ class MarketplaceController extends Controller {
         $totalPages = ceil($total / $perPage);
         
         // Get cart count for navbar
-        $user = $this->auth->user();
+        $user = Auth::getInstance()->user();
         $cartCount = $this->cartModel->getItemCount($user->company_id, $user->id);
         
         $this->render('browse', [
@@ -63,7 +64,7 @@ class MarketplaceController extends Controller {
         $featuredProducts = $this->productModel->getFeatured(8);
         $categories = $this->categoryModel->getWithProductCount();
         
-        $user = $this->auth->user();
+        $user = Auth::getInstance()->user();
         $cartCount = $this->cartModel->getItemCount($user->company_id, $user->id);
         
         $this->render('featured', [

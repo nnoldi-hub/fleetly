@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../core/Controller.php';
+require_once __DIR__ . '/../../../core/Auth.php';
 require_once __DIR__ . '/../models/Cart.php';
 require_once __DIR__ . '/../models/Product.php';
 
@@ -20,7 +21,7 @@ class CartController extends Controller {
      * Show cart page
      */
     public function index() {
-        $user = $this->auth->user();
+        $user = Auth::getInstance()->user();
         $items = $this->cartModel->getItems($user->company_id, $user->id);
         $summary = $this->cartModel->getSummary($user->company_id, $user->id);
         
@@ -172,7 +173,7 @@ class CartController extends Controller {
             exit;
         }
         
-        $user = $this->auth->user();
+        $user = Auth::getInstance()->user();
         $this->cartModel->clearCart($user->company_id, $user->id);
         
         $_SESSION['success'] = 'Coșul a fost golit';

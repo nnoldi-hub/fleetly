@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../../core/Controller.php';
+require_once __DIR__ . '/../../../../core/Auth.php';
 require_once __DIR__ . '/../../models/Order.php';
 require_once __DIR__ . '/../../models/OrderItem.php';
 require_once __DIR__ . '/../../.././../core/Mailer.php';
@@ -15,7 +16,7 @@ class OrderAdminController extends Controller {
         parent::__construct();
         
         // Check if user is SuperAdmin
-        $user = $this->auth->user();
+        $user = Auth::getInstance()->user();
         if ($user->role !== 'superadmin') {
             $_SESSION['error'] = 'Acces interzis';
             header('Location: ' . BASE_URL);

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../core/Controller.php';
+require_once __DIR__ . '/../../../core/Auth.php';
 require_once __DIR__ . '/../models/Product.php';
 require_once __DIR__ . '/../models/Cart.php';
 
@@ -52,7 +53,7 @@ class ProductController extends Controller {
         );
         
         // Get cart count
-        $user = $this->auth->user();
+        $user = Auth::getInstance()->user();
         $cartCount = $this->cartModel->getItemCount($user->company_id, $user->id);
         
         $this->render('product-detail', [
