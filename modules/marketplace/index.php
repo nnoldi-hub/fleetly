@@ -24,7 +24,7 @@ try {
     echo "<!-- Auth instance OK -->";
     
     if (!$auth->check()) {
-        header('Location: ' . BASE_URL . 'modules/auth/index.php?action=login');
+        header('Location: ' . BASE_URL . '?action=login');
         exit;
     }
     echo "<!-- Auth check passed -->";
