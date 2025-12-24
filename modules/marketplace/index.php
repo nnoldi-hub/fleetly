@@ -5,32 +5,29 @@
  * Handles all marketplace requests and routes to appropriate controllers
  */
 
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Enable error reporting for debugging
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-echo "<!-- DEBUG START -->";
-
 try {
     require_once __DIR__ . '/../../config/config.php';
-    echo "<!-- Config OK -->";
-    
     require_once __DIR__ . '/../../core/Auth.php';
-    echo "<!-- Auth loaded -->";
 
     // Authentication check
     $auth = Auth::getInstance();
-    echo "<!-- Auth instance OK -->";
     
     if (!$auth->check()) {
         header('Location: ' . BASE_URL . '?action=login');
         exit;
     }
-    echo "<!-- Auth check passed -->";
 
     $user = $auth->user();
-    echo "<!-- User: " . ($user ? $user->id : 'NULL') . " -->";
 } catch (Exception $e) {
     die('Initialization error: ' . $e->getMessage() . '<br>File: ' . $e->getFile() . '<br>Line: ' . $e->getLine());
 } catch (Error $e) {
