@@ -139,20 +139,8 @@ $requiresVehicle = in_array($product['category_slug'] ?? '', $vehicleCategories)
                                 <label for="fleet_vehicle_id" class="form-label">Selectează vehiculul:</label>
                                 <select class="form-select form-select-lg" id="fleet_vehicle_id" name="fleet_vehicle_id">
                                     <option value="">-- Alege un vehicul --</option>
-                                    <?php 
-                                    // Obține vehiculele din flotă
-                                    $auth = Auth::getInstance();
-                                    $user = $auth->user();
-                                    if ($user && $user->company_id):
-                                        $db = Database::getInstance();
-                                        $vehicles = $db->fetchAll(
-                                            "SELECT id, registration_number, brand, model, vin 
-                                             FROM vehicles WHERE company_id = ? AND status = 'active' 
-                                             ORDER BY registration_number",
-                                            [$user->company_id]
-                                        );
-                                        foreach ($vehicles as $vehicle):
-                                    ?>
+                                    <?php if (!empty($vehicles)): ?>
+                                        <?php foreach ($vehicles as $vehicle): ?>
                                         <option value="<?= $vehicle['id'] ?>" 
                                                 data-plate="<?= htmlspecialchars($vehicle['registration_number']) ?>"
                                                 data-brand="<?= htmlspecialchars($vehicle['brand']) ?>"
@@ -161,11 +149,14 @@ $requiresVehicle = in_array($product['category_slug'] ?? '', $vehicleCategories)
                                             <?= htmlspecialchars($vehicle['registration_number']) ?> - 
                                             <?= htmlspecialchars($vehicle['brand']) ?> <?= htmlspecialchars($vehicle['model']) ?>
                                         </option>
-                                    <?php 
-                                        endforeach;
-                                    endif; 
-                                    ?>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <option value="" disabled>Nu ai vehicule în flotă</option>
+                                    <?php endif; ?>
                                 </select>
+                                <?php if (empty($vehicles)): ?>
+                                    <small class="text-warning"><i class="fas fa-exclamation-triangle me-1"></i>Nu ai vehicule înregistrate. Selectează "Vehicul nou" pentru a încărca documentele.</small>
+                                <?php endif; ?>
                             </div>
                             
                             <!-- Vehicul nou - încărcare documente -->
@@ -310,27 +301,16 @@ $requiresVehicle = in_array($product['category_slug'] ?? '', $vehicleCategories)
                                     </label>
                                     <select class="form-select" id="cart_vehicle_id" name="vehicle_id" required>
                                         <option value="">-- Alege un vehicul --</option>
-                                        <?php 
-                                        $auth = Auth::getInstance();
-                                        $user = $auth->user();
-                                        if ($user && $user->company_id):
-                                            $db = Database::getInstance();
-                                            $vehicles = $db->fetchAll(
-                                                "SELECT id, registration_number, brand, model 
-                                                 FROM vehicles WHERE company_id = ? AND status = 'active' 
-                                                 ORDER BY registration_number",
-                                                [$user->company_id]
-                                            );
-                                            foreach ($vehicles as $vehicle):
-                                        ?>
+                                        <?php if (!empty($vehicles)): ?>
+                                            <?php foreach ($vehicles as $vehicle): ?>
                                             <option value="<?= $vehicle['id'] ?>">
                                                 <?= htmlspecialchars($vehicle['registration_number']) ?> - 
                                                 <?= htmlspecialchars($vehicle['brand']) ?> <?= htmlspecialchars($vehicle['model']) ?>
                                             </option>
-                                        <?php 
-                                            endforeach;
-                                        endif; 
-                                        ?>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <option value="" disabled>Nu ai vehicule în flotă</option>
+                                        <?php endif; ?>
                                     </select>
                                     <small class="text-muted">Selectează vehiculul pentru care comanzi acest produs</small>
                                 </div>
