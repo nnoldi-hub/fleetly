@@ -24,37 +24,49 @@ class MarketplaceController extends Controller {
      * Main marketplace page - browse products
      */
     public function index() {
-        $categoryId = $_GET['category'] ?? null;
-        $search = $_GET['search'] ?? '';
-        $page = max(1, (int)($_GET['page'] ?? 1));
-        $perPage = 12;
-        $offset = ($page - 1) * $perPage;
-        
-        $filters = [
-            'category_id' => $categoryId,
-            'search' => $search
-        ];
-        
-        $products = $this->productModel->getAll($filters, $perPage, $offset);
-        $categories = $this->categoryModel->getWithProductCount();
-        $total = $this->productModel->count($filters);
-        $totalPages = ceil($total / $perPage);
-        
-        // Get cart count for navbar
-        $user = Auth::getInstance()->user();
-        $cartCount = $this->cartModel->getItemCount($user->company_id, $user->id);
-        
-        $this->render('browse', [
-            'products' => $products,
-            'categories' => $categories,
-            'currentCategory' => $categoryId,
-            'search' => $search,
-            'currentPage' => $page,
-            'totalPages' => $totalPages,
-            'total' => $total,
-            'cartCount' => $cartCount,
-            'pageTitle' => 'Marketplace - Produse pentru Flotă'
-        ]);
+        try {
+            $categoryId = $_GET['category'] ?? null;
+            $search = $_GET['search'] ?? '';
+            $page = max(1, (int)($_GET['page'] ?? 1));
+            $perPage = 12;
+            $offset = ($page - 1) * $perPage;
+            
+            $filters = [
+                'category_id' => $categoryId,
+                'search' => $search
+            ];
+            
+            $products = $this->productModel->getAll($filters, $perPage, $offset);
+            $categories = $this->categoryModel->getWithProductCount();
+            $total = $this->productModel->count($filters);
+            $totalPages = ceil($total / $perPage);
+            
+            // Get cart count for navbar
+            $auth = Auth::getInstance();
+            $user = $auth->user();
+            $cartCount = 0;
+            
+            if ($user && isset($user->company_id) && isset($user->id)) {
+                $cartCount = $this->cartModel->getItemCount($user->company_id, $user->id);
+            }
+            
+            $this->render('browse', [
+                'products' => $products,
+                'categories' => $categories,
+                'currentCategory' => $categoryId,
+                'search' => $search,
+                'currentPage' => $page,
+                'totalPages' => $totalPages,
+                'total' => $total,
+                'cartCount' => $cartCount,
+                'pageTitle' => 'Marketplace - Produse pentru Flotă'
+            ]);
+        } catch (Exception $e) {
+            error_log('MarketplaceController::index error: ' . $e->getMessage());
+            http_response_code(500);
+            echo 'Eroare: ' . htmlspecialchars($e->getMessage());
+            exit;
+        }
     }
     
     /**
