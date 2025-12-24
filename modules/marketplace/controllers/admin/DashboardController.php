@@ -22,7 +22,8 @@ class DashboardController extends Controller {
         $auth = Auth::getInstance();
         $user = $auth->user();
         
-        if (!$user || $user->role !== 'superadmin') {
+        // Check role_slug for superadmin
+        if (!$user || ($user->role_slug !== 'superadmin' && (!isset($user->role) || $user->role !== 'superadmin'))) {
             $_SESSION['error'] = 'Acces interzis';
             header('Location: ' . BASE_URL);
             exit;

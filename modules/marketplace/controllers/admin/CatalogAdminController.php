@@ -16,7 +16,9 @@ class CatalogAdminController extends Controller {
         
         // Check if user is SuperAdmin
         $user = Auth::getInstance()->user();
-        if ($user->role !== 'superadmin') {
+        $isSuperAdmin = (isset($user->role_slug) && $user->role_slug === 'superadmin') 
+                     || (isset($user->role) && $user->role === 'superadmin');
+        if (!$user || !$isSuperAdmin) {
             $_SESSION['error'] = 'Acces interzis';
             header('Location: ' . BASE_URL);
             exit;

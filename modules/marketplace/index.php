@@ -34,6 +34,14 @@ try {
     die('FATAL Initialization error: ' . $e->getMessage() . '<br>File: ' . $e->getFile() . '<br>Line: ' . $e->getLine());
 }
 
+// Helper function to check if user is superadmin
+function isSuperAdmin($user) {
+    if (!$user) return false;
+    // Check both role_slug (from DB join) and role (if set directly)
+    return (isset($user->role_slug) && $user->role_slug === 'superadmin') 
+        || (isset($user->role) && $user->role === 'superadmin');
+}
+
 // Get action parameter
 $action = $_GET['action'] ?? 'index';
 
@@ -123,7 +131,7 @@ try {
     // Admin routes (SuperAdmin only)
     case 'admin':
     case 'admin-dashboard':
-        if ($user->role !== 'superadmin') {
+        if (!isSuperAdmin($user)) {
             $_SESSION['error'] = 'Acces interzis';
             header('Location: ' . BASE_URL);
             exit;
@@ -134,7 +142,7 @@ try {
         break;
         
     case 'admin-products':
-        if ($user->role !== 'superadmin') {
+        if (!isSuperAdmin($user)) {
             $_SESSION['error'] = 'Acces interzis';
             header('Location: ' . BASE_URL);
             exit;
@@ -145,7 +153,7 @@ try {
         break;
         
     case 'admin-product-create':
-        if ($user->role !== 'superadmin') {
+        if (!isSuperAdmin($user)) {
             $_SESSION['error'] = 'Acces interzis';
             header('Location: ' . BASE_URL);
             exit;
@@ -156,7 +164,7 @@ try {
         break;
         
     case 'admin-product-store':
-        if ($user->role !== 'superadmin') {
+        if (!isSuperAdmin($user)) {
             $_SESSION['error'] = 'Acces interzis';
             header('Location: ' . BASE_URL);
             exit;
@@ -167,7 +175,7 @@ try {
         break;
         
     case 'admin-product-edit':
-        if ($user->role !== 'superadmin') {
+        if (!isSuperAdmin($user)) {
             $_SESSION['error'] = 'Acces interzis';
             header('Location: ' . BASE_URL);
             exit;
@@ -178,7 +186,7 @@ try {
         break;
         
     case 'admin-product-update':
-        if ($user->role !== 'superadmin') {
+        if (!isSuperAdmin($user)) {
             $_SESSION['error'] = 'Acces interzis';
             header('Location: ' . BASE_URL);
             exit;
@@ -189,7 +197,7 @@ try {
         break;
         
     case 'admin-product-delete':
-        if ($user->role !== 'superadmin') {
+        if (!isSuperAdmin($user)) {
             $_SESSION['error'] = 'Acces interzis';
             header('Location: ' . BASE_URL);
             exit;
@@ -200,7 +208,7 @@ try {
         break;
         
     case 'admin-orders':
-        if ($user->role !== 'superadmin') {
+        if (!isSuperAdmin($user)) {
             $_SESSION['error'] = 'Acces interzis';
             header('Location: ' . BASE_URL);
             exit;
@@ -211,7 +219,7 @@ try {
         break;
         
     case 'admin-order':
-        if ($user->role !== 'superadmin') {
+        if (!isSuperAdmin($user)) {
             $_SESSION['error'] = 'Acces interzis';
             header('Location: ' . BASE_URL);
             exit;
@@ -222,7 +230,7 @@ try {
         break;
         
     case 'admin-order-update-status':
-        if ($user->role !== 'superadmin') {
+        if (!isSuperAdmin($user)) {
             $_SESSION['error'] = 'Acces interzis';
             header('Location: ' . BASE_URL);
             exit;
