@@ -234,4 +234,33 @@ $router->addRoute('GET', '/service/reports/mechanic-performance', 'ServiceReport
 $router->addRoute('GET', '/service/reports/work-times', 'ServiceReportController', 'workTimes');
 $router->addRoute('GET', '/service/reports/export', 'ServiceReportController', 'export');
 
+// Marketplace - Public routes
+$router->addRoute('GET', '/marketplace', 'MarketplaceController', 'index');
+$router->addRoute('GET', '/marketplace/browse', 'MarketplaceController', 'index');
+$router->addRoute('GET', '/marketplace/product', 'ProductController', 'show');
+$router->addRoute('GET', '/marketplace/cart', 'CartController', 'index');
+$router->addRoute('POST', '/marketplace/cart/add', 'CartController', 'add');
+$router->addRoute('POST', '/marketplace/cart/update', 'CartController', 'update');
+$router->addRoute('POST', '/marketplace/cart/remove', 'CartController', 'remove');
+$router->addRoute('POST', '/marketplace/cart/clear', 'CartController', 'clear');
+$router->addRoute('GET', '/marketplace/checkout', 'CheckoutController', 'index');
+$router->addRoute('POST', '/marketplace/checkout/process', 'CheckoutController', 'process');
+$router->addRoute('GET', '/marketplace/orders', 'OrderController', 'index');
+$router->addRoute('GET', '/marketplace/order', 'OrderController', 'details');
+$router->addRoute('GET', '/marketplace/order-confirmation', 'CheckoutController', 'confirmation');
+
+// Marketplace - Admin routes
+$router->addRoute('GET', '/marketplace/admin', 'DashboardController', 'index');
+$router->addRoute('GET', '/marketplace/admin/dashboard', 'DashboardController', 'index');
+$router->addRoute('GET', '/marketplace/admin/products', 'CatalogAdminController', 'index');
+$router->addRoute('GET', '/marketplace/admin/products/add', 'CatalogAdminController', 'add');
+$router->addRoute('POST', '/marketplace/admin/products/add', 'CatalogAdminController', 'add');
+$router->addRoute('GET', '/marketplace/admin/products/edit', 'CatalogAdminController', 'edit');
+$router->addRoute('POST', '/marketplace/admin/products/edit', 'CatalogAdminController', 'edit');
+$router->addRoute('POST', '/marketplace/admin/products/delete', 'CatalogAdminController', 'delete');
+$router->addRoute('POST', '/marketplace/admin/products/toggle-status', 'CatalogAdminController', 'toggleStatus');
+$router->addRoute('GET', '/marketplace/admin/orders', 'OrderAdminController', 'index');
+$router->addRoute('GET', '/marketplace/admin/orders/view', 'OrderAdminController', 'view');
+$router->addRoute('POST', '/marketplace/admin/orders/update-status', 'OrderAdminController', 'updateStatus');
+
 // Sf�r?it liste
