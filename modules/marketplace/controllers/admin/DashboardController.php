@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../../../core/Controller.php';
 require_once __DIR__ . '/../../models/Order.php';
 require_once __DIR__ . '/../../models/Product.php';
+require_once __DIR__ . '/../../models/Category.php';
 
 /**
  * Admin Dashboard Controller - Marketplace overview
@@ -9,6 +10,7 @@ require_once __DIR__ . '/../../models/Product.php';
 class DashboardController extends Controller {
     private $orderModel;
     private $productModel;
+    private $categoryModel;
     
     public function __construct() {
         parent::__construct();
@@ -23,6 +25,7 @@ class DashboardController extends Controller {
         
         $this->orderModel = new Order();
         $this->productModel = new Product();
+        $this->categoryModel = new Category();
     }
     
     /**
@@ -32,17 +35,21 @@ class DashboardController extends Controller {
         // Get statistics
         $stats = $this->orderModel->getStatistics();
         
+        // Add product stats
+        $stats['total_products'] = $this->productModel->count([]);
+        $stats['active_products'] = $this->productModel->count(['is_active' => 1]);
+        
         // Get recent orders
         $recentOrders = $this->orderModel->getAll([], 10, 0);
         
-        // Get product count
-        $productCount = $this->productModel->count([]);
+        // Get category stats
+        $categoryStats = $this->categoryModel->getWithProductCount();
         
         // Extract data for view
         extract([
             'stats' => $stats,
             'recentOrders' => $recentOrders,
-            'productCount' => $productCount,
+            'categoryStats' => $categoryStats,
             'pageTitle' => 'Marketplace Admin Dashboard'
         ]);
         

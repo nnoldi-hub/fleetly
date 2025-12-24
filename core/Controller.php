@@ -22,9 +22,16 @@ if (!class_exists('Database')) {
 
 abstract class Controller {
     protected $db;
+    protected $auth;
     
     public function __construct() {
         $this->db = Database::getInstance();
+        
+        // Initialize Auth if not already loaded
+        if (!class_exists('Auth')) {
+            require_once __DIR__ . '/Auth.php';
+        }
+        $this->auth = Auth::getInstance();
     }
     
     protected function render($view, $data = []) {
