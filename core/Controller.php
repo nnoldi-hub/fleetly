@@ -22,29 +22,9 @@ if (!class_exists('Database')) {
 
 abstract class Controller {
     protected $db;
-    protected $auth;
     
     public function __construct() {
         $this->db = Database::getInstance();
-        
-        // Auth will be loaded on-demand via $this->auth property access
-        // This prevents initialization issues in base classes
-    }
-    
-    /**
-     * Lazy load Auth instance when accessed
-     */
-    public function __get($name) {
-        if ($name === 'auth') {
-            if ($this->auth === null) {
-                if (!class_exists('Auth')) {
-                    require_once __DIR__ . '/Auth.php';
-                }
-                $this->auth = Auth::getInstance();
-            }
-            return $this->auth;
-        }
-        return null;
     }
     
     protected function render($view, $data = []) {
