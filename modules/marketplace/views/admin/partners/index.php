@@ -177,7 +177,8 @@ $pageTitle = 'Administrare Parteneri & Reclame';
             </div>
         </div>
         
-        <!-- Statistici sumar -->
+        <!-- Statistici sumar (doar dacă există parteneri) -->
+        <?php if (!empty($partners)): ?>
         <div class="row mt-4">
             <div class="col-md-3">
                 <div class="card bg-primary text-white">
@@ -212,4 +213,5 @@ $pageTitle = 'Administrare Parteneri & Reclame';
                 </div>
             </div>
         </div>
+        <?php endif; ?>
 </div>
