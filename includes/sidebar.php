@@ -19,13 +19,9 @@
             <li class="nav-item mb-2">
                 <a class="nav-link text-white" href="<?= ROUTE_BASE ?>superadmin/companies"><i class="fas fa-sitemap me-2"></i>Gestionează flota</a>
             </li>
-            <!-- MARKETPLACE ADMIN -->
-            <li class="nav-item mb-2">
-                <a class="nav-link text-white bg-success" href="<?= BASE_URL ?>modules/marketplace/?action=admin-dashboard"><i class="fas fa-store me-2"></i>Marketplace Admin</a>
-            </li>
             <!-- PARTENERI & RECLAME ADMIN -->
             <li class="nav-item mb-2">
-                <a class="nav-link text-white bg-info" href="<?= BASE_URL ?>modules/marketplace/?action=admin-partners"><i class="fas fa-handshake me-2"></i>Parteneri & Reclame</a>
+                <a class="nav-link text-white" href="<?= BASE_URL ?>modules/marketplace/?action=admin-partners"><i class="fas fa-handshake me-2"></i>Parteneri & Reclame</a>
             </li>
             <li class="nav-item mb-2">
                 <a class="nav-link text-white" href="<?= ROUTE_BASE ?>settings"><i class="fas fa-user-cog me-2"></i>Setări profil</a>
@@ -152,16 +148,9 @@
                 </div>
             </li>
 
-            <!-- 5. MARKETPLACE -->
+            <!-- 5. PARTENERI & OFERTE -->
             <li class="nav-item mb-2">
-                <a class="nav-link text-white fw-bold bg-success" href="<?= BASE_URL ?>modules/marketplace/">
-                    <i class="fas fa-store me-2"></i>Marketplace
-                </a>
-            </li>
-
-            <!-- 5.1 PARTENERI & OFERTE -->
-            <li class="nav-item mb-2">
-                <a class="nav-link text-white fw-bold bg-info" href="<?= BASE_URL ?>modules/marketplace/?action=partners">
+                <a class="nav-link text-white fw-bold" href="<?= BASE_URL ?>modules/marketplace/?action=partners">
                     <i class="fas fa-handshake me-2"></i>Parteneri & Oferte
                 </a>
             </li>
@@ -207,6 +196,9 @@
             </li>
             <li class="nav-item mb-2">
                 <a class="nav-link" href="<?= ROUTE_BASE ?>superadmin/companies"><i class="fas fa-sitemap me-2"></i>Gestionează flota</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link" href="<?= BASE_URL ?>modules/marketplace/?action=admin-partners"><i class="fas fa-handshake me-2"></i>Parteneri & Reclame</a>
             </li>
             <li class="nav-item mb-2">
                 <a class="nav-link" href="<?= ROUTE_BASE ?>settings"><i class="fas fa-user-cog me-2"></i>Setări profil</a>
@@ -333,16 +325,9 @@
                 </div>
             </li>
 
-            <!-- 5. MARKETPLACE (Mobile) -->
+            <!-- 5. PARTENERI & OFERTE (Mobile) -->
             <li class="nav-item mb-2">
-                <a class="nav-link fw-bold bg-success text-white" href="<?= BASE_URL ?>modules/marketplace/">
-                    <i class="fas fa-store me-2"></i>Marketplace
-                </a>
-            </li>
-
-            <!-- 5.1 PARTENERI & OFERTE (Mobile) -->
-            <li class="nav-item mb-2">
-                <a class="nav-link fw-bold bg-info text-white" href="<?= BASE_URL ?>modules/marketplace/?action=partners">
+                <a class="nav-link fw-bold" href="<?= BASE_URL ?>modules/marketplace/?action=partners">
                     <i class="fas fa-handshake me-2"></i>Parteneri & Oferte
                 </a>
             </li>
