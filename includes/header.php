@@ -35,7 +35,7 @@
     </style>
 </head>
 <body>
-  <?php include 'includes/sidebar.php'; ?>
+  <?php include __DIR__ . '/sidebar.php'; ?>
   <header class="bg-primary text-white py-2 px-3 app-header">
     <div class="d-flex align-items-center">
       <!-- Mobile: offcanvas toggle -->
