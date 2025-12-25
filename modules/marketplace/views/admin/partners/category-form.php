@@ -4,8 +4,7 @@
  */
 $isEdit = !empty($category->id);
 $pageTitle = $isEdit ? 'Editare Categorie' : 'Adaugă Categorie Nouă';
-include __DIR__ . '/../../../../../includes/header.php';
-include __DIR__ . '/../../../../../includes/sidebar.php';
+?>
 
 // Iconițe disponibile
 $availableIcons = [
@@ -46,8 +45,7 @@ $availableColors = [
 ];
 ?>
 
-<main class="main-content" style="margin-left: 220px; padding: 20px;">
-    <div class="container-fluid">
+<div class="container-fluid">
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
@@ -180,7 +178,7 @@ $availableColors = [
             </div>
         </div>
     </div>
-</main>
+</div>
 
 <style>
 .color-option .color-swatch {
@@ -229,5 +227,3 @@ document.addEventListener('DOMContentLoaded', function() {
     descInput.addEventListener('input', updatePreview);
 });
 </script>
-
-<?php include __DIR__ . '/../../../../../includes/footer.php'; ?>

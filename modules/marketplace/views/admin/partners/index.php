@@ -3,16 +3,13 @@
  * Admin - Lista Parteneri
  */
 $pageTitle = 'Administrare Parteneri & Reclame';
-include __DIR__ . '/../../../../../includes/header.php';
-include __DIR__ . '/../../../../../includes/sidebar.php';
 ?>
 
-<main class="main-content" style="margin-left: 220px; padding: 20px;">
-    <div class="container-fluid">
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h1 class="h3 mb-0"><i class="fas fa-handshake text-primary me-2"></i>Parteneri & Reclame</h1>
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0"><i class="fas fa-handshake text-primary me-2"></i>Parteneri & Reclame</h1>
                 <p class="text-muted mb-0">Gestionează linkurile și reclamele către firmele partenere</p>
             </div>
             <div>
@@ -215,7 +212,4 @@ include __DIR__ . '/../../../../../includes/sidebar.php';
                 </div>
             </div>
         </div>
-    </div>
-</main>
-
-<?php include __DIR__ . '/../../../../../includes/footer.php'; ?>
+</div>

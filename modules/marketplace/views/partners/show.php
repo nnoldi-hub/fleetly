@@ -3,20 +3,17 @@
  * Pagina detalii Partener
  */
 $pageTitle = htmlspecialchars($partner['name']) . ' - Parteneri';
-include __DIR__ . '/../../../../includes/header.php';
-include __DIR__ . '/../../../../includes/sidebar.php';
 ?>
 
-<main class="main-content" style="margin-left: 220px; padding: 20px;">
-    <div class="container-fluid">
-        <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="<?= BASE_URL ?>modules/marketplace/?action=partners">Parteneri</a></li>
-                <li class="breadcrumb-item"><a href="<?= BASE_URL ?>modules/marketplace/?action=partners&category=<?= urlencode($partner['category_slug']) ?>"><?= htmlspecialchars($partner['category_name']) ?></a></li>
-                <li class="breadcrumb-item active"><?= htmlspecialchars($partner['name']) ?></li>
-            </ol>
-        </nav>
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="<?= BASE_URL ?>modules/marketplace/?action=partners">Parteneri</a></li>
+            <li class="breadcrumb-item"><a href="<?= BASE_URL ?>modules/marketplace/?action=partners&category=<?= urlencode($partner['category_slug']) ?>"><?= htmlspecialchars($partner['category_name']) ?></a></li>
+            <li class="breadcrumb-item active"><?= htmlspecialchars($partner['name']) ?></li>
+        </ol>
+    </nav>
         
         <!-- Banner -->
         <?php if ($partner['banner_image']): ?>
@@ -244,8 +241,7 @@ include __DIR__ . '/../../../../includes/sidebar.php';
                 <i class="fas fa-arrow-left me-2"></i>Înapoi la toți partenerii
             </a>
         </div>
-    </div>
-</main>
+</div>
 
 <script>
 function copyPromoCode(code) {
@@ -261,5 +257,3 @@ function copyPromoCode(code) {
     line-height: 1.8;
 }
 </style>
-
-<?php include __DIR__ . '/../../../../includes/footer.php'; ?>

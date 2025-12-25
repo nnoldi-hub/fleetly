@@ -61,7 +61,10 @@ class PartnerController {
             $selectedCategory = $this->categoryModel->getBySlug($filters['category_slug']);
         }
         
+        // Include header (care include și sidebar)
+        include __DIR__ . '/../../../includes/header.php';
         include __DIR__ . '/../views/partners/index.php';
+        include __DIR__ . '/../../../includes/footer.php';
     }
     
     /**
@@ -106,7 +109,10 @@ class PartnerController {
         
         $similarPartners = array_slice($similarPartners, 0, 4);
         
+        // Include header (care include și sidebar)
+        include __DIR__ . '/../../../includes/header.php';
         include __DIR__ . '/../views/partners/show.php';
+        include __DIR__ . '/../../../includes/footer.php';
     }
     
     /**

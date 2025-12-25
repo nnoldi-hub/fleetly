@@ -3,8 +3,6 @@
  * Admin - Lista Categorii Parteneri
  */
 $pageTitle = 'Categorii Parteneri';
-include __DIR__ . '/../../../../../includes/header.php';
-include __DIR__ . '/../../../../../includes/sidebar.php';
 
 // Iconițe disponibile pentru selectare
 $availableIcons = [
@@ -26,8 +24,7 @@ $availableIcons = [
 ];
 ?>
 
-<main class="main-content" style="margin-left: 220px; padding: 20px;">
-    <div class="container-fluid">
+<div class="container-fluid">
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
@@ -127,6 +124,4 @@ $availableIcons = [
             <?php endif; ?>
         </div>
     </div>
-</main>
-
-<?php include __DIR__ . '/../../../../../includes/footer.php'; ?>
+</div>

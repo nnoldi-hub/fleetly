@@ -3,16 +3,13 @@
  * Pagina principală Parteneri - vizualizare pentru utilizatori
  */
 $pageTitle = 'Parteneri & Oferte';
-include __DIR__ . '/../../../../includes/header.php';
-include __DIR__ . '/../../../../includes/sidebar.php';
 ?>
 
-<main class="main-content" style="margin-left: 220px; padding: 20px;">
-    <div class="container-fluid">
-        <!-- Header -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="bg-primary text-white rounded-3 p-4 mb-4">
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="bg-primary text-white rounded-3 p-4 mb-4">
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <h1 class="display-6 mb-2"><i class="fas fa-handshake me-3"></i>Parteneri & Oferte Speciale</h1>
@@ -246,8 +243,7 @@ include __DIR__ . '/../../../../includes/sidebar.php';
                 <p class="text-muted">Partenerii vor fi adăugați în curând</p>
             </div>
         <?php endif; ?>
-    </div>
-</main>
+</div>
 
 <style>
 .category-card {
@@ -267,5 +263,3 @@ include __DIR__ . '/../../../../includes/sidebar.php';
     box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15);
 }
 </style>
-
-<?php include __DIR__ . '/../../../../includes/footer.php'; ?>

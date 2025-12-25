@@ -29,6 +29,15 @@ class PartnerAdminController {
     }
     
     /**
+     * Render view cu header și footer
+     */
+    private function render($viewPath) {
+        include __DIR__ . '/../../../../includes/header.php';
+        include $viewPath;
+        include __DIR__ . '/../../../../includes/footer.php';
+    }
+    
+    /**
      * Dashboard parteneri - lista tuturor partenerilor
      */
     public function index() {
@@ -41,7 +50,7 @@ class PartnerAdminController {
         $partners = $this->partnerModel->getAll($filters);
         $categories = $this->categoryModel->getAll(true);
         
-        include __DIR__ . '/../../views/admin/partners/index.php';
+        $this->render(__DIR__ . '/../../views/admin/partners/index.php');
     }
     
     /**
@@ -52,7 +61,7 @@ class PartnerAdminController {
         $partner = null;
         $errors = [];
         
-        include __DIR__ . '/../../views/admin/partners/form.php';
+        $this->render(__DIR__ . '/../../views/admin/partners/form.php');
     }
     
     /**
@@ -74,7 +83,7 @@ class PartnerAdminController {
         if (!empty($errors)) {
             $categories = $this->categoryModel->getAll(true);
             $partner = (object) $data;
-            include __DIR__ . '/../../views/admin/partners/form.php';
+            $this->render(__DIR__ . '/../../views/admin/partners/form.php');
             return;
         }
         
@@ -88,7 +97,7 @@ class PartnerAdminController {
             $_SESSION['error'] = 'Eroare la salvare: ' . $e->getMessage();
             $categories = $this->categoryModel->getAll(true);
             $partner = (object) $data;
-            include __DIR__ . '/../../views/admin/partners/form.php';
+            $this->render(__DIR__ . '/../../views/admin/partners/form.php');
         }
         exit;
     }
@@ -119,7 +128,7 @@ class PartnerAdminController {
         // Obține statistici
         $stats = $this->partnerModel->getStats($id);
         
-        include __DIR__ . '/../../views/admin/partners/form.php';
+        $this->render(__DIR__ . '/../../views/admin/partners/form.php');
     }
     
     /**
@@ -152,7 +161,7 @@ class PartnerAdminController {
         if (!empty($errors)) {
             $partner = (object) array_merge($this->partnerModel->getById($id), $data);
             $categories = $this->categoryModel->getAll(true);
-            include __DIR__ . '/../../views/admin/partners/form.php';
+            $this->render(__DIR__ . '/../../views/admin/partners/form.php');
             return;
         }
         
@@ -247,7 +256,7 @@ class PartnerAdminController {
      */
     public function categories() {
         $categories = $this->categoryModel->getAllWithCounts();
-        include __DIR__ . '/../../views/admin/partners/categories.php';
+        $this->render(__DIR__ . '/../../views/admin/partners/categories.php');
     }
     
     /**
@@ -256,7 +265,7 @@ class PartnerAdminController {
     public function createCategory() {
         $category = null;
         $errors = [];
-        include __DIR__ . '/../../views/admin/partners/category-form.php';
+        $this->render(__DIR__ . '/../../views/admin/partners/category-form.php');
     }
     
     /**
@@ -284,7 +293,7 @@ class PartnerAdminController {
         
         if (!empty($errors)) {
             $category = (object) $data;
-            include __DIR__ . '/../../views/admin/partners/category-form.php';
+            $this->render(__DIR__ . '/../../views/admin/partners/category-form.php');
             return;
         }
         
@@ -295,7 +304,7 @@ class PartnerAdminController {
         } catch (Exception $e) {
             $_SESSION['error'] = 'Eroare la salvare: ' . $e->getMessage();
             $category = (object) $data;
-            include __DIR__ . '/../../views/admin/partners/category-form.php';
+            $this->render(__DIR__ . '/../../views/admin/partners/category-form.php');
         }
         exit;
     }
@@ -322,7 +331,7 @@ class PartnerAdminController {
         $category = (object) $category;
         $errors = [];
         
-        include __DIR__ . '/../../views/admin/partners/category-form.php';
+        $this->render(__DIR__ . '/../../views/admin/partners/category-form.php');
     }
     
     /**
