@@ -23,6 +23,10 @@
             <li class="nav-item mb-2">
                 <a class="nav-link text-white bg-success" href="<?= BASE_URL ?>modules/marketplace/?action=admin-dashboard"><i class="fas fa-store me-2"></i>Marketplace Admin</a>
             </li>
+            <!-- PARTENERI & RECLAME ADMIN -->
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white bg-info" href="<?= BASE_URL ?>modules/marketplace/?action=admin-partners"><i class="fas fa-handshake me-2"></i>Parteneri & Reclame</a>
+            </li>
             <li class="nav-item mb-2">
                 <a class="nav-link text-white" href="<?= ROUTE_BASE ?>settings"><i class="fas fa-user-cog me-2"></i>Setări profil</a>
             </li>
@@ -152,6 +156,13 @@
             <li class="nav-item mb-2">
                 <a class="nav-link text-white fw-bold bg-success" href="<?= BASE_URL ?>modules/marketplace/">
                     <i class="fas fa-store me-2"></i>Marketplace
+                </a>
+            </li>
+
+            <!-- 5.1 PARTENERI & OFERTE -->
+            <li class="nav-item mb-2">
+                <a class="nav-link text-white fw-bold bg-info" href="<?= BASE_URL ?>modules/marketplace/?action=partners">
+                    <i class="fas fa-handshake me-2"></i>Parteneri & Oferte
                 </a>
             </li>
 
@@ -322,7 +333,21 @@
                 </div>
             </li>
 
-            <!-- 5. CONT UTILIZATOR (Mobile) -->
+            <!-- 5. MARKETPLACE (Mobile) -->
+            <li class="nav-item mb-2">
+                <a class="nav-link fw-bold bg-success text-white" href="<?= BASE_URL ?>modules/marketplace/">
+                    <i class="fas fa-store me-2"></i>Marketplace
+                </a>
+            </li>
+
+            <!-- 5.1 PARTENERI & OFERTE (Mobile) -->
+            <li class="nav-item mb-2">
+                <a class="nav-link fw-bold bg-info text-white" href="<?= BASE_URL ?>modules/marketplace/?action=partners">
+                    <i class="fas fa-handshake me-2"></i>Parteneri & Oferte
+                </a>
+            </li>
+
+            <!-- 6. CONT UTILIZATOR (Mobile) -->
             <li class="nav-item mb-2">
                 <a class="nav-link fw-bold" data-bs-toggle="collapse" href="#userAccountMobile" role="button" aria-expanded="false" aria-controls="userAccountMobile">
                     <i class="fas fa-user-circle me-2"></i>Cont Utilizator

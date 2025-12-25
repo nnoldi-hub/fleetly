@@ -239,6 +239,187 @@ try {
         $controller = new OrderAdminController();
         $controller->updateStatus();
         break;
+    
+    // ========== PARTENERI & RECLAME - Vizualizare Utilizatori ==========
+    case 'partners':
+        require_once __DIR__ . '/controllers/PartnerController.php';
+        $controller = new PartnerController();
+        $controller->index();
+        break;
+        
+    case 'partner-show':
+        require_once __DIR__ . '/controllers/PartnerController.php';
+        $controller = new PartnerController();
+        $controller->show();
+        break;
+        
+    case 'partner-redirect':
+        require_once __DIR__ . '/controllers/PartnerController.php';
+        $controller = new PartnerController();
+        $controller->redirect();
+        break;
+        
+    case 'partner-category':
+        require_once __DIR__ . '/controllers/PartnerController.php';
+        $controller = new PartnerController();
+        $controller->category();
+        break;
+    
+    // ========== PARTENERI & RECLAME - Admin (SuperAdmin Only) ==========
+    case 'admin-partners':
+        if (!isSuperAdmin($user)) {
+            $_SESSION['error'] = 'Acces interzis';
+            header('Location: ' . BASE_URL);
+            exit;
+        }
+        require_once __DIR__ . '/controllers/admin/PartnerAdminController.php';
+        $controller = new PartnerAdminController();
+        $controller->index();
+        break;
+        
+    case 'admin-partner-create':
+        if (!isSuperAdmin($user)) {
+            $_SESSION['error'] = 'Acces interzis';
+            header('Location: ' . BASE_URL);
+            exit;
+        }
+        require_once __DIR__ . '/controllers/admin/PartnerAdminController.php';
+        $controller = new PartnerAdminController();
+        $controller->create();
+        break;
+        
+    case 'admin-partner-store':
+        if (!isSuperAdmin($user)) {
+            $_SESSION['error'] = 'Acces interzis';
+            header('Location: ' . BASE_URL);
+            exit;
+        }
+        require_once __DIR__ . '/controllers/admin/PartnerAdminController.php';
+        $controller = new PartnerAdminController();
+        $controller->store();
+        break;
+        
+    case 'admin-partner-edit':
+        if (!isSuperAdmin($user)) {
+            $_SESSION['error'] = 'Acces interzis';
+            header('Location: ' . BASE_URL);
+            exit;
+        }
+        require_once __DIR__ . '/controllers/admin/PartnerAdminController.php';
+        $controller = new PartnerAdminController();
+        $controller->edit();
+        break;
+        
+    case 'admin-partner-update':
+        if (!isSuperAdmin($user)) {
+            $_SESSION['error'] = 'Acces interzis';
+            header('Location: ' . BASE_URL);
+            exit;
+        }
+        require_once __DIR__ . '/controllers/admin/PartnerAdminController.php';
+        $controller = new PartnerAdminController();
+        $controller->update();
+        break;
+        
+    case 'admin-partner-delete':
+        if (!isSuperAdmin($user)) {
+            $_SESSION['error'] = 'Acces interzis';
+            header('Location: ' . BASE_URL);
+            exit;
+        }
+        require_once __DIR__ . '/controllers/admin/PartnerAdminController.php';
+        $controller = new PartnerAdminController();
+        $controller->delete();
+        break;
+        
+    case 'admin-partner-toggle-status':
+        if (!isSuperAdmin($user)) {
+            $_SESSION['error'] = 'Acces interzis';
+            header('Location: ' . BASE_URL);
+            exit;
+        }
+        require_once __DIR__ . '/controllers/admin/PartnerAdminController.php';
+        $controller = new PartnerAdminController();
+        $controller->toggleStatus();
+        break;
+        
+    case 'admin-partner-toggle-featured':
+        if (!isSuperAdmin($user)) {
+            $_SESSION['error'] = 'Acces interzis';
+            header('Location: ' . BASE_URL);
+            exit;
+        }
+        require_once __DIR__ . '/controllers/admin/PartnerAdminController.php';
+        $controller = new PartnerAdminController();
+        $controller->toggleFeatured();
+        break;
+    
+    // ========== CATEGORII PARTENERI - Admin ==========
+    case 'admin-partner-categories':
+        if (!isSuperAdmin($user)) {
+            $_SESSION['error'] = 'Acces interzis';
+            header('Location: ' . BASE_URL);
+            exit;
+        }
+        require_once __DIR__ . '/controllers/admin/PartnerAdminController.php';
+        $controller = new PartnerAdminController();
+        $controller->categories();
+        break;
+        
+    case 'admin-partner-category-create':
+        if (!isSuperAdmin($user)) {
+            $_SESSION['error'] = 'Acces interzis';
+            header('Location: ' . BASE_URL);
+            exit;
+        }
+        require_once __DIR__ . '/controllers/admin/PartnerAdminController.php';
+        $controller = new PartnerAdminController();
+        $controller->createCategory();
+        break;
+        
+    case 'admin-partner-category-store':
+        if (!isSuperAdmin($user)) {
+            $_SESSION['error'] = 'Acces interzis';
+            header('Location: ' . BASE_URL);
+            exit;
+        }
+        require_once __DIR__ . '/controllers/admin/PartnerAdminController.php';
+        $controller = new PartnerAdminController();
+        $controller->storeCategory();
+        break;
+        
+    case 'admin-partner-category-edit':
+        if (!isSuperAdmin($user)) {
+            $_SESSION['error'] = 'Acces interzis';
+            header('Location: ' . BASE_URL);
+            exit;
+        }
+        require_once __DIR__ . '/controllers/admin/PartnerAdminController.php';
+        $controller = new PartnerAdminController();
+        $controller->editCategory();
+        break;
+        
+    case 'admin-partner-category-update':
+        if (!isSuperAdmin($user)) {
+            $_SESSION['error'] = 'Acces interzis';
+            header('Location: ' . BASE_URL);
+            exit;
+        }
+        require_once __DIR__ . '/controllers/admin/PartnerAdminController.php';
+        $controller = new PartnerAdminController();
+        $controller->updateCategory();
+        break;
+        
+    case 'admin-partner-category-delete':
+        if (!isSuperAdmin($user)) {
+            $_SESSION['error'] = 'Acces interzis';
+            header('Location: ' . BASE_URL);
+            exit;
+        }
+        require_once __DIR__ . '/controllers/admin/PartnerAdminController.php';
+        $controller = new PartnerAdminController();
+        $controller->deleteCategory();
+        break;
         
     default:
         http_response_code(404);
