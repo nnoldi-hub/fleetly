@@ -19,18 +19,27 @@ date_default_timezone_set('Europe/Bucharest');
 // Headers JSON
 header('Content-Type: application/json; charset=utf-8');
 
-// CORS Headers
+// CORS Headers - Allow mobile apps and web
 $allowedOrigins = [
     'http://localhost',
     'http://localhost:3000',
     'http://127.0.0.1',
+    'https://fleetly.ro',
+    'http://fleetly.ro',
     'capacitor://localhost',
     'ionic://localhost'
 ];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-if (in_array($origin, $allowedOrigins) || empty($origin)) {
+
+// Mobile apps (Flutter, etc.) send no Origin header - allow them
+// Also allow listed origins
+if (empty($origin) || in_array($origin, $allowedOrigins)) {
+    // For mobile apps with no origin, use * to allow
     header('Access-Control-Allow-Origin: ' . ($origin ?: '*'));
+} else {
+    // Allow all for mobile app compatibility
+    header('Access-Control-Allow-Origin: *');
 }
 
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS, PATCH');

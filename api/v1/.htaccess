@@ -3,7 +3,14 @@
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /fleet-management/api/v1/
+    
+    # Detect environment - production uses /api/v1/, dev uses /fleet-management/api/v1/
+    # RewriteBase is set dynamically based on environment
+    # For production (fleetly.ro): /api/v1/
+    # For development (localhost): /fleet-management/api/v1/
+    
+    # Try without explicit RewriteBase for better compatibility
+    # RewriteBase /api/v1/
     
     # Allow CORS preflight
     RewriteCond %{REQUEST_METHOD} OPTIONS
