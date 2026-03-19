@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:fleetly_mobile/core/constants/app_constants.dart';
 import 'package:fleetly_mobile/core/theme/app_theme.dart';
 import 'package:fleetly_mobile/features/auth/presentation/providers/auth_provider.dart';
 
@@ -18,7 +20,7 @@ class DashboardScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {
-              // TODO: Navigate to notifications
+              context.push(AppConstants.notificationsRoute);
             },
           ),
           PopupMenuButton<String>(
@@ -37,8 +39,11 @@ class DashboardScreen extends ConsumerWidget {
             onSelected: (value) async {
               if (value == 'logout') {
                 await ref.read(authNotifierProvider.notifier).logout();
+              } else if (value == 'profile') {
+                context.push(AppConstants.settingsRoute);
+              } else if (value == 'settings') {
+                context.push(AppConstants.settingsRoute);
               }
-              // TODO: Handle profile and settings
             },
             itemBuilder: (context) => <PopupMenuEntry<String>>[
               const PopupMenuItem<String>(
@@ -100,18 +105,20 @@ class DashboardScreen extends ConsumerWidget {
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
                 childAspectRatio: 1.4,
-                children: const [
+                children: [
                   _StatCard(
                     icon: Icons.directions_car,
                     title: 'Vehicule',
                     value: '0',
                     color: AppTheme.primaryColor,
+                    onTap: () => context.push(AppConstants.vehiclesRoute),
                   ),
                   _StatCard(
                     icon: Icons.person,
                     title: 'Șoferi',
                     value: '0',
                     color: AppTheme.secondaryColor,
+                    onTap: () => context.push(AppConstants.driversRoute),
                   ),
                   _StatCard(
                     icon: Icons.description,
@@ -119,6 +126,7 @@ class DashboardScreen extends ConsumerWidget {
                     value: '0',
                     subtitle: '0 expiră curând',
                     color: AppTheme.warningColor,
+                    onTap: () => context.push(AppConstants.documentsRoute),
                   ),
                   _StatCard(
                     icon: Icons.build,
@@ -126,6 +134,7 @@ class DashboardScreen extends ConsumerWidget {
                     value: '0',
                     subtitle: 'programate',
                     color: AppTheme.infoColor,
+                    onTap: () => context.push(AppConstants.maintenanceRoute),
                   ),
                 ],
               ),
@@ -144,7 +153,7 @@ class DashboardScreen extends ConsumerWidget {
                       icon: Icons.add_circle_outline,
                       label: 'Adaugă vehicul',
                       onTap: () {
-                        // TODO: Navigate to add vehicle
+                        context.push('${AppConstants.vehiclesRoute}/add');
                       },
                     ),
                   ),
@@ -154,7 +163,7 @@ class DashboardScreen extends ConsumerWidget {
                       icon: Icons.local_gas_station,
                       label: 'Alimentare',
                       onTap: () {
-                        // TODO: Navigate to add fuel
+                        context.push('${AppConstants.fuelRoute}/add');
                       },
                     ),
                   ),
@@ -164,7 +173,7 @@ class DashboardScreen extends ConsumerWidget {
                       icon: Icons.build_circle_outlined,
                       label: 'Service',
                       onTap: () {
-                        // TODO: Navigate to add maintenance
+                        context.push('${AppConstants.maintenanceRoute}/new');
                       },
                     ),
                   ),
@@ -182,7 +191,7 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      // TODO: View all alerts
+                      context.push(AppConstants.notificationsRoute);
                     },
                     child: const Text('Vezi toate'),
                   ),
@@ -215,7 +224,23 @@ class DashboardScreen extends ConsumerWidget {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
         onTap: (index) {
-          // TODO: Navigate between tabs
+          switch (index) {
+            case 0:
+              // Already on dashboard
+              break;
+            case 1:
+              context.push(AppConstants.vehiclesRoute);
+              break;
+            case 2:
+              context.push(AppConstants.driversRoute);
+              break;
+            case 3:
+              showModalBottomSheet(
+                context: context,
+                builder: (context) => _MoreMenuSheet(),
+              );
+              break;
+          }
         },
         items: const [
           BottomNavigationBarItem(
@@ -250,6 +275,7 @@ class _StatCard extends StatelessWidget {
   final String value;
   final String? subtitle;
   final Color color;
+  final VoidCallback? onTap;
 
   const _StatCard({
     required this.icon,
@@ -257,51 +283,56 @@ class _StatCard extends StatelessWidget {
     required this.value,
     this.subtitle,
     required this.color,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(icon, color: color, size: 20),
                   ),
-                  child: Icon(icon, color: color, size: 20),
-                ),
-                Text(
-                  value,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-              ],
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                if (subtitle != null)
                   Text(
-                    subtitle!,
-                    style: Theme.of(context).textTheme.bodySmall,
+                    value,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
-              ],
-            ),
-          ],
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  if (subtitle != null)
+                    Text(
+                      subtitle!,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -338,6 +369,70 @@ class _QuickActionButton extends StatelessWidget {
               label,
               style: Theme.of(context).textTheme.bodySmall,
               textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MoreMenuSheet extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.description_outlined),
+              title: const Text('Documente'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push(AppConstants.documentsRoute);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.build_outlined),
+              title: const Text('Mentenanță'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push(AppConstants.maintenanceRoute);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.local_gas_station_outlined),
+              title: const Text('Combustibil'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push(AppConstants.fuelRoute);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.security_outlined),
+              title: const Text('Asigurări'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push(AppConstants.insuranceRoute);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.bar_chart_outlined),
+              title: const Text('Rapoarte'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push(AppConstants.reportsRoute);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings_outlined),
+              title: const Text('Setări'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push(AppConstants.settingsRoute);
+              },
             ),
           ],
         ),
