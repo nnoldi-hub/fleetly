@@ -84,7 +84,25 @@ foreach ($apiCoreFiles as $file) {
 if (file_exists($dbConfig)) {
     try {
         require_once $dbConfig;
-        if (defined('DB_HOST') && defined('DB_NAME') && defined('DB_USER')) {
+        // Check for DatabaseConfig class (new format)
+        if (class_exists('DatabaseConfig')) {
+            $host = DatabaseConfig::getHost();
+            $dbName = DatabaseConfig::getDbName();
+            $user = DatabaseConfig::getUsername();
+            $pass = DatabaseConfig::getPassword();
+            
+            $dsn = 'mysql:host=' . $host . ';dbname=' . $dbName . ';charset=utf8mb4';
+            $pdo = new PDO($dsn, $user, $pass, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            ]);
+            $tests['db_connection'] = [
+                'test' => 'Database connection',
+                'value' => 'Connected to ' . $dbName . ' @ ' . $host,
+                'passed' => true
+            ];
+        } 
+        // Fallback to old constants format
+        elseif (defined('DB_HOST') && defined('DB_NAME') && defined('DB_USER')) {
             $dsn = 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4';
             $pdo = new PDO($dsn, DB_USER, DB_PASS ?? '');
             $tests['db_connection'] = [
@@ -95,7 +113,7 @@ if (file_exists($dbConfig)) {
         } else {
             $tests['db_connection'] = [
                 'test' => 'Database connection',
-                'value' => 'DB constants not defined',
+                'value' => 'No DatabaseConfig class or DB constants found',
                 'passed' => false
             ];
         }
